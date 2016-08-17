@@ -1,4 +1,4 @@
-# svn $Id$
+# svn $Id: makefile 807 2016-07-09 02:03:55Z arango $
 #::::::::::::::::::::::::::::::::::::::::::::::::::::: Hernan G. Arango :::
 # Copyright (c) 2002-2016 The ROMS/TOMS Group             Kate Hedstrom :::
 #   Licensed under a MIT/X style license                                :::
@@ -37,7 +37,7 @@ endif
 #  Initialize some things.
 #--------------------------------------------------------------------------
 
-  sources    :=
+  sources    := 
 
 #==========================================================================
 #  Start of user-defined options. In some macro definitions below: "on" or
@@ -59,12 +59,12 @@ endif
 #  the .h extension. For example, the upwelling application includes the
 #  "upwelling.h" header file.
 
-ROMS_APPLICATION ?= UPWELLING
+ROMS_APPLICATION ?= CKELVIN
 
 #  If application header files is not located in "ROMS/Include",
 #  provide an alternate directory FULL PATH.
 
-MY_HEADER_DIR ?=
+MY_HEADER_DIR ?= /home/z3500785/Research/Simulations/Kelvin/coastal_setup/Antarctic_Realistic
 
 #  If your application requires analytical expressions and they are
 #  not located in "ROMS/Functionals", provide an alternate directory.
@@ -74,7 +74,7 @@ MY_HEADER_DIR ?=
 #  If applicable, also used this directory to place your customized
 #  biology model header file (like fennel.h, nemuro.h, ecosim.h, etc).
 
-MY_ANALYTICAL_DIR ?=
+MY_ANALYTICAL_DIR ?= /home/z3500785/Research/Simulations/Kelvin/coastal_setup/Antarctic_Realistic
 
 #  Sometimes it is desirable to activate one or more CPP options to
 #  run different variants of the same application without modifying
@@ -94,7 +94,7 @@ MY_CPP_FLAGS ?=
 #  If parallel applications, use at most one of these definitions
 #  (leave both definitions blank in serial applications):
 
-     USE_MPI ?=
+     USE_MPI ?= 
   USE_OpenMP ?=
 
 #  If distributed-memory, turn on compilation via the script "mpif90".
@@ -105,7 +105,7 @@ MY_CPP_FLAGS ?=
 #  In this, case the user need to select the desired compiler below and
 #  turn on both USE_MPI and USE_MPIF90 macros.
 
-  USE_MPIF90 ?=
+  USE_MPIF90 ?= 
 
 #  If applicable, activate 64-bit compilation:
 
@@ -114,7 +114,7 @@ MY_CPP_FLAGS ?=
 #  If applicable, link with NetCDF-4 library. Notice that the NetCDF-4
 #  library needs both the HDF5 and MPI libraries.
 
- USE_NETCDF4 ?=
+ USE_NETCDF4 ?= on
 
 #--------------------------------------------------------------------------
 #  We are going to include a file with all the settings that depend on
@@ -139,13 +139,13 @@ MY_CPP_FLAGS ?=
 #  NetCDF and so on.
 #--------------------------------------------------------------------------
 
-        FORT ?= pgi
+        FORT ?= gfortran
 
 #--------------------------------------------------------------------------
 #  Set directory for executable.
 #--------------------------------------------------------------------------
 
-      BINDIR ?= .
+      BINDIR ?= /home/z3500785/Research/Simulations/Kelvin/coastal_setup/Antarctic_Realistic
 
 #==========================================================================
 #  End of user-defined options. See also the machine-dependent include

@@ -1,0 +1,57 @@
+	NEW ROMS RYAN's CHANGES LOG FILE
+
+This file log's changes that I make to the most recent ROMS
+version. 
+
+To keep updated on the latest ROMS version, in the base
+directory use the command: 
+	  svn update
+To revert to the unchanged version of a file, use the command:
+   	  svn revert -filename-
+The original command to checkout the version was:
+ svn checkout --username Ryan_Holmes https://www.myroms.org/svn/src/trunk ROMS/
+ 
+File began: 23/4/14 by Ryan Holmes
+
+----------------------------------------------------------------------
+
+23/4/14 - Setup to compile on cluster;
+	1 makefile_original saved (revision 734)
+	2 makefile altered for cees-cluster run on PEQ_BMIX, saved as
+	  makefile_cees-cluster
+	3 Linux-gfortran - the lines containing: 
+	
+		ifeq "${FC_TEST}" ""
+		$(SCRATCH_DIR)/ran_state.o: FFLAGS += -fno-strict-overflow
+		endif
+	  had been commented out in the OLD_ROMS version, may need to
+		do it again? -> Yes I did!!
+	4 Analytical files should be in the INC directory of the
+		simulation run.
+        5 Changed mod_scalars.F at line 1335 to use the higher K0
+		parameters in KPP. This is surround by a cpp option to
+		ONLY ACTIVATE IF PEQMIX IS ACTIVATED!
+
+16/5/16 - This working copy seems to be too old to work with
+          svn. Therefore I have downloaded the most recent version of
+          ROMS retaining the make files and the Linux-gfortran file
+          from above. I have not changed the mod_scalars.F
+          file. Only needed to change nc-config to nf-config in
+          Linux-gfortran.mk (nc-config masked by anaconda version on
+          Path).
+        - Upwelling test case successfully run with mpi, results in
+          Testing/
+
+17/8/16 - Redownloaded ROMS trunk as a git repository using the
+          command
+          git svn clone --prefix=origin/ --username Ryan_Holmes https://www.myroms.org/svn/src/trunk ./
+        - Now should be able to make changes and track them using git
+          (no longer an svn repository). Should be able to include
+          remote updates using git svn rebase, git svn fetch
+          etc. However, these are currently seg faulting leaving an
+          error signal 11.
+        - Changes from above included here (Linux-gfortran.mk and
+          makefile), plus OLD_ROMS (contains NUMDIF) and
+          OLD_ROMS_14_8_13 saved in separate folders.
+          
+          
