@@ -385,7 +385,7 @@
 ! 
 !  Alter wind stress to include ENSO EOF 
 !
-          Uwind(i,j) = Uwind(i,j) + 5.0_r8*UwindP(i,j)
+          Uwind(i,j) = Uwind(i,j) + N34rc(ng)*UwindP(i,j)
 # endif
 !
 !  Input bulk parameterization fields.

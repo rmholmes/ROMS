@@ -739,6 +739,10 @@
                 END DO
 # endif
               END DO
+# ifdef PERTURB_WIND
+            CASE ('N34rc')
+              Npts=load_r(Nval, Rval, Ngrids, N34rc)
+# endif
             CASE ('AKV_BAK')
               Npts=load_r(Nval, Rval, Ngrids, Akv_bak)
             CASE ('ad_AKV_fac')
@@ -3635,6 +3639,12 @@
      &            'Background vertical mixing coefficient (m2/s)',      &
      &            'for tracer ', itrc, TRIM(Vname(1,idTvar(itrc)))
           END DO
+# ifdef PERTURB_WIND
+          WRITE (out,210) N34rc(ng), 'N34rc',                           &
+     &          'Nino 3.4 regression coefficient (1/degC).'
+          WRITE (out,210) N34mn(ng), 'N34mn',                           &
+     &          'Climatological Nino 3.4 (degC).'
+# endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
      &          'Background vertical mixing coefficient (m2/s)',        &
      &          'for momentum.'

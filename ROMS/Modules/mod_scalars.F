@@ -337,6 +337,18 @@
 #endif
         real(r8) :: gorho0                      ! m4/s2/kg
         real(r8) :: vonKar = 0.41_r8            ! non-dimensional
+#ifdef PERTURB_WIND
+!
+!-----------------------------------------------------------------------
+!  Constants associated with ENSO statistical coupling
+!-----------------------------------------------------------------------
+!
+!    N34rc         Nino 3.4 regression coefficient
+!    N34mn         Climatalogical Nino 3.4
+!     
+        real(r8), allocatable :: N34rc(:)       ! degC^(-1)
+        real(r8), allocatable :: N34mn(:)       ! degC
+#endif
 !
 !-----------------------------------------------------------------------
 !  Various model parameters.  Some of these parameters are overwritten
@@ -1781,6 +1793,10 @@
       allocate ( tl_VolCons(4,Ngrids) )
 #endif
 
+#ifdef PERTURB_WIND
+      allocate ( N34rc(Ngrids) )
+      allocate ( N34mn(Ngrids) )
+#endif
       allocate ( Lsponge(Ngrids) )
       allocate ( LuvSponge(Ngrids) )
       allocate ( LtracerSponge(MT,Ngrids) )

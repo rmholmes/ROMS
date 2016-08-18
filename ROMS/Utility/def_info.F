@@ -1434,6 +1434,23 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 #endif
+#ifdef PERTURB_WIND
+      Vinfo( 1)='N34rc'
+      Vinfo( 2)='Nino 3.4 regression coefficient'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='N34mn'
+      Vinfo( 2)='Climatological Nino 3.4'
+      Vinfo( 3)='degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
 #ifdef SOLVE3D
 !
 !  Background vertical mixing coefficients.
