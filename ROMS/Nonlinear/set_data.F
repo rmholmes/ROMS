@@ -96,9 +96,6 @@
       integer :: i, ic, itrc, j, k, my_tile
 
       real(r8) :: cff, cff1, cff2
-# ifdef PERTURB_WIND
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: UwindP
-# endif
 # include "set_bounds.h"
 !
 !  Lower and upper bounds for nontiled (global values) boundary arrays.
@@ -262,31 +259,12 @@
       IF (exit_flag.ne.NoError) RETURN
 
 #    ifdef PERTURB_WIND
-!
-!  Add an ENSO EOF perturbation to the surface winds that depends on
-!  the Nino 3.4 Anomaly from the model
-!
       CALL set_2dfld_tile (ng, tile, iNLM, idUaiP,                      &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     FORCES(ng)%UwindPG,                          &
-     &                     UwindP,                                      &
+     &                     FORCES(ng)%UwindP,                           &
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
-
-      DO j=JstrR,JendR
-        DO i=IstrR,IendR
-          FORCES(ng)%Uwind(i,j)=FORCES(ng)%Uwind(i,j)+                  &
-     &                      5.0_r8*UwindP(i,j)
-        END DO
-      END DO
-
-#     ifdef DISTRIBUTE
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%UWind)
-#     endif
 #    endif
 #    ifdef CURVGRID
 !

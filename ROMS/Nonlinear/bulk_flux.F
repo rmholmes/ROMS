@@ -104,6 +104,9 @@
      &                     FORCES(ng) % Tair,                           &
      &                     FORCES(ng) % Uwind,                          &
      &                     FORCES(ng) % Vwind,                          &
+# ifdef PERTURB_WIND
+     &                     FORCES(ng) % UwindP,                         &
+# endif
 # ifdef CLOUDS
      &                     FORCES(ng) % cloud,                          &
 # endif
@@ -149,6 +152,9 @@
 # endif
      &                           alpha, beta, rho, t,                   &
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
+# ifdef PERTURB_WIND
+     &                           UwindP,                                &
+# endif
 # ifdef CLOUDS
      &                           cloud,                                 &
 # endif
@@ -203,7 +209,10 @@
       real(r8), intent(in) :: Hair(LBi:,LBj:)
       real(r8), intent(in) :: Pair(LBi:,LBj:)
       real(r8), intent(in) :: Tair(LBi:,LBj:)
-      real(r8), intent(in) :: Uwind(LBi:,LBj:)
+      real(r8), intent(inout) :: Uwind(LBi:,LBj:)
+#  ifdef PERTURB_WIND
+      real(r8), intent(in) :: UwindP(LBi:,LBj:)
+#  endif
       real(r8), intent(in) :: Vwind(LBi:,LBj:)
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:,LBj:)
@@ -250,7 +259,10 @@
       real(r8), intent(in) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Pair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Tair(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: Uwind(LBi:UBi,LBj:UBj)
+      real(r8), intent(inout) :: Uwind(LBi:UBi,LBj:UBj)
+#  ifdef PERTURB_WIND
+      real(r8), intent(in) :: UwindP(LBi:UBi,LBj:UBj)
+#  endif
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:UBi,LBj:UBj)
@@ -369,6 +381,12 @@
       twopi_inv=0.5_r8/pi
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
+# ifdef PERTURB_WIND
+! 
+!  Alter wind stress to include ENSO EOF 
+!
+          Uwind(i,j) = Uwind(i,j) + 5.0_r8*UwindP(i,j)
+# endif
 !
 !  Input bulk parameterization fields.
 !
