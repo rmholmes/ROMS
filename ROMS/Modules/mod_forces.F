@@ -281,9 +281,6 @@
 
 # if defined BULK_FLUXES || defined ECOSIM
           real(r8), pointer :: Uwind(:,:)
-#  ifdef PERTURB_WIND
-          real(r8), pointer :: UwindP(:,:)
-#  endif
           real(r8), pointer :: Vwind(:,:)
 #  ifndef ANA_WINDS
           real(r8), pointer :: UwindG(:,:,:)
@@ -600,9 +597,6 @@
 
 # if defined BULK_FLUXES || defined ECOSIM
       allocate ( FORCES(ng) % Uwind(LBi:UBi,LBj:UBj) )
-#  ifdef PERTURB_WIND
-      allocate ( FORCES(ng) % UwindP(LBi:UBi,LBj:UBj) )
-#  endif
       allocate ( FORCES(ng) % Vwind(LBi:UBi,LBj:UBj) )
 
 #  ifndef ANA_WINDS
@@ -959,9 +953,6 @@
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
             FORCES(ng) % Uwind(i,j) = IniVal
-#  ifdef PERTURB_WIND
-            FORCES(ng) % UwindP(i,j) = IniVal
-#  endif
             FORCES(ng) % Vwind(i,j) = IniVal
 # endif
 # ifdef BULK_FLUXES
