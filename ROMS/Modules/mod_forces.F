@@ -96,6 +96,10 @@
 !                 horizontal RHO-points.                               !
 !  UwindG       Latest two-time snapshots of input "Uwind" grided      !
 !                 data used for interpolation.                         !
+!  UwindP       Surface wind perturbation in the XI-direction (m/s)    !
+!               at horizontal RHO-points.                              !
+!  UwindPG      Latest two-time snapshots of input "UwindP" grided     !
+!                 data used for interpolation.                         !
 !  Vwind        Surface wind in the ETA-direction (m/s) at             !
 !                 horizontal RHO-points.                               !
 !  VwindG       Latest two-time snapshots of input "Vwind" grided      !
@@ -277,9 +281,15 @@
 
 # if defined BULK_FLUXES || defined ECOSIM
           real(r8), pointer :: Uwind(:,:)
+#  ifdef PERTURB_WIND
+          real(r8), pointer :: UwindP(:,:)
+#  endif
           real(r8), pointer :: Vwind(:,:)
 #  ifndef ANA_WINDS
           real(r8), pointer :: UwindG(:,:,:)
+#   ifdef PERTURB_WIND
+          real(r8), pointer :: UwindPG(:,:,:)
+#   endif
           real(r8), pointer :: VwindG(:,:,:)
 #  endif
 # endif
@@ -590,10 +600,16 @@
 
 # if defined BULK_FLUXES || defined ECOSIM
       allocate ( FORCES(ng) % Uwind(LBi:UBi,LBj:UBj) )
+#  ifdef PERTURB_WIND
+      allocate ( FORCES(ng) % UwindP(LBi:UBi,LBj:UBj) )
+#  endif
       allocate ( FORCES(ng) % Vwind(LBi:UBi,LBj:UBj) )
 
 #  ifndef ANA_WINDS
       allocate ( FORCES(ng) % UwindG(LBi:UBi,LBj:UBj,2) )
+#   ifdef PERTURB_WIND
+      allocate ( FORCES(ng) % UwindPG(LBi:UBi,LBj:UBj,2) )
+#   endif
       allocate ( FORCES(ng) % VwindG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
@@ -943,6 +959,9 @@
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
             FORCES(ng) % Uwind(i,j) = IniVal
+#  ifdef PERTURB_WIND
+            FORCES(ng) % UwindP(i,j) = IniVal
+#  endif
             FORCES(ng) % Vwind(i,j) = IniVal
 # endif
 # ifdef BULK_FLUXES
@@ -970,6 +989,10 @@
 #  ifndef ANA_WINDS
             FORCES(ng) % UwindG(i,j,1) = IniVal
             FORCES(ng) % UwindG(i,j,2) = IniVal
+#   ifdef PERTURB_WIND
+            FORCES(ng) % UwindPG(i,j,1) = IniVal
+            FORCES(ng) % UwindPG(i,j,2) = IniVal
+#   endif
             FORCES(ng) % VwindG(i,j,1) = IniVal
             FORCES(ng) % VwindG(i,j,2) = IniVal
 #  endif

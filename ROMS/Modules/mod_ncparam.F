@@ -274,6 +274,7 @@
         integer  :: idU3Sd        ! 3D U-Stokes drift velocity
         integer  :: idUads        ! 3D U-velocity adjoint sensitivity
         integer  :: idUair        ! surface U-wind
+        integer  :: idUaiP        ! surface U-wind perturbation
         integer  :: idUbar        ! 2D U-velocity
         integer  :: idUbas        ! 2D U-velocity adjoint sensitivity
         integer  :: idUbcl        ! 2D U-velocity climatology
@@ -1124,6 +1125,8 @@
               idevap=varid
             CASE ('idUair')
               idUair=varid
+            CASE ('idUaiP')
+              idUaiP=varid
             CASE ('idVair')
               idVair=varid
             CASE ('idWamp')

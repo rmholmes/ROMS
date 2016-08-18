@@ -127,6 +127,17 @@
      &                FORCES(ng) % UwindG)
       IF (exit_flag.ne.NoError) RETURN
 
+# ifdef PERTURB_WIND
+      CALL get_2dfld (ng, iNLM, idUaiP, ncFRCid(idUaiP,ng),             &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+# ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+# endif
+     &                FORCES(ng) % UwindPG)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+
       CALL get_2dfld (ng , iNLM, idVair, ncFRCid(idVair,ng),            &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
      &                LBi, UBi, LBj, UBj, 2, 1,                         &

@@ -259,6 +259,21 @@
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 
+#    ifdef PERTURB_WIND
+      CALL set_2dfld_tile (ng, tile, iNLM, idUaiP,                      &
+     &                     LBi, UBi, LBj, UBj,                          &
+     &                     FORCES(ng)%UwindPG,                          &
+     &                     FORCES(ng)%UwindP,                           &
+     &                     update)
+      IF (exit_flag.ne.NoError) RETURN
+
+      DO j=JstrR,JendR
+        DO i=IstrR,IendR
+          FORCES(ng)%Uwind(i,j)=FORCES(ng)%Uwind(i,j)+                  &
+     &                      5.0_r8*FORCES(ng)%UwindP(i,j)
+        END DO
+      END DO
+#    endif
 #    ifdef CURVGRID
 !
 !  If input point surface winds or interpolated from coarse data, rotate

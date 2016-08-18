@@ -64,7 +64,7 @@ ROMS_APPLICATION ?= SAPEQ
 #  If application header files is not located in "ROMS/Include",
 #  provide an alternate directory FULL PATH.
 
-MY_HEADER_DIR ?= /short/e14/rmh561/SAPEQ/INC
+MY_HEADER_DIR ?= /home/z3500785/Research/Simulations/SAPEQ/INC
 
 #  If your application requires analytical expressions and they are
 #  not located in "ROMS/Functionals", provide an alternate directory.
@@ -74,7 +74,7 @@ MY_HEADER_DIR ?= /short/e14/rmh561/SAPEQ/INC
 #  If applicable, also used this directory to place your customized
 #  biology model header file (like fennel.h, nemuro.h, ecosim.h, etc).
 
-MY_ANALYTICAL_DIR ?= /short/e14/rmh561/SAPEQ/INC
+MY_ANALYTICAL_DIR ?= /home/z3500785/Research/Simulations/SAPEQ/INC
 
 #  Sometimes it is desirable to activate one or more CPP options to
 #  run different variants of the same application without modifying
@@ -145,7 +145,7 @@ MY_CPP_FLAGS ?=
 #  Set directory for executable.
 #--------------------------------------------------------------------------
 
-      BINDIR ?= /short/e14/rmh561/SAPEQ
+      BINDIR ?= /home/z3500785/Research/Simulations/SAPEQ
 
 #==========================================================================
 #  End of user-defined options. See also the machine-dependent include
