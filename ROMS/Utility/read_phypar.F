@@ -739,9 +739,13 @@
                 END DO
 # endif
               END DO
-# ifdef PERTURB_WIND
-            CASE ('N34rc')
-              Npts=load_r(Nval, Rval, Ngrids, N34rc)
+# ifdef STATS_ENSO
+            CASE ('stenRuwnd')
+              Npts=load_r(Nval, Rval, Ngrids, stenRuwnd)
+            CASE ('stenMean')
+              Npts=load_r(Nval, Rval, Ngrids, stenMean)
+            CASE ('stenNdays')
+              Npts=load_i(Nval, Rval, Ngrids, stenNdays)
 # endif
             CASE ('AKV_BAK')
               Npts=load_r(Nval, Rval, Ngrids, Akv_bak)
@@ -3639,11 +3643,14 @@
      &            'Background vertical mixing coefficient (m2/s)',      &
      &            'for tracer ', itrc, TRIM(Vname(1,idTvar(itrc)))
           END DO
-# ifdef PERTURB_WIND
-          WRITE (out,210) N34rc(ng), 'N34rc',                           &
-     &          'Nino 3.4 regression coefficient (1/degC).'
-          WRITE (out,210) N34mn(ng), 'N34mn',                           &
-     &          'Climatological Nino 3.4 (degC).'
+# ifdef STATS_ENSO
+          WRITE (out,210) stenRuwnd(ng), 'stenRuwnd',                   &
+     &          'Regression coefficient of Uwind EOF onto',             &
+     &          'SST index (1/degC).'
+          WRITE (out,210) stenMean(ng), 'stenMean',                     &
+     &          'Climatological value of SST index (degC).'
+          WRITE (out,120) stenNdays, 'stenNdays',                       &
+     &          'Number of days to average SST index over.'
 # endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
      &          'Background vertical mixing coefficient (m2/s)',        &

@@ -258,7 +258,7 @@
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 
-#    ifdef PERTURB_WIND
+#    ifdef STATS_ENSO
       CALL set_2dfld_tile (ng, tile, iNLM, idUaiP,                      &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     FORCES(ng)%UwindPG,                          &

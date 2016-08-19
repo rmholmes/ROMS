@@ -163,7 +163,8 @@
 ** LONGWAVE            use if computing net longwave radiation               **
 ** LONGWAVE_OUT        use if computing outgoing longwave radiation          **
 ** EMINUSP             use if computing E-P                                  **
-** PERTURB_WIND        use if perturbing wind speed with an ENSO EOF         **
+** STATS_ENSO          use if altering surface forcing using a               **
+**                     statistical ENSO model                                **
 **                                                                           **
 ** OPTIONS for wave roughness formulation in bulk fluxes:                    **
 **                                                                           **

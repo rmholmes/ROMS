@@ -1434,19 +1434,27 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 #endif
-#ifdef PERTURB_WIND
-      Vinfo( 1)='N34rc'
-      Vinfo( 2)='Nino 3.4 regression coefficient'
+#ifdef STATS_ENSO
+      Vinfo( 1)='stenRuwnd'
+      Vinfo( 2)='Regression coefficient of Uwind EOF onto SST index'
       Vinfo( 3)='1/degC'
       status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
-      Vinfo( 1)='N34mn'
-      Vinfo( 2)='Climatological Nino 3.4'
+      Vinfo( 1)='stenMean'
+      Vinfo( 2)='Climatological value of SST index'
       Vinfo( 3)='degC'
       status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenNdays'
+      Vinfo( 2)='Number of days to average SST index over'
+      Vinfo( 3)=''
+      status=def_var(ng, model, ncid, varid, nf90_int,                  &
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN

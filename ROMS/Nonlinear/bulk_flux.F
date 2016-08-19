@@ -104,7 +104,7 @@
      &                     FORCES(ng) % Tair,                           &
      &                     FORCES(ng) % Uwind,                          &
      &                     FORCES(ng) % Vwind,                          &
-# ifdef PERTURB_WIND
+# ifdef STATS_ENSO
      &                     FORCES(ng) % UwindP,                         &
 # endif
 # ifdef CLOUDS
@@ -152,7 +152,7 @@
 # endif
      &                           alpha, beta, rho, t,                   &
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
-# ifdef PERTURB_WIND
+# ifdef STATS_ENSO
      &                           UwindP,                                &
 # endif
 # ifdef CLOUDS
@@ -210,7 +210,7 @@
       real(r8), intent(in) :: Pair(LBi:,LBj:)
       real(r8), intent(in) :: Tair(LBi:,LBj:)
       real(r8), intent(inout) :: Uwind(LBi:,LBj:)
-#  ifdef PERTURB_WIND
+#  ifdef STATS_ENSO
       real(r8), intent(in) :: UwindP(LBi:,LBj:)
 #  endif
       real(r8), intent(in) :: Vwind(LBi:,LBj:)
@@ -260,7 +260,7 @@
       real(r8), intent(in) :: Pair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Tair(LBi:UBi,LBj:UBj)
       real(r8), intent(inout) :: Uwind(LBi:UBi,LBj:UBj)
-#  ifdef PERTURB_WIND
+#  ifdef STATS_ENSO
       real(r8), intent(in) :: UwindP(LBi:UBi,LBj:UBj)
 #  endif
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
@@ -307,6 +307,9 @@
 
       real(r8) :: cff, cff1, cff2, diffh, diffw, oL, upvel
       real(r8) :: twopi_inv, wet_bulb
+# ifdef STATS_ENSO
+      real(r8) :: stenIanom
+# endif
 # ifdef LONGWAVE
       real(r8) :: e_sat, vap_p
 # endif
@@ -379,13 +382,21 @@
 !
       Hscale=rho0*Cp
       twopi_inv=0.5_r8/pi
+# ifdef STATS_ENSO
+      stenIanom=0.0_r8
+      DO i=1,stenNdays
+        stenIanom=stenIanom + stenIndex(i,ng)
+      END DO
+      stenIanom=stenIanom/stenNdays
+# endif
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
-# ifdef PERTURB_WIND
+# ifdef STATS_ENSO
 ! 
-!  Alter wind stress to include ENSO EOF 
+!  Alter wind stress for statistical ENSO model  
 !
-          Uwind(i,j) = Uwind(i,j) + N34rc(ng)*UwindP(i,j)
+          Uwind(i,j) = Uwind(i,j) + UwindP(i,j)*                        &
+     &      stenIanom/stenRuwnd(ng)
 # endif
 !
 !  Input bulk parameterization fields.

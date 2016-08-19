@@ -337,17 +337,21 @@
 #endif
         real(r8) :: gorho0                      ! m4/s2/kg
         real(r8) :: vonKar = 0.41_r8            ! non-dimensional
-#ifdef PERTURB_WIND
+#ifdef STATS_ENSO
 !
 !-----------------------------------------------------------------------
-!  Constants associated with ENSO statistical coupling
+!  Constants associated with statistical ENSO forcing
 !-----------------------------------------------------------------------
 !
-!    N34rc         Nino 3.4 regression coefficient
-!    N34mn         Climatalogical Nino 3.4
+!    stenRuwnd      Regression coefficient of Uwind EOF onto SST index
+!    stenMean       Climatological value of SST index
+!    stenCount      Counter for current day of stenNdays
+!    stenIndex      the SST index over the last stenNdays
 !     
-        real(r8), allocatable :: N34rc(:)       ! degC^(-1)
-        real(r8), allocatable :: N34mn(:)       ! degC
+        real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
+        real(r8), allocatable :: stenMean(:)       ! degC
+        integer, allocatable  :: stenCount(:)
+        real(r8), allocatable :: stenIndex(:,:)
 #endif
 !
 !-----------------------------------------------------------------------
@@ -1793,9 +1797,11 @@
       allocate ( tl_VolCons(4,Ngrids) )
 #endif
 
-#ifdef PERTURB_WIND
-      allocate ( N34rc(Ngrids) )
-      allocate ( N34mn(Ngrids) )
+#ifdef STATS_ENSO
+      allocate ( stenRuwnd(Ngrids) )
+      allocate ( stenMean(Ngrids) )
+      allocate ( stenCount(Ngrids) )
+      allocate ( stenIndex(stenNdays,Ngrids) )
 #endif
       allocate ( Lsponge(Ngrids) )
       allocate ( LuvSponge(Ngrids) )
@@ -2357,6 +2363,12 @@
           tl_tnu4(itrc,ng)=IniVal
           tnu4(itrc,ng)=IniVal
         END DO
+#ifdef STATS_ENSO
+        stenCount(ng)=0
+        DO i=1,stenNdays
+          stenIndex(i,ng) = 0.0_r8
+        END DO
+#endif
         ad_Akv_fac(ng)=1.0_r8
         tl_Akv_fac(ng)=1.0_r8
         ad_visc2(ng)=IniVal

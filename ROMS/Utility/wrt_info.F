@@ -443,16 +443,21 @@
       IF (exit_flag.ne.NoError) RETURN
 #endif
 
-#ifdef PERTURB_WIND
-      CALL netcdf_put_fvar (ng, model, ncname, 'N34rc',                 &
-     &                      N34rc(ng), (/0/), (/0/),                    &
+#ifdef STATS_ENSO
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRuwnd',             &
+     &                      stenRuwnd(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
-      CALL netcdf_put_fvar (ng, model, ncname, 'N34mn',                 &
-     &                      N34mn(ng), (/0/), (/0/),                    &
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenMean',              &
+     &                      stenMean(ng), (/0/), (/0/),                 &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
+
+!      CALL netcdf_put_fvar (ng, model, ncname, 'stenNdays',             &
+!     &                      stenNdays, (/0/), (/0/),                    &
+!     &                      ncid = ncid)
+!      IF (exit_flag.ne.NoError) RETURN
 #endif
 
 #ifdef SOLVE3D
