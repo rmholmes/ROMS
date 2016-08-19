@@ -1435,14 +1435,6 @@
       IF (exit_flag.ne.NoError) RETURN
 #endif
 #ifdef STATS_ENSO
-      Vinfo( 1)='stenRuwnd'
-      Vinfo( 2)='Regression coefficient of Uwind EOF onto SST index'
-      Vinfo( 3)='1/degC'
-      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
-     &               1, (/0/), Aval, Vinfo, ncname,                     &
-     &               SetParAccess = .FALSE.)
-      IF (exit_flag.ne.NoError) RETURN
-
       Vinfo( 1)='stenMean'
       Vinfo( 2)='Climatological value of SST index'
       Vinfo( 3)='degC'
@@ -1478,6 +1470,62 @@
       Vinfo( 1)='stenRegnW'
       Vinfo( 2)='SST index region western boundary'
       Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRuwnd'
+      Vinfo( 2)='Coupling coefficient of Uwind pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRvwnd'
+      Vinfo( 2)='Coupling coefficient of Vwind pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRqair'
+      Vinfo( 2)='Coupling coefficient of Qair pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRtair'
+      Vinfo( 2)='Coupling coefficient of Tair pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRpair'
+      Vinfo( 2)='Coupling coefficient of Pair pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRsrad'
+      Vinfo( 2)='Coupling coefficient of swrad pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRlrad'
+      Vinfo( 2)='Coupling coefficient of lwrad_down pattern onto SST in'
+      Vinfo( 3)='1/degC'
       status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)

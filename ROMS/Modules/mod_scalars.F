@@ -343,21 +343,34 @@
 !  Constants associated with statistical ENSO forcing
 !-----------------------------------------------------------------------
 !
-!    stenRuwnd      Regression coefficient of Uwind EOF onto SST index
 !    stenMean       Climatological value of SST index
 !    stenRegnN      SST index region northern boundary
 !    stenRegnE      SST index region eastern boundary
 !    stenRegnS      SST index region southern boundary
 !    stenRegnW      SST index region western boundary
+!    stenRuwnd      Coupling coefficient of Uwind pattern onto SST index
+!    stenRvwnd      Coupling coefficient of Uwind pattern onto SST index
+!    stenRqair      Coupling coefficient of Qair pattern onto SST index
+!    stenRtair      Coupling coefficient of Tair pattern onto SST index
+!    stenRpair      Coupling coefficient of Pair pattern onto SST index
+!    stenRsrad      Coupling coefficient of swrad pattern onto SST index
+!    stenRlrad      Coupling coefficient of lwrad_down pattern onto SST index
+!
 !    stenCount      Counter for current day of stenNdays
 !    stenIndex      the SST index over the last stenNdays
 !     
-        real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
         real(r8), allocatable :: stenMean(:)       ! degC
         real(r8), allocatable :: stenRegnN(:)       ! degrees
         real(r8), allocatable :: stenRegnE(:)       ! degrees
         real(r8), allocatable :: stenRegnS(:)       ! degrees
         real(r8), allocatable :: stenRegnW(:)       ! degrees
+        real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRvwnd(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRqair(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRtair(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRpair(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRsrad(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRlrad(:)      ! degC^(-1)
         integer, allocatable  :: stenCount(:)
         real(r8), allocatable :: stenIndex(:,:)
 #endif
@@ -1806,12 +1819,18 @@
 #endif
 
 #ifdef STATS_ENSO
-      allocate ( stenRuwnd(Ngrids) )
       allocate ( stenMean(Ngrids) )
       allocate ( stenRegnN(Ngrids) )
       allocate ( stenRegnE(Ngrids) )
       allocate ( stenRegnS(Ngrids) )
       allocate ( stenRegnW(Ngrids) )
+      allocate ( stenRuwnd(Ngrids) )
+      allocate ( stenRvwnd(Ngrids) )
+      allocate ( stenRqair(Ngrids) )
+      allocate ( stenRtair(Ngrids) )
+      allocate ( stenRpair(Ngrids) )
+      allocate ( stenRsrad(Ngrids) )
+      allocate ( stenRlrad(Ngrids) )
       allocate ( stenCount(Ngrids) )
       allocate ( stenIndex(stenNdays,Ngrids) )
 #endif

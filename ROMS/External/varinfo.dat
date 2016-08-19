@@ -1467,15 +1467,6 @@
   'r2dvar'
   1.0d0
 
-'UwindP'                                            ! Input
-  'surface u-wind perturbation component'
-  'meter second-1'                                 ! [m/s]
-  'u-windP, scalar, series'
-  'prt_time'
-  'idUaiP'
-  'r2dvar'
-  1.0d0
-
 'Vwind'                                            ! Input
   'surface v-wind component'
   'meter second-1'                                 ! [m/s]
@@ -1699,6 +1690,75 @@
   'ocean_time'
   'idV3Sd'
   'v3dvar'
+  1.0d0
+
+!
+!------------------------------------------------------------------------------
+!  Atmospheric forcing anomalies for statistical ENSO model
+!------------------------------------------------------------------------------
+!
+
+'UwindP'                                            ! Input
+  'surface u-wind anomaly'
+  'meter second-1'                                 ! [m/s]
+  'u-wind anomaly, scalar, series'
+  'prt_time'
+  'idUairP'
+  'r2dvar'
+  1.0d0
+
+'VwindP'                                            ! Input
+  'surface v-wind anomaly'
+  'meter second-1'                                 ! [m/s]
+  'v-wind anomaly, scalar, series'
+  'prt_time'
+  'idVairP'
+  'r2dvar'
+  1.0d0
+
+'PairP'                                            ! Input
+  'surface air pressure anomaly'
+  'millibar'                                       ! [millibar]
+  'Pair anomaly, scalar, series'
+  'prt_time'
+  'idPairP'
+  'r2dvar'
+  1.0d0
+
+'TairP'                                            ! Input
+  'surface air temperature anomaly'
+  'Celsius'                                        ! [Kelvin]
+  'Tair anomaly, scalar, series'
+  'prt_time'
+  'idTairP'
+  'r2dvar'
+  1.0d0
+
+'QairP'                                            ! Input
+  'surface air relative humidity anomaly'          !  relative    or  specific
+  'percentage'                                     ! [percentage  or  g/kg    ]
+  'Qair anomaly, scalar, series'
+  'prt_time'
+  'idQairP'
+  'r2dvar'                                         ! relative        specific
+  0.01d0                                           ! 1/100      or   1.0
+
+'swradP'                                           ! Input/Output
+  'solar shortwave radiation flux anomaly'
+  'watt meter-2'                                   ! Input:  [Watt/m2]
+  'shortwave radiation anomaly, scalar, series'    ! [Celsius m/s]
+  'prt_time'                                       ! Output: [Watt/m2]
+  'idSradP'
+  'r2dvar'
+  1.0d0
+
+'lwrad_downP'                                       ! Input
+  'downwelling longwave radiation flux anomaly'
+  'watt meter-2'                                   ! Input:  [Watt/m2]
+  'downwelling longwave radiation anomaly, scalar, series' ! [Celsius m/s]
+  'prt_time'
+  'idLdwnP'
+  'r2dvar'
   1.0d0
 
 !

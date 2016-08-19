@@ -444,8 +444,13 @@
 #endif
 
 #ifdef STATS_ENSO
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRuwnd',             &
-     &                      stenRuwnd(ng), (/0/), (/0/),                &
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenMean',              &
+     &                      stenMean(ng), (/0/), (/0/),                 &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnN',             &
+     &                      stenRegnN(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
@@ -466,6 +471,41 @@
 
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnW',             &
      &                      stenRegnW(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRuwnd',             &
+     &                      stenRuwnd(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRvwnd',             &
+     &                      stenRvwnd(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRqair',             &
+     &                      stenRqair(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRpair',             &
+     &                      stenRpair(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRtair',             &
+     &                      stenRtair(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRsrad',             &
+     &                      stenRsrad(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRlrad',             &
+     &                      stenRlrad(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 

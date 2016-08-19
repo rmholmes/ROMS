@@ -104,9 +104,6 @@
      &                     FORCES(ng) % Tair,                           &
      &                     FORCES(ng) % Uwind,                          &
      &                     FORCES(ng) % Vwind,                          &
-# ifdef STATS_ENSO
-     &                     FORCES(ng) % UwindP,                         &
-# endif
 # ifdef CLOUDS
      &                     FORCES(ng) % cloud,                          &
 # endif
@@ -152,9 +149,6 @@
 # endif
      &                           alpha, beta, rho, t,                   &
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
-# ifdef STATS_ENSO
-     &                           UwindP,                                &
-# endif
 # ifdef CLOUDS
      &                           cloud,                                 &
 # endif
@@ -209,10 +203,7 @@
       real(r8), intent(in) :: Hair(LBi:,LBj:)
       real(r8), intent(in) :: Pair(LBi:,LBj:)
       real(r8), intent(in) :: Tair(LBi:,LBj:)
-      real(r8), intent(inout) :: Uwind(LBi:,LBj:)
-#  ifdef STATS_ENSO
-      real(r8), intent(in) :: UwindP(LBi:,LBj:)
-#  endif
+      real(r8), intent(in) :: Uwind(LBi:,LBj:)
       real(r8), intent(in) :: Vwind(LBi:,LBj:)
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:,LBj:)
@@ -259,10 +250,7 @@
       real(r8), intent(in) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Pair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Tair(LBi:UBi,LBj:UBj)
-      real(r8), intent(inout) :: Uwind(LBi:UBi,LBj:UBj)
-#  ifdef STATS_ENSO
-      real(r8), intent(in) :: UwindP(LBi:UBi,LBj:UBj)
-#  endif
+      real(r8), intent(in) :: Uwind(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:UBi,LBj:UBj)
@@ -307,9 +295,6 @@
 
       real(r8) :: cff, cff1, cff2, diffh, diffw, oL, upvel
       real(r8) :: twopi_inv, wet_bulb
-# ifdef STATS_ENSO
-      real(r8) :: stenIanom
-# endif
 # ifdef LONGWAVE
       real(r8) :: e_sat, vap_p
 # endif
@@ -382,22 +367,8 @@
 !
       Hscale=rho0*Cp
       twopi_inv=0.5_r8/pi
-# ifdef STATS_ENSO
-      stenIanom=0.0_r8
-      DO i=1,stenNdays
-        stenIanom=stenIanom + stenIndex(i,ng)
-      END DO
-      stenIanom=stenIanom/stenNdays
-# endif
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
-# ifdef STATS_ENSO
-! 
-!  Alter wind stress for statistical ENSO model  
-!
-          Uwind(i,j) = Uwind(i,j) + UwindP(i,j)*                        &
-     &      stenIanom/stenRuwnd(ng)
-# endif
 !
 !  Input bulk parameterization fields.
 !

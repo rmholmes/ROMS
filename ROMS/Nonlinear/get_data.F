@@ -128,7 +128,7 @@
       IF (exit_flag.ne.NoError) RETURN
 
 # ifdef STATS_ENSO
-      CALL get_2dfld (ng, iNLM, idUaiP, ncFRCid(idUaiP,ng),             &
+      CALL get_2dfld (ng, iNLM, idUairP, ncFRCid(idUairP,ng),           &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
      &                LBi, UBi, LBj, UBj, 2, 1,                         &
 # ifdef MASKING
@@ -146,6 +146,17 @@
 # endif
      &                FORCES(ng) % VwindG)
       IF (exit_flag.ne.NoError) RETURN
+
+# ifdef STATS_ENSO
+      CALL get_2dfld (ng , iNLM, idVairP, ncFRCid(idVairP,ng),          &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+# ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+# endif
+     &                FORCES(ng) % VwindPG)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 
 #ifndef AIR_OCEAN
@@ -218,6 +229,16 @@
 # endif
      &                FORCES(ng) % PairG)
       IF (exit_flag.ne.NoError) RETURN
+# ifdef STATS_ENSO
+      CALL get_2dfld (ng, iNLM, idPairP, ncFRCid(idPairP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+# ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+# endif
+     &                FORCES(ng) % PairPG)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 
 #if !defined ANA_WWAVE && defined WAVE_DATA
@@ -347,6 +368,17 @@
 #  endif
      &                FORCES(ng) % srflxG)
       IF (exit_flag.ne.NoError) RETURN
+
+#  ifdef STATS_ENSO
+      CALL get_2dfld (ng, iNLM, idSradP, ncFRCid(idSradP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#  ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#  endif
+     &                FORCES(ng) % srflxPG)
+      IF (exit_flag.ne.NoError) RETURN
+#  endif
 # endif
 
 # if defined RED_TIDE && defined DAILY_SHORTWAVE
@@ -395,6 +427,17 @@
 #  endif
      &                FORCES(ng) % lrflxG)
       IF (exit_flag.ne.NoError) RETURN
+
+#  ifdef STATS_ENSO
+      CALL get_2dfld (ng, iNLM, idLdwnP, ncFRCid(idLdwnP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#  ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#  endif
+     &                FORCES(ng) % lrflxPG)
+      IF (exit_flag.ne.NoError) RETURN
+#  endif
 # endif
 
 # if !defined ANA_TAIR && \
@@ -413,6 +456,17 @@
 #  endif
      &                FORCES(ng) % TairG)
       IF (exit_flag.ne.NoError) RETURN
+
+#  ifdef STATS_ENSO
+      CALL get_2dfld (ng, iNLM, idTairP, ncFRCid(idTairP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#  ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#  endif
+     &                FORCES(ng) % TairPG)
+      IF (exit_flag.ne.NoError) RETURN
+#  endif
 # endif
 
 # if !defined ANA_HUMIDITY && (defined BULK_FLUXES || defined ECOSIM)
@@ -429,6 +483,17 @@
 #  endif
      &                FORCES(ng) % HairG)
       IF (exit_flag.ne.NoError) RETURN
+
+#  ifdef STATS_ENSO
+      CALL get_2dfld (ng, iNLM, idQairP, ncFRCid(idQairP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#  ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#  endif
+     &                FORCES(ng) % HairPG)
+      IF (exit_flag.ne.NoError) RETURN
+#  endif
 # endif
 
 # if !defined ANA_RAIN && defined BULK_FLUXES

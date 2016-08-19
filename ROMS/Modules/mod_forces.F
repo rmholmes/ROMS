@@ -96,10 +96,6 @@
 !                 horizontal RHO-points.                               !
 !  UwindG       Latest two-time snapshots of input "Uwind" grided      !
 !                 data used for interpolation.                         !
-!  UwindP       Surface wind perturbation in the XI-direction (m/s)    !
-!               at horizontal RHO-points.                              !
-!  UwindPG      Latest two-time snapshots of input "UwindP" grided     !
-!                 data used for interpolation.                         !
 !  Vwind        Surface wind in the ETA-direction (m/s) at             !
 !                 horizontal RHO-points.                               !
 !  VwindG       Latest two-time snapshots of input "Vwind" grided      !
@@ -150,6 +146,22 @@
 !                 5 nm bandwidth.                                      !
 !  avcos        Cosine of average zenith angle of downwelling          !
 !                 spectral photons.                                    !
+#ifdef STATS_ENSO
+!  UwindPG      Surface wind anomaly in the XI-direction (m/s)         !
+!               at horizontal RHO-points, two-time snapshots.          !
+!  VwindPG      Surface wind anomaly in the ETA-direction (m/s)        !
+!               at horizontal RHO-points, two-time snapshots.          !
+!  PairPG       Surface air pressure anomaly (mb), two-time snapshots. !
+!  TairPG       Surface air temperature anomaly (Celsius), two-time    !
+!               snapshots                                              !
+!  HairPG       Surface air specific (g/kg) or relative humidity       !
+!               (percentage) anomaly, two-time snapshots               !
+!  srflxPG      Kinematic surface shortwave solar radiation flux       !
+!               (Celsius m/s) anomaly at horizontal RHO-points,        !
+!               two-time snapshots.                                    !
+!  lrflxPG      Kinematic net longwave radiation (degC m/s), two-time  !
+!               snapshots.                                             !
+#endif
 !                                                                      !
 !=======================================================================
 !
@@ -179,6 +191,9 @@
           real(r8), pointer :: Pair(:,:)
 # ifndef ANA_PAIR
           real(r8), pointer :: PairG(:,:,:)
+#  ifdef STATS_ENSO
+          real(r8), pointer :: PairPG(:,:,:)
+#  endif
 # endif
 #endif
 
@@ -244,6 +259,9 @@
           real(r8), pointer :: srflx(:,:)
 #  ifndef ANA_SRFLUX
           real(r8), pointer :: srflxG(:,:,:)
+#   ifdef STATS_ENSO
+          real(r8), pointer :: srflxPG(:,:,:)
+#   endif
 #  endif
 # endif
 
@@ -263,6 +281,9 @@
           real(r8), pointer :: lrflx(:,:)
 #  ifndef LONGWAVE
           real(r8), pointer :: lrflxG(:,:,:)
+#   ifdef STATS_ENSO
+          real(r8), pointer :: lrflxPG(:,:,:)
+#   endif
 #  endif
           real(r8), pointer :: shflx(:,:)
 # endif
@@ -272,25 +293,29 @@
           real(r8), pointer :: Hair(:,:)
 #  ifndef ANA_HUMIDITY
           real(r8), pointer :: HairG(:,:,:)
+#   ifdef STATS_ENSO
+          real(r8), pointer :: HairPG(:,:,:)
+#   endif
 #  endif
           real(r8), pointer :: Tair(:,:)
 #  ifndef ANA_TAIR
           real(r8), pointer :: TairG(:,:,:)
+#   ifdef STATS_ENSO
+          real(r8), pointer :: TairPG(:,:,:)
+#   endif
 #  endif
 # endif
 
 # if defined BULK_FLUXES || defined ECOSIM
           real(r8), pointer :: Uwind(:,:)
-#   ifdef STATS_ENSO
-          real(r8), pointer :: UwindP(:,:)
-#   endif
           real(r8), pointer :: Vwind(:,:)
 #  ifndef ANA_WINDS
           real(r8), pointer :: UwindG(:,:,:)
+          real(r8), pointer :: VwindG(:,:,:)
 #   ifdef STATS_ENSO
           real(r8), pointer :: UwindPG(:,:,:)
+          real(r8), pointer :: VwindPG(:,:,:)
 #   endif
-          real(r8), pointer :: VwindG(:,:,:)
 #  endif
 # endif
 
@@ -490,6 +515,9 @@
       allocate ( FORCES(ng) % Pair(LBi:UBi,LBj:UBj) )
 # ifndef ANA_PAIR
       allocate ( FORCES(ng) % PairG(LBi:UBi,LBj:UBj,2) )
+#  ifdef STATS_ENSO
+      allocate ( FORCES(ng) % PairPG(LBi:UBi,LBj:UBj,2) )
+#  endif
 # endif
 #endif
 
@@ -556,6 +584,9 @@
 
 #  ifndef ANA_SRFLUX
       allocate ( FORCES(ng) % srflxG(LBi:UBi,LBj:UBj,2) )
+#   ifdef STATS_ENSO
+      allocate ( FORCES(ng) % srflxPG(LBi:UBi,LBj:UBj,2) )
+#   endif
 #  endif
 # endif
 
@@ -578,6 +609,9 @@
 
 #  ifndef LONGWAVE
       allocate ( FORCES(ng) % lrflxG(LBi:UBi,LBj:UBj,2) )
+#   ifdef STATS_ENSO
+      allocate ( FORCES(ng) % lrflxPG(LBi:UBi,LBj:UBj,2) )
+#   endif
 #  endif
 
       allocate ( FORCES(ng) % shflx(LBi:UBi,LBj:UBj) )
@@ -589,28 +623,32 @@
 
 #  ifndef ANA_HUMIDITY
       allocate ( FORCES(ng) % HairG(LBi:UBi,LBj:UBj,2) )
+#   ifdef STATS_ENSO
+      allocate ( FORCES(ng) % HairPG(LBi:UBi,LBj:UBj,2) )
+#   endif
 #  endif
 
       allocate ( FORCES(ng) % Tair(LBi:UBi,LBj:UBj) )
 
 #  ifndef ANA_TAIR
       allocate ( FORCES(ng) % TairG(LBi:UBi,LBj:UBj,2) )
+#   ifdef STATS_ENSO
+      allocate ( FORCES(ng) % TairPG(LBi:UBi,LBj:UBj,2) )
+#   endif
 #  endif
 # endif
 
 # if defined BULK_FLUXES || defined ECOSIM
       allocate ( FORCES(ng) % Uwind(LBi:UBi,LBj:UBj) )
-#   ifdef STATS_ENSO
-      allocate ( FORCES(ng) % UwindP(LBi:UBi,LBj:UBj) )
-#   endif
       allocate ( FORCES(ng) % Vwind(LBi:UBi,LBj:UBj) )
 
 #  ifndef ANA_WINDS
       allocate ( FORCES(ng) % UwindG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % VwindG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
       allocate ( FORCES(ng) % UwindPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % VwindPG(LBi:UBi,LBj:UBj,2) )
 #   endif
-      allocate ( FORCES(ng) % VwindG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
 
@@ -868,6 +906,10 @@
 # ifndef ANA_PAIR
             FORCES(ng) % PairG(i,j,1) = IniVal
             FORCES(ng) % PairG(i,j,2) = IniVal
+#  ifdef STATS_ENSO
+            FORCES(ng) % PairPG(i,j,1) = IniVal
+            FORCES(ng) % PairPG(i,j,2) = IniVal
+#  endif
 # endif
 #endif
 #ifdef WAVES_DIR
@@ -933,6 +975,10 @@
 #  ifndef ANA_SRFLUX
             FORCES(ng) % srflxG(i,j,1) = IniVal
             FORCES(ng) % srflxG(i,j,2) = IniVal
+#   ifdef STATS_ENSO
+            FORCES(ng) % srflxPG(i,j,1) = IniVal
+            FORCES(ng) % srflxPG(i,j,2) = IniVal
+#   endif
 #  endif
 # endif
 # if defined RED_TIDE && defined DAILY_SHORTWAVE
@@ -959,9 +1005,6 @@
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
             FORCES(ng) % Uwind(i,j) = IniVal
-#   ifdef STATS_ENSO
-            FORCES(ng) % UwindP(i,j) = IniVal
-#   endif
             FORCES(ng) % Vwind(i,j) = IniVal
 # endif
 # ifdef BULK_FLUXES
@@ -974,27 +1017,41 @@
 # if !defined LONGWAVE && defined BULK_FLUXES
             FORCES(ng) % lrflxG(i,j,1) = IniVal
             FORCES(ng) % lrflxG(i,j,2) = IniVal
+#   ifdef STATS_ENSO
+            FORCES(ng) % lrflxPG(i,j,1) = IniVal
+            FORCES(ng) % lrflxPG(i,j,2) = IniVal
+#   endif
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
 #  ifndef ANA_HUMIDITY
             FORCES(ng) % HairG(i,j,1) = IniVal
             FORCES(ng) % HairG(i,j,2) = IniVal
+#   ifdef STATS_ENSO
+            FORCES(ng) % HairPG(i,j,1) = IniVal
+            FORCES(ng) % HairPG(i,j,2) = IniVal
+#   endif
 #  endif
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
 #  ifndef ANA_TAIR
             FORCES(ng) % TairG(i,j,1) = IniVal
             FORCES(ng) % TairG(i,j,2) = IniVal
+#   ifdef STATS_ENSO
+            FORCES(ng) % TairPG(i,j,1) = IniVal
+            FORCES(ng) % TairPG(i,j,2) = IniVal
+#   endif
 #  endif
 #  ifndef ANA_WINDS
             FORCES(ng) % UwindG(i,j,1) = IniVal
             FORCES(ng) % UwindG(i,j,2) = IniVal
+            FORCES(ng) % VwindG(i,j,1) = IniVal
+            FORCES(ng) % VwindG(i,j,2) = IniVal
 #   ifdef STATS_ENSO
             FORCES(ng) % UwindPG(i,j,1) = IniVal
             FORCES(ng) % UwindPG(i,j,2) = IniVal
+            FORCES(ng) % VwindPG(i,j,1) = IniVal
+            FORCES(ng) % VwindPG(i,j,2) = IniVal
 #   endif
-            FORCES(ng) % VwindG(i,j,1) = IniVal
-            FORCES(ng) % VwindG(i,j,2) = IniVal
 #  endif
 # endif
 # if !defined ANA_RAIN && defined BULK_FLUXES
