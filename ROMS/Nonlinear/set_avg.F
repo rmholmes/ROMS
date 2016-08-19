@@ -111,6 +111,9 @@
 !***********************************************************************
 !
       USE mod_param
+# ifdef STATS_ENSO
+      USE mod_parallel
+# endif
       USE mod_ncparam
       USE mod_average
 # if defined FORWARD_WRITE && defined SOLVE3D
@@ -134,6 +137,9 @@
 # endif
 # ifdef DISTRIBUTE
       USE mp_exchange_mod, ONLY : mp_exchange2d
+#  ifdef STATS_ENSO
+      USE distribute_mod, ONLY : mp_reduce
+#  endif
 #  ifdef SOLVE3D
       USE mp_exchange_mod, ONLY : mp_exchange3d
 #  endif
@@ -174,7 +180,13 @@
 # endif
       real(r8) :: potvor_bar(LBi:UBi,LBj:UBj)
       real(r8) :: relvor_bar(LBi:UBi,LBj:UBj)
-
+# ifdef STATS_ENSO
+      real(r8) :: my_index, my_area, index, area
+      integer :: NSUB
+      integer, parameter :: Nreduce = 2
+      real(r8), dimension(Nreduce) :: buffer
+      character (len=3), dimension(Nreduce) :: op_handle
+# endif
 # include "set_bounds.h"
 !
 !-----------------------------------------------------------------------
@@ -2547,6 +2559,46 @@
             END IF
           END IF
         END DO
+#ifdef STATS_ENSO
+        stenCount(ng) = MOD(stenCount(ng),stenNdays) + 1
+        my_index = 0.0_r8
+        my_area = 0.0_r8
+! Calculate SST index for statistical ENSO model
+        DO j=JstrR,JendR
+          DO i=IstrR,IendR
+!             IF ( in index region )
+            my_index = my_index + AVERAGE(ng)%avgt(i,j,N(ng),itemp)*    &
+     &                            GRID(ng) % omn(i,j)
+            my_area = my_area + GRID(ng) % omn(i,j)
+!             END IF
+          END DO
+        END DO
+# ifdef DISTRIBUTE
+        NSUB=1
+# else
+        write(*,*) 'This will not work!!!!!!!! ERRORR!!!!!!'
+# endif
+        IF (tile_count.eq.0) THEN
+          area=my_area
+          index=my_index
+        ELSE
+          area=area+my_area
+          index=index+my_index
+        END IF
+        tile_count=tile_count+1
+        IF (tile_count.eq.NSUB) THEN
+          tile_count=0
+          buffer(1)=area
+          buffer(2)=index
+          op_handle(1)='SUM'
+          op_handle(2)='SUM'
+          CALL mp_reduce (ng, iNLM, Nreduce, buffer, op_handle)
+          area=buffer(1)
+          index=buffer(2)
+          stenIndex(stenCount(ng),ng) = index/area ! - stenMean(ng)
+        END IF
+        write(*,*) stenCount(ng), stenIndex(stenCount(ng),ng)
+#endif
 
 #  if defined SEDIMENT && defined BEDLOAD
         DO it=1,NST
