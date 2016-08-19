@@ -2560,17 +2560,24 @@
           END IF
         END DO
 #ifdef STATS_ENSO
+!
+!-----------------------------------------------------------------------
+!  Calculate SST index for statistical ENSO model 
+!-----------------------------------------------------------------------
+!
         stenCount(ng) = MOD(stenCount(ng),stenNdays) + 1
         my_index = 0.0_r8
         my_area = 0.0_r8
-! Calculate SST index for statistical ENSO model
         DO j=JstrR,JendR
           DO i=IstrR,IendR
-!             IF ( in index region )
-            my_index = my_index + AVERAGE(ng)%avgt(i,j,N(ng),itemp)*    &
-     &                            GRID(ng) % omn(i,j)
-            my_area = my_area + GRID(ng) % omn(i,j)
-!             END IF
+            IF ((GRID(ng) % lonr(i,j) .ge. stenRegnW(ng)).and.          &
+     &          (GRID(ng) % lonr(i,j) .le. stenRegnE(ng)).and.          &
+     &          (GRID(ng) % latr(i,j) .ge. stenRegnS(ng)).and.          &
+     &          (GRID(ng) % latr(i,j) .le. stenRegnN(ng))) THEN
+              my_index = my_index + AVERAGE(ng)%avgt(i,j,N(ng),itemp)*  &
+     &                              GRID(ng) % omn(i,j)
+              my_area = my_area + GRID(ng) % omn(i,j)
+            END IF
           END DO
         END DO
 # ifdef DISTRIBUTE
@@ -2595,7 +2602,7 @@
           CALL mp_reduce (ng, iNLM, Nreduce, buffer, op_handle)
           area=buffer(1)
           index=buffer(2)
-          stenIndex(stenCount(ng),ng) = index/area ! - stenMean(ng)
+          stenIndex(stenCount(ng),ng) = index/area - stenMean(ng)
         END IF
         write(*,*) stenCount(ng), stenIndex(stenCount(ng),ng)
 #endif

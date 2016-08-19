@@ -345,11 +345,19 @@
 !
 !    stenRuwnd      Regression coefficient of Uwind EOF onto SST index
 !    stenMean       Climatological value of SST index
+!    stenRegnN      SST index region northern boundary
+!    stenRegnE      SST index region eastern boundary
+!    stenRegnS      SST index region southern boundary
+!    stenRegnW      SST index region western boundary
 !    stenCount      Counter for current day of stenNdays
 !    stenIndex      the SST index over the last stenNdays
 !     
         real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
         real(r8), allocatable :: stenMean(:)       ! degC
+        real(r8), allocatable :: stenRegnN(:)       ! degrees
+        real(r8), allocatable :: stenRegnE(:)       ! degrees
+        real(r8), allocatable :: stenRegnS(:)       ! degrees
+        real(r8), allocatable :: stenRegnW(:)       ! degrees
         integer, allocatable  :: stenCount(:)
         real(r8), allocatable :: stenIndex(:,:)
 #endif
@@ -1800,6 +1808,10 @@
 #ifdef STATS_ENSO
       allocate ( stenRuwnd(Ngrids) )
       allocate ( stenMean(Ngrids) )
+      allocate ( stenRegnN(Ngrids) )
+      allocate ( stenRegnE(Ngrids) )
+      allocate ( stenRegnS(Ngrids) )
+      allocate ( stenRegnW(Ngrids) )
       allocate ( stenCount(Ngrids) )
       allocate ( stenIndex(stenNdays,Ngrids) )
 #endif

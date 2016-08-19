@@ -449,8 +449,23 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenMean',              &
-     &                      stenMean(ng), (/0/), (/0/),                 &
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnN',             &
+     &                      stenRegnN(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnE',             &
+     &                      stenRegnE(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnS',             &
+     &                      stenRegnS(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnW',             &
+     &                      stenRegnW(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 

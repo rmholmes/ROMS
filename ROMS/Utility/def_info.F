@@ -1451,6 +1451,38 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
+      Vinfo( 1)='stenRegnN'
+      Vinfo( 2)='SST index region northern boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRegnE'
+      Vinfo( 2)='SST index region eastern boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRegnS'
+      Vinfo( 2)='SST index region southern boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRegnW'
+      Vinfo( 2)='SST index region western boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
       Vinfo( 1)='stenNdays'
       Vinfo( 2)='Number of days to average SST index over'
       Vinfo( 3)=''
