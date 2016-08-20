@@ -43,8 +43,8 @@
 #
 
 ifdef USE_NETCDF4
-        NC_CONFIG ?= nc-config
-    NETCDF_INCDIR ?= $(shell $(NC_CONFIG) --prefix)/include
+        NC_CONFIG ?= nf-config
+    NETCDF_INCDIR ?= $(shell $(NC_CONFIG) --prefix)/include/Intel
              LIBS := $(shell $(NC_CONFIG) --flibs)
 else
     NETCDF_INCDIR ?= /usr/local/include
