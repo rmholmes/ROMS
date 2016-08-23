@@ -1950,6 +1950,9 @@
 #else
       IF (Master) WRITE (stdout,20) AVG(ng)%Rindex
 #endif
+#ifdef STATS_ENSO
+      IF (Master) WRITE (stdout,30) stenNdays, stenIanom(ng) 
+#endif
 !
   10  FORMAT (/,' WRT_AVG - error while writing variable: ',a,/,11x,    &
      &        'into averages NetCDF file for time record: ',i4)
@@ -1958,6 +1961,9 @@
      &        'in record = ',i7.7,2x,i2.2)
 # else
      &        'in record = ',i7.7)
+# endif
+# ifdef STATS_ENSO
+  30  FORMAT (6x,'STATS_ENSO  - ', i4.4, 'xNAVG SST anomaly = ',f5.2)
 # endif
 #else
       SUBROUTINE wrt_avg
