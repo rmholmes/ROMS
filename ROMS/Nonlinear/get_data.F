@@ -127,7 +127,11 @@
 # ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 # endif
+# ifdef STATS_ENSO
+     &                FORCES(ng) % UwindOG)
+# else
      &                FORCES(ng) % UwindG)
+# endif
       IF (exit_flag.ne.NoError) RETURN
 # ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
@@ -144,9 +148,9 @@
       IF (stenUpdte(ng)) THEN
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%UwindG(i,j,1)=FORCES(ng)%UwindG(i,j,1)+          &
+            FORCES(ng)%UwindG(i,j,1)=FORCES(ng)%UwindOG(i,j,1)+         &
      &      stenIanom(ng)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,1)
-            FORCES(ng)%UwindG(i,j,2)=FORCES(ng)%UwindG(i,j,2)+          &
+            FORCES(ng)%UwindG(i,j,2)=FORCES(ng)%UwindOG(i,j,2)+         &
      &      stenIanom(ng)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,2)
           END DO
         END DO
@@ -159,7 +163,11 @@
 # ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 # endif
+# ifdef STATS_ENSO
+     &                FORCES(ng) % VwindOG)
+# else
      &                FORCES(ng) % VwindG)
+# endif
       IF (exit_flag.ne.NoError) RETURN
 # ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
@@ -176,9 +184,9 @@
       IF (stenUpdte(ng)) THEN
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%VwindG(i,j,1)=FORCES(ng)%VwindG(i,j,1)+          &
+            FORCES(ng)%VwindG(i,j,1)=FORCES(ng)%VwindOG(i,j,1)+         &
      &      stenIanom(ng)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,1)
-            FORCES(ng)%VwindG(i,j,2)=FORCES(ng)%VwindG(i,j,2)+          &
+            FORCES(ng)%VwindG(i,j,2)=FORCES(ng)%VwindOG(i,j,2)+         &
      &      stenIanom(ng)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,2)
           END DO
         END DO
@@ -254,7 +262,11 @@
 # ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 # endif
+# ifdef STATS_ENSO
+     &                FORCES(ng) % PairOG)
+# else
      &                FORCES(ng) % PairG)
+# endif
       IF (exit_flag.ne.NoError) RETURN
 # ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
@@ -271,9 +283,9 @@
       IF (stenUpdte(ng)) THEN
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%PairG(i,j,1)=FORCES(ng)%PairG(i,j,1)+            &
+            FORCES(ng)%PairG(i,j,1)=FORCES(ng)%PairOG(i,j,1)+           &
      &      stenIanom(ng)*stenRpair(ng)*FORCES(ng)%PairPG(i,j,1)
-            FORCES(ng)%PairG(i,j,2)=FORCES(ng)%PairG(i,j,2)+            &
+            FORCES(ng)%PairG(i,j,2)=FORCES(ng)%PairOG(i,j,2)+           &
      &      stenIanom(ng)*stenRpair(ng)*FORCES(ng)%PairPG(i,j,2)
           END DO
         END DO
@@ -406,7 +418,11 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % srflxOG)
+#  else
      &                FORCES(ng) % srflxG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
@@ -423,9 +439,9 @@
       IF (stenUpdte(ng)) THEN
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%srflxG(i,j,1)=FORCES(ng)%srflxG(i,j,1)+          &
+            FORCES(ng)%srflxG(i,j,1)=FORCES(ng)%srflxOG(i,j,1)+         &
      &      stenIanom(ng)*stenRsrad(ng)*FORCES(ng)%srflxPG(i,j,1)
-            FORCES(ng)%srflxG(i,j,2)=FORCES(ng)%srflxG(i,j,2)+          &
+            FORCES(ng)%srflxG(i,j,2)=FORCES(ng)%srflxOG(i,j,2)+         &
      &      stenIanom(ng)*stenRsrad(ng)*FORCES(ng)%srflxPG(i,j,2)
           END DO
         END DO
@@ -477,7 +493,11 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % lrflxOG)
+#  else
      &                FORCES(ng) % lrflxG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
@@ -494,9 +514,9 @@
       IF (stenUpdte(ng)) THEN
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%lrflxG(i,j,1)=FORCES(ng)%lrflxG(i,j,1)+          &
+            FORCES(ng)%lrflxG(i,j,1)=FORCES(ng)%lrflxOG(i,j,1)+         &
      &      stenIanom(ng)*stenRlrad(ng)*FORCES(ng)%lrflxPG(i,j,1)
-            FORCES(ng)%lrflxG(i,j,2)=FORCES(ng)%lrflxG(i,j,2)+          &
+            FORCES(ng)%lrflxG(i,j,2)=FORCES(ng)%lrflxOG(i,j,2)+         &
      &      stenIanom(ng)*stenRlrad(ng)*FORCES(ng)%lrflxPG(i,j,2)
           END DO
         END DO
@@ -518,7 +538,11 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % TairOG)
+#  else
      &                FORCES(ng) % TairG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
@@ -535,9 +559,9 @@
       IF (stenUpdte(ng)) THEN
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%TairG(i,j,1)=FORCES(ng)%TairG(i,j,1)+            &
+            FORCES(ng)%TairG(i,j,1)=FORCES(ng)%TairOG(i,j,1)+           &
      &      stenIanom(ng)*stenRtair(ng)*FORCES(ng)%TairPG(i,j,1)
-            FORCES(ng)%TairG(i,j,2)=FORCES(ng)%TairG(i,j,2)+            &
+            FORCES(ng)%TairG(i,j,2)=FORCES(ng)%TairOG(i,j,2)+           &
      &      stenIanom(ng)*stenRtair(ng)*FORCES(ng)%TairPG(i,j,2)
           END DO
         END DO
@@ -557,7 +581,11 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % HairOG)
+#  else
      &                FORCES(ng) % HairG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
@@ -574,9 +602,9 @@
       IF (stenUpdte(ng)) THEN
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%HairG(i,j,1)=FORCES(ng)%HairG(i,j,1)+            &
+            FORCES(ng)%HairG(i,j,1)=FORCES(ng)%HairOG(i,j,1)+           &
      &      stenIanom(ng)*stenRqair(ng)*FORCES(ng)%HairPG(i,j,1)
-            FORCES(ng)%HairG(i,j,2)=FORCES(ng)%HairG(i,j,2)+            &
+            FORCES(ng)%HairG(i,j,2)=FORCES(ng)%HairOG(i,j,2)+           &
      &      stenIanom(ng)*stenRqair(ng)*FORCES(ng)%HairPG(i,j,2)
           END DO
         END DO

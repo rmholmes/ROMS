@@ -149,18 +149,25 @@
 #ifdef STATS_ENSO
 !  UwindPG      Surface wind anomaly in the XI-direction (m/s)         !
 !               at horizontal RHO-points, two-time snapshots.          !
+!  UwindOG      Dummy location for background UwindG input             !
 !  VwindPG      Surface wind anomaly in the ETA-direction (m/s)        !
 !               at horizontal RHO-points, two-time snapshots.          !
+!  VwindOG      Dummy location for background VwindG input             !
 !  PairPG       Surface air pressure anomaly (mb), two-time snapshots. !
+!  PairOG       Dummy location for background PairG input              !
 !  TairPG       Surface air temperature anomaly (Celsius), two-time    !
 !               snapshots                                              !
+!  TairOG       Dummy location for background TairG input              !
 !  HairPG       Surface air specific (g/kg) or relative humidity       !
 !               (percentage) anomaly, two-time snapshots               !
+!  HairOG       Dummy location for background HairG input              !
 !  srflxPG      Kinematic surface shortwave solar radiation flux       !
 !               (Celsius m/s) anomaly at horizontal RHO-points,        !
 !               two-time snapshots.                                    !
+!  srflxOG      Dummy location for background srflxG input             !
 !  lrflxPG      Kinematic net longwave radiation (degC m/s), two-time  !
 !               snapshots.                                             !
+!  lrflxOG      Dummy location for background lrflxG input             !
 #endif
 !                                                                      !
 !=======================================================================
@@ -193,6 +200,7 @@
           real(r8), pointer :: PairG(:,:,:)
 #  ifdef STATS_ENSO
           real(r8), pointer :: PairPG(:,:,:)
+          real(r8), pointer :: PairOG(:,:,:)
 #  endif
 # endif
 #endif
@@ -261,6 +269,7 @@
           real(r8), pointer :: srflxG(:,:,:)
 #   ifdef STATS_ENSO
           real(r8), pointer :: srflxPG(:,:,:)
+          real(r8), pointer :: srflxOG(:,:,:)
 #   endif
 #  endif
 # endif
@@ -283,6 +292,7 @@
           real(r8), pointer :: lrflxG(:,:,:)
 #   ifdef STATS_ENSO
           real(r8), pointer :: lrflxPG(:,:,:)
+          real(r8), pointer :: lrflxOG(:,:,:)
 #   endif
 #  endif
           real(r8), pointer :: shflx(:,:)
@@ -295,6 +305,7 @@
           real(r8), pointer :: HairG(:,:,:)
 #   ifdef STATS_ENSO
           real(r8), pointer :: HairPG(:,:,:)
+          real(r8), pointer :: HairOG(:,:,:)
 #   endif
 #  endif
           real(r8), pointer :: Tair(:,:)
@@ -302,6 +313,7 @@
           real(r8), pointer :: TairG(:,:,:)
 #   ifdef STATS_ENSO
           real(r8), pointer :: TairPG(:,:,:)
+          real(r8), pointer :: TairOG(:,:,:)
 #   endif
 #  endif
 # endif
@@ -315,6 +327,8 @@
 #   ifdef STATS_ENSO
           real(r8), pointer :: UwindPG(:,:,:)
           real(r8), pointer :: VwindPG(:,:,:)
+          real(r8), pointer :: UwindOG(:,:,:)
+          real(r8), pointer :: VwindOG(:,:,:)
 #   endif
 #  endif
 # endif
@@ -517,6 +531,7 @@
       allocate ( FORCES(ng) % PairG(LBi:UBi,LBj:UBj,2) )
 #  ifdef STATS_ENSO
       allocate ( FORCES(ng) % PairPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % PairOG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
 #endif
@@ -586,6 +601,7 @@
       allocate ( FORCES(ng) % srflxG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
       allocate ( FORCES(ng) % srflxPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % srflxOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
 # endif
@@ -611,6 +627,7 @@
       allocate ( FORCES(ng) % lrflxG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
       allocate ( FORCES(ng) % lrflxPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % lrflxOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
 
@@ -625,6 +642,7 @@
       allocate ( FORCES(ng) % HairG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
       allocate ( FORCES(ng) % HairPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % HairOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
 
@@ -634,6 +652,7 @@
       allocate ( FORCES(ng) % TairG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
       allocate ( FORCES(ng) % TairPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % TairOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
 # endif
@@ -648,6 +667,8 @@
 #   ifdef STATS_ENSO
       allocate ( FORCES(ng) % UwindPG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % UwindOG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % VwindOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
 # endif
@@ -909,6 +930,8 @@
 #  ifdef STATS_ENSO
             FORCES(ng) % PairPG(i,j,1) = IniVal
             FORCES(ng) % PairPG(i,j,2) = IniVal
+            FORCES(ng) % PairOG(i,j,1) = IniVal
+            FORCES(ng) % PairOG(i,j,2) = IniVal
 #  endif
 # endif
 #endif
@@ -978,6 +1001,8 @@
 #   ifdef STATS_ENSO
             FORCES(ng) % srflxPG(i,j,1) = IniVal
             FORCES(ng) % srflxPG(i,j,2) = IniVal
+            FORCES(ng) % srflxOG(i,j,1) = IniVal
+            FORCES(ng) % srflxOG(i,j,2) = IniVal
 #   endif
 #  endif
 # endif
@@ -1020,6 +1045,8 @@
 #   ifdef STATS_ENSO
             FORCES(ng) % lrflxPG(i,j,1) = IniVal
             FORCES(ng) % lrflxPG(i,j,2) = IniVal
+            FORCES(ng) % lrflxOG(i,j,1) = IniVal
+            FORCES(ng) % lrflxOG(i,j,2) = IniVal
 #   endif
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
@@ -1029,6 +1056,8 @@
 #   ifdef STATS_ENSO
             FORCES(ng) % HairPG(i,j,1) = IniVal
             FORCES(ng) % HairPG(i,j,2) = IniVal
+            FORCES(ng) % HairOG(i,j,1) = IniVal
+            FORCES(ng) % HairOG(i,j,2) = IniVal
 #   endif
 #  endif
 # endif
@@ -1039,6 +1068,8 @@
 #   ifdef STATS_ENSO
             FORCES(ng) % TairPG(i,j,1) = IniVal
             FORCES(ng) % TairPG(i,j,2) = IniVal
+            FORCES(ng) % TairOG(i,j,1) = IniVal
+            FORCES(ng) % TairOG(i,j,2) = IniVal
 #   endif
 #  endif
 #  ifndef ANA_WINDS
@@ -1051,6 +1082,10 @@
             FORCES(ng) % UwindPG(i,j,2) = IniVal
             FORCES(ng) % VwindPG(i,j,1) = IniVal
             FORCES(ng) % VwindPG(i,j,2) = IniVal
+            FORCES(ng) % UwindOG(i,j,1) = IniVal
+            FORCES(ng) % UwindOG(i,j,2) = IniVal
+            FORCES(ng) % VwindOG(i,j,1) = IniVal
+            FORCES(ng) % VwindOG(i,j,2) = IniVal
 #   endif
 #  endif
 # endif

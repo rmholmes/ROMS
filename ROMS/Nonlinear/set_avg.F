@@ -2583,7 +2583,7 @@
 # ifdef DISTRIBUTE
         NSUB=1
 # else
-        write(*,*) 'This will not work!!!!!!!! ERRORR!!!!!!'
+        write(*,*) 'ERROR: This code will not work without DISTRIBUTE'
 # endif
         IF (tile_count.eq.0) THEN
           area=my_area
@@ -2610,7 +2610,6 @@
         END DO
         stenIanom(ng)=stenIanom(ng)/stenNdays
         stenUpdte(ng)=.TRUE.
-        write(*,*) stenCount(ng), stenIanom(ng)
 #endif
 
 #  if defined SEDIMENT && defined BEDLOAD
