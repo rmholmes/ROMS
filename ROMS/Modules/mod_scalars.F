@@ -358,7 +358,8 @@
 !
 !    stenCount      Counter for current day of stenNdays
 !    stenIndex      the SST index over the last stenNdays
-!     
+!    stenIanom      Current averaged Index anomaly
+!    stenUpdte      Current Index has been updated
         real(r8), allocatable :: stenMean(:)       ! degC
         real(r8), allocatable :: stenRegnN(:)       ! degrees
         real(r8), allocatable :: stenRegnE(:)       ! degrees
@@ -372,7 +373,9 @@
         real(r8), allocatable :: stenRsrad(:)      ! degC^(-1)
         real(r8), allocatable :: stenRlrad(:)      ! degC^(-1)
         integer, allocatable  :: stenCount(:)
-        real(r8), allocatable :: stenIndex(:,:)
+        real(r8), allocatable :: stenIndex(:,:)    ! degC
+        real(r8), allocatable :: stenIanom(:)      ! degC
+        logical, allocatable  :: stenUpdte(:)
 #endif
 !
 !-----------------------------------------------------------------------
@@ -1833,6 +1836,8 @@
       allocate ( stenRlrad(Ngrids) )
       allocate ( stenCount(Ngrids) )
       allocate ( stenIndex(stenNdays,Ngrids) )
+      allocate ( stenIanom(Ngrids) )
+      allocate ( stenUpdte(Ngrids) )
 #endif
       allocate ( Lsponge(Ngrids) )
       allocate ( LuvSponge(Ngrids) )
@@ -2399,6 +2404,8 @@
         DO i=1,stenNdays
           stenIndex(i,ng) = 0.0_r8
         END DO
+        stenIanom(ng)=0.0_r8
+        stenUpdte(ng)=.FALSE.
 #endif
         ad_Akv_fac(ng)=1.0_r8
         tl_Akv_fac(ng)=1.0_r8

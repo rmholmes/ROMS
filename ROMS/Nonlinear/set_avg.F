@@ -2604,7 +2604,13 @@
           index=buffer(2)
           stenIndex(stenCount(ng),ng) = index/area - stenMean(ng)
         END IF
-        write(*,*) stenCount(ng), stenIndex(stenCount(ng),ng)
+        stenIanom(ng)=0.0_r8
+        DO i=1,stenNdays
+          stenIanom(ng)=stenIanom(ng) + stenIndex(i,ng)
+        END DO
+        stenIanom(ng)=stenIanom(ng)/stenNdays
+        stenUpdte(ng)=.TRUE.
+        write(*,*) stenCount(ng), stenIanom(ng)
 #endif
 
 #  if defined SEDIMENT && defined BEDLOAD

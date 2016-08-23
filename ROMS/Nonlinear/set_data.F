@@ -96,16 +96,7 @@
       integer :: i, ic, itrc, j, k, my_tile
 
       real(r8) :: cff, cff1, cff2
-# ifdef STATS_ENSO
-      real(r8) :: stenIanom
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: UwindP
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: VwindP
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: HairP
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: PairP
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairP
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: SradP
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: LradP
-# endif
+
 # include "set_bounds.h"
 !
 !  Lower and upper bounds for nontiled (global values) boundary arrays.
@@ -115,16 +106,6 @@
       IUB=BOUNDS(ng)%UBi(my_tile)
       JLB=BOUNDS(ng)%LBj(my_tile)
       JUB=BOUNDS(ng)%UBj(my_tile)
-# ifdef STATS_ENSO
-!  
-!  Get SST index anomaly
-!
-      stenIanom=0.0_r8
-      DO i=1,stenNdays
-        stenIanom=stenIanom + stenIndex(i,ng)
-      END DO
-      stenIanom=stenIanom/stenNdays
-# endif
 
 # ifdef SOLVE3D
 
@@ -164,30 +145,6 @@
      &                     FORCES(ng)%Tair,                             &
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
-
-#    ifdef STATS_ENSO
-      CALL set_2dfld_tile (ng, tile, iNLM, idTairP,                     &
-     &                     LBi, UBi, LBj, UBj,                          &
-     &                     FORCES(ng)%TairPG,                           &
-     &                     TairP,                                       &
-     &                     update)
-      IF (exit_flag.ne.NoError) RETURN
- 
-       DO j=JstrR,JendR
-         DO i=IstrR,IendR
-           FORCES(ng)%Tair(i,j)=FORCES(ng)%Tair(i,j)+                   &
-     &                stenIanom*stenRtair(ng)*TairP(i,j)
-         END DO
-       END DO
-
-#     ifdef DISTRIBUTE
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%Tair)
-#     endif
-#    endif
 #   endif
 #  endif
 
@@ -207,30 +164,6 @@
      &                     FORCES(ng)%Hair,                             &
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
-
-#    ifdef STATS_ENSO
-      CALL set_2dfld_tile (ng, tile, iNLM, idQairP,                     &
-     &                     LBi, UBi, LBj, UBj,                          &
-     &                     FORCES(ng)%HairPG,                           &
-     &                     HairP,                                       &
-     &                     update)
-      IF (exit_flag.ne.NoError) RETURN
- 
-       DO j=JstrR,JendR
-         DO i=IstrR,IendR
-           FORCES(ng)%Hair(i,j)=FORCES(ng)%Hair(i,j)+                   &
-     &                stenIanom*stenRqair(ng)*HairP(i,j)
-         END DO
-       END DO
-
-#     ifdef DISTRIBUTE
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%Hair)
-#     endif
-#    endif
 #   endif
 #  endif
 
@@ -249,30 +182,6 @@
      &                     FORCES(ng)%srflx,                            &
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
-
-#    ifdef STATS_ENSO
-      CALL set_2dfld_tile (ng, tile, iNLM, idSradP,                     &
-     &                     LBi, UBi, LBj, UBj,                          &
-     &                     FORCES(ng)%srflxPG,                          &
-     &                     SradP,                                       &
-     &                     update)
-      IF (exit_flag.ne.NoError) RETURN
- 
-       DO j=JstrR,JendR
-         DO i=IstrR,IendR
-           FORCES(ng)%srflx(i,j)=FORCES(ng)%srflx(i,j)+                 &
-     &                stenIanom*stenRsrad(ng)*SradP(i,j)
-         END DO
-       END DO
-
-#     ifdef DISTRIBUTE
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%srflx)
-#     endif
-#    endif
 #   endif
 
 #   ifdef DIURNAL_SRFLUX
@@ -325,30 +234,6 @@
      &                     FORCES(ng)%lrflx,                            &
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
-
-#    ifdef STATS_ENSO
-      CALL set_2dfld_tile (ng, tile, iNLM, idLdwnP,                     &
-     &                     LBi, UBi, LBj, UBj,                          &
-     &                     FORCES(ng)%lrflxPG,                          &
-     &                     LradP,                                       &
-     &                     update)
-      IF (exit_flag.ne.NoError) RETURN
- 
-       DO j=JstrR,JendR
-         DO i=IstrR,IendR
-           FORCES(ng)%lrflx(i,j)=FORCES(ng)%lrflx(i,j)+                 &
-     &                stenIanom*stenRlrad(ng)*LradP(i,j)
-         END DO
-       END DO
-
-#     ifdef DISTRIBUTE
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%lrflx)
-#     endif
-#    endif
 #  endif
 
 #  if defined BULK_FLUXES || defined ECOSIM
@@ -374,43 +259,6 @@
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 
-#    ifdef STATS_ENSO
-      CALL set_2dfld_tile (ng, tile, iNLM, idUairP,                     &
-     &                     LBi, UBi, LBj, UBj,                          &
-     &                     FORCES(ng)%UwindPG,                          &
-     &                     UwindP,                                      &
-     &                     update)
-      IF (exit_flag.ne.NoError) RETURN
-
-      CALL set_2dfld_tile (ng, tile, iNLM, idVairP,                     &
-     &                     LBi, UBi, LBj, UBj,                          &
-     &                     FORCES(ng)%VwindPG,                          &
-     &                     VwindP,                                      &
-     &                     update)
-      IF (exit_flag.ne.NoError) RETURN
- 
-       DO j=JstrR,JendR
-         DO i=IstrR,IendR
-           FORCES(ng)%Uwind(i,j)=FORCES(ng)%Uwind(i,j)+                  &
-     &                stenIanom*stenRuwnd(ng)*UwindP(i,j)
-           FORCES(ng)%Vwind(i,j)=FORCES(ng)%Vwind(i,j)+                  &
-     &                stenIanom*stenRvwnd(ng)*VwindP(i,j)
-         END DO
-       END DO
-
-#     ifdef DISTRIBUTE
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%Uwind)
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%Vwind)
-#     endif
-#    endif
 #    ifdef CURVGRID
 !
 !  If input point surface winds or interpolated from coarse data, rotate
@@ -772,30 +620,6 @@
      &                     FORCES(ng)%Pair,                             &
      &                     update, SetBC)
       IF (exit_flag.ne.NoError) RETURN
-
-#    ifdef STATS_ENSO
-      CALL set_2dfld_tile (ng, tile, iNLM, idPairP,                     &
-     &                     LBi, UBi, LBj, UBj,                          &
-     &                     FORCES(ng)%PairPG,                           &
-     &                     PairP,                                       &
-     &                     update)
-      IF (exit_flag.ne.NoError) RETURN
- 
-       DO j=JstrR,JendR
-         DO i=IstrR,IendR
-           FORCES(ng)%Pair(i,j)=FORCES(ng)%Pair(i,j)+                   &
-     &                stenIanom*stenRpair(ng)*PairP(i,j)
-         END DO
-       END DO
-
-#     ifdef DISTRIBUTE
-        CALL mp_exchange2d (ng, tile, iNLM, 2,                          &
-     &                      LBi, UBi, LBj, UBj,                         &
-     &                      NghostPoints,                               &
-     &                      EWperiodic(ng), NSperiodic(ng),             &
-     &                      FORCES(ng)%Pair)
-#     endif
-#    endif
 #  endif
 # endif
 
