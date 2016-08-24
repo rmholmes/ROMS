@@ -57,6 +57,20 @@
      &                      ncid = FLT(ng)%ncid,                        &
      &                      varid = FLT(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
+#ifdef STATS_ENSO
+!
+!  Write out SST index and current count.
+!
+      CALL netcdf_put_ivar (ng, iNLM, FLT(ng)%name, 'stenCount',        &
+     &                      stenCount(ng), (/0/), (/0/),                &
+     &                      ncid = FLT(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, iNLM, FLT(ng)%name, 'stenIndex',        &
+     &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
+     &                      ncid = FLT(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
 !
 !  Write out floats X-grid locations.
 !

@@ -92,6 +92,20 @@
      &                      ncid = AVG(ng)%ncid,                        &
      &                      varid = AVG(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
+#ifdef STATS_ENSO
+!
+!  Write out SST index and current count.
+!
+      CALL netcdf_put_ivar (ng, iNLM, AVG(ng)%name, 'stenCount',        &
+     &                      stenCount(ng), (/0/), (/0/),                &
+     &                      ncid = AVG(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name, 'stenIndex',        &
+     &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
+     &                      ncid = AVG(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
 !
 !  Write out free-surface (m).
 !

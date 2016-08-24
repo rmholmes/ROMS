@@ -49,6 +49,9 @@
 !                DimIDs(30) => Number of 3D variables time levels (2). !
 !                DimIDs(31) => Number of 2D variables time levels (3). !
 !                DimIDs(32) => Number of sediment tracers.             !
+#ifdef STATS_ENSO
+!                DimIDs(33) => StenIndex dimension (length stenNdays)  !
+#endif
 !                                                                      !
 !  On Output:                                                          !
 !                                                                      !
@@ -89,6 +92,9 @@
 
       integer :: brydim, i, ie, is, j, lstr, varid
       integer :: srdim, stadim, status, swdim, trcdim, usrdim
+#ifdef STATS_ENSO
+      integer :: stendim
+#endif
 #ifdef SEDIMENT
       integer :: seddim
 #endif
@@ -137,6 +143,9 @@
       srdim=DimIDs(9)
       swdim=DimIDs(10)
       trcdim=DimIDs(11)
+#ifdef STATS_ENSO
+      stendim=DimIDs(33)
+#endif
 #ifdef SEDIMENT
       seddim=DimIDs(32)
 #endif
@@ -1536,6 +1545,22 @@
       Vinfo( 3)=''
       status=def_var(ng, model, ncid, varid, nf90_int,                  &
      &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenCount'
+      Vinfo( 2)='Counter for current day of stenNdays'
+      Vinfo( 3)=''
+      status=def_var(ng, model, ncid, varid, nf90_int,                  &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenIndex'
+      Vinfo( 2)='the SST index over the last stenNdays'
+      Vinfo( 3)='degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/stendim/), Aval, Vinfo, ncname,               &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 #endif

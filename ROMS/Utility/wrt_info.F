@@ -513,6 +513,16 @@
      &                      stenNdays, (/0/), (/0/),                    &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_ivar (ng, model, ncname, 'stenCount',             &
+     &                      stenCount(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenIndex',             &
+     &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
 #endif
 
 #ifdef SOLVE3D
