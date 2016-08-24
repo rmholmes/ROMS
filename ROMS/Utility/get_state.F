@@ -425,16 +425,6 @@
 
 ! Read variables if present:
       IF (exit_flag.eq.NoError) THEN
-          CALL netcdf_get_ivar (ng, IDmod, ncname, 'stenCount',         &
-     &                          stenCount(ng),                          &
-     &                          ncid = ncINPid,                         &
-     &                          start = (/1/),                          &
-     &                          total = (/1/))
-          IF (exit_flag.ne.NoError) RETURN
-          IF (Master) THEN
-            WRITE (stdout,*) 'stenCount', stenCount
-          END IF
-
           CALL netcdf_get_fvar (ng, IDmod, ncname, 'stenIndex',         &
      &                          stenIndex(:,ng),                        &
      &                          ncid = ncINPid,                         &
@@ -444,6 +434,16 @@
           IF (exit_flag.ne.NoError) RETURN
           IF (Master) THEN
             WRITE (stdout,70) 'stenIndex', Fmin, Fmax
+          END IF
+
+          CALL netcdf_get_ivar (ng, IDmod, ncname, 'stenCount',         &
+     &                          stenCount(ng),                          &
+     &                          ncid = ncINPid,                         &
+     &                          start = (/1/),                          &
+     &                          total = (/1/))
+          IF (exit_flag.ne.NoError) RETURN
+          IF (Master) THEN
+            WRITE (stdout,80) 'stenCount', stenCount
           END IF
       ELSE
          exit_flag = NoError
@@ -4616,6 +4616,8 @@
      &        'at time record = ',i3,/,18x,'in input NetCDF file: ',a)
   70  FORMAT (16x,'- ',a,/,19x,'(Min = ',1p,e15.8,                      &
      &        ' Max = ',1p,e15.8,')')
-
+#ifdef STATS_ENSO
+  80  FORMAT (16x,'- ',a,i3.0)
+#endif
       RETURN
       END SUBROUTINE get_state
