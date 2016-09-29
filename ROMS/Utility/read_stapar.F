@@ -201,6 +201,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Sout(idShea,:))
             CASE ('Sout(idLrad)')
               Npts=load_l(Nval, Cval, Ngrids, Sout(idLrad,:))
+            CASE ('Sout(idTair)')
+              Npts=load_l(Nval, Cval, Ngrids, Sout(idTair,:))
             CASE ('Sout(idSrad)')
               Npts=load_l(Nval, Cval, Ngrids, Sout(idSrad,:))
             CASE ('Sout(idEmPf)')
@@ -630,6 +632,9 @@
             IF (Sout(idLrad,ng)) WRITE (out,90) Sout(idLrad,ng),        &
      &          'Sout(idLrad)',                                         &
      &          'Write out longwave radiation flux.'
+            IF (Sout(idTair,ng)) WRITE (out,90) Sout(idTair,ng),        &
+     &          'Sout(idTair)',                                         &
+     &          'Write out atmospheric air temperature.'
             IF (Sout(idLhea,ng)) WRITE (out,90) Sout(idLhea,ng),        &
      &          'Sout(idLhea)',                                         &
      &          'Write out latent heat flux.'

@@ -142,7 +142,11 @@
       CALL set_2dfld_tile (ng, tile, iNLM, idTair,                      &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     FORCES(ng)%TairG,                            &
+#   ifdef ABLM
+     &                     FORCES(ng)%TairB,                            &
+#   else
      &                     FORCES(ng)%Tair,                             &
+#   endif
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 #   endif

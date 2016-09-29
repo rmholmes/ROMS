@@ -87,7 +87,12 @@
 !                                                                      !
 !  Surface air temperature.                                            !
 !                                                                      !
+#ifdef ABLM
+!  Tair         Surface air temperature (Celsius) internal             !
+!  TairB        Surface air temperature (Celsius) external             !
+#else
 !  Tair         Surface air temperature (Celsius)                      !
+#endif
 !  TairG        Latest two-time snapshots of input "Tair" grided       !
 !                 data used for interpolation.                         !
 !  Surface Winds.                                                      !
@@ -270,6 +275,9 @@
           real(r8), pointer :: HairG(:,:,:)
 #  endif
           real(r8), pointer :: Tair(:,:)
+#  ifdef ABLM
+          real(r8), pointer :: TairB(:,:)
+#  endif
 #  ifndef ANA_TAIR
           real(r8), pointer :: TairG(:,:,:)
 #  endif
@@ -582,6 +590,10 @@
 #  endif
 
       allocate ( FORCES(ng) % Tair(LBi:UBi,LBj:UBj) )
+
+#   ifdef ABLM
+      allocate ( FORCES(ng) % Tair(LBi:UBi,LBj:UBj) )
+#   endif
 
 #  ifndef ANA_TAIR
       allocate ( FORCES(ng) % TairG(LBi:UBi,LBj:UBj,2) )
@@ -940,6 +952,9 @@
     (defined SHORTWAVE && defined ANA_SRFLUX)
             FORCES(ng) % Hair(i,j) = IniVal
             FORCES(ng) % Tair(i,j) = IniVal
+#  ifdef ABLM
+            FORCES(ng) % Tair(i,j) = IniVal
+#  endif
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
             FORCES(ng) % Uwind(i,j) = IniVal

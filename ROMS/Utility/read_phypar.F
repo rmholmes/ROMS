@@ -1646,6 +1646,13 @@
                 RETURN
               END IF
               Npts=load_l(Nval, Cval, Ngrids, Hout(idLrad,:))
+            CASE ('Hout(idTair)')
+              IF (idTair.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idTair'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idTair,:))
             CASE ('Hout(idSrad)')
               IF (idSrad.eq.0) THEN
                 IF (Master) WRITE (out,280) 'idSrad'
@@ -1933,6 +1940,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Qout(idShea,:))
             CASE ('Qout(idLrad)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idLrad,:))
+            CASE ('Qout(idTair)')
+              Npts=load_l(Nval, Cval, Ngrids, Qout(idTair,:))
             CASE ('Qout(idSrad)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idSrad,:))
             CASE ('Qout(idEmPf)')
@@ -2075,6 +2084,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Aout(idShea,:))
             CASE ('Aout(idLrad)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idLrad,:))
+            CASE ('Aout(idTair)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idTair,:))
             CASE ('Aout(idSrad)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSrad,:))
             CASE ('Aout(idevap)')
@@ -4460,6 +4471,9 @@
             IF (Hout(idLrad,ng)) WRITE (out,170) Hout(idLrad,ng),       &
      &         'Hout(idLrad)',                                          &
      &         'Write out longwave radiation flux.'
+            IF (Hout(idTair,ng)) WRITE (out,170) Hout(idTair,ng),       &
+     &         'Hout(idTair)',                                          &
+     &         'Write out atmospheric air temperature.'
             IF (Hout(idLhea,ng)) WRITE (out,170) Hout(idLhea,ng),       &
      &         'Hout(idLhea)',                                          &
      &         'Write out latent heat flux.'
@@ -4764,6 +4778,9 @@
             IF (Qout(idLrad,ng)) WRITE (out,170) Qout(idLrad,ng),       &
      &         'Qout(idLrad)',                                          &
      &         'Write out longwave radiation flux.'
+            IF (Qout(idTair,ng)) WRITE (out,170) Qout(idTair,ng),       &
+     &         'Qout(idTair)',                                          &
+     &         'Write out atmospheric air temperature.'
             IF (Qout(idLhea,ng)) WRITE (out,170) Qout(idLhea,ng),       &
      &         'Qout(idLhea)',                                          &
      &         'Write out latent heat flux.'
@@ -4962,6 +4979,9 @@
             IF (Aout(idLrad,ng)) WRITE (out,170) Aout(idLrad,ng),       &
      &         'Aout(idLrad)',                                          &
      &         'Write out averaged longwave radiation flux.'
+            IF (Aout(idTair,ng)) WRITE (out,170) Aout(idTair,ng),       &
+     &         'Aout(idTair)',                                          &
+     &         'Write out atmospheric air temperature.'
             IF (Aout(idLhea,ng)) WRITE (out,170) Aout(idLhea,ng),       &
      &         'Aout(idLhea)',                                          &
      &         'Write out averaged latent heat flux.'

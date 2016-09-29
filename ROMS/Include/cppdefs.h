@@ -158,6 +158,7 @@
 **   sea surface temperature; (3) provide net longwave radiation (default).  **
 **                                                                           **
 ** BULK_FLUXES         use if bulk fluxes computation                        **
+** ABLM                use if atmospheric boundary layer model               **
 ** NL_BULK_FLUXES      use bulk fluxes computed by nonlinear model           **
 ** COOL_SKIN           use if cool skin correction                           **
 ** LONGWAVE            use if computing net longwave radiation               **

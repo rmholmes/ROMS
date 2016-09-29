@@ -73,6 +73,7 @@
 #  ifdef BULK_FLUXES
 !  avglhf     Latent heat flux (W/m2).                                 !
 !  avglrf     Longwave radiation flux (W/m2).                          !
+!  avgTair    Atmospheric air temperature (degC)                       !
 !  avgshf     Sensible heat flux (W/m2).                               !
 #   ifdef EMINUSP
 !  avgevap    Surface net evaporation (kg/m2/s).                       !
@@ -213,6 +214,7 @@
 #  ifdef BULK_FLUXES
           real(r8), pointer :: avglhf(:,:)
           real(r8), pointer :: avglrf(:,:)
+          real(r8), pointer :: avgTair(:,:)
           real(r8), pointer :: avgshf(:,:)
 #   ifdef EMINUSP
           real(r8), pointer :: avgevap(:,:)
@@ -449,6 +451,9 @@
       END IF
       IF (Aout(idLrad,ng)) THEN
         allocate ( AVERAGE(ng) % avglrf(LBi:UBi,LBj:UBj) )
+      END IF
+      IF (Aout(idTair,ng)) THEN
+        allocate ( AVERAGE(ng) % avgTair(LBi:UBi,LBj:UBj) )
       END IF
       IF (Aout(idShea,ng)) THEN
         allocate ( AVERAGE(ng) % avgshf(LBi:UBi,LBj:UBj) )
@@ -961,6 +966,13 @@
         DO j=Jmin,Jmax
           DO i=Imin,Imax
             AVERAGE(ng) % avglrf(i,j) = IniVal
+          END DO
+        END DO
+      END IF
+      IF (Aout(idTair,ng)) THEN
+        DO j=Jmin,Jmax
+          DO i=Imin,Imax
+            AVERAGE(ng) % avgTair(i,j) = IniVal
           END DO
         END DO
       END IF
