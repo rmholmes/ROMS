@@ -38,6 +38,9 @@
       USE bbl_mod, ONLY : bblm
 # endif
 # ifdef BULK_FLUXES
+#  ifdef ABLM
+      USE ablm_mod, ONLY: ablm_advdif
+#  endif
       USE bulk_flux_mod, ONLY : bulk_flux
 # endif
 # ifdef BVF_MIXING
@@ -354,6 +357,9 @@
               ng=GridNumber(ig,nl)
               DO tile=first_tile(ng),last_tile(ng),+1
 # ifdef BULK_FLUXES
+#  ifdef ABLM
+                CALL ablm_advdif (ng, tile)
+#  endif
 #  if defined FOUR_DVAR && defined NL_BULK_FLUXES
                 IF (Nrun.eq.1) CALL bulk_flux (ng, tile)
 #  else
