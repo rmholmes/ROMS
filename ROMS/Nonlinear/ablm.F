@@ -149,11 +149,8 @@
 !  Local variable declarations.
 !
       integer :: i, j
-!     integer, parameter :: IterMax = 3
-!      real(r8), parameter :: eps = 1.0E-20_r8
-!      real(r8) :: Wspeed, ZQoL, ZToL
-!      real(r8), dimension(IminS:ImaxS) :: CC
-!      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: Hlv
+!      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTen
+!      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTenBef
 
 # include "set_bounds.h"
 !
@@ -161,30 +158,62 @@
 !  Atmospheric boundary layer model Tair and Qair advection/diffusion
 !=======================================================================
 !
+! Start atmospheric time loop
+!      DO nt=1,ablm_ntatm
+
+!
+!-----------------------------------------------------------------------
+!  Calculate RHS of Tair advection/diffusion equation
+!-----------------------------------------------------------------------
+!
+!        CALL GAD_2D_RHS()
+
+!
+!-----------------------------------------------------------------------
+!  Extrapolate to new time tendency using adams-bashforth2
+!-----------------------------------------------------------------------
+!
+!        CALL ADAMS_BASHFORTH2()
+
+!
+!-----------------------------------------------------------------------
+!  Step Tair forward in time
+!-----------------------------------------------------------------------
+!
+!        CALL ABLM_TIMESTEP()
+
 ! Calculate Tair due to some random function:
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
           Tair(i,j) = TairB(i,j) + 1.0_r8
         END DO
       END DO
+
 !
 !-----------------------------------------------------------------------
 !  Exchange boundary data.
 !-----------------------------------------------------------------------
 !
-      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
-        CALL exchange_r2d_tile (ng, tile,                               &
+        IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+          CALL exchange_r2d_tile (ng, tile,                             &
      &                          LBi, UBi, LBj, UBj,                     &
      &                          Tair)
-      END IF
+        END IF
 
 # ifdef DISTRIBUTE
-      CALL mp_exchange2d (ng, tile, iNLM, 4,                            &
+        CALL mp_exchange2d (ng, tile, iNLM, 4,                          &
      &                    LBi, UBi, LBj, UBj,                           &
      &                    NghostPoints,                                 &
      &                    EWperiodic(ng), NSperiodic(ng),               &
      &                    Tair)
 # endif
+
+!
+!-----------------------------------------------------------------------
+!  Reset boundary values to open boundary conditions
+!-----------------------------------------------------------------------
+!
+!        CALL ABLM_COPY_EDGES()
 
       RETURN
       END SUBROUTINE ablm_advdif_tile
