@@ -592,7 +592,7 @@
       allocate ( FORCES(ng) % Tair(LBi:UBi,LBj:UBj) )
 
 #   ifdef ABLM
-      allocate ( FORCES(ng) % Tair(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % TairB(LBi:UBi,LBj:UBj) )
 #   endif
 
 #  ifndef ANA_TAIR
@@ -953,7 +953,7 @@
             FORCES(ng) % Hair(i,j) = IniVal
             FORCES(ng) % Tair(i,j) = IniVal
 #  ifdef ABLM
-            FORCES(ng) % Tair(i,j) = IniVal
+            FORCES(ng) % TairB(i,j) = IniVal
 #  endif
 # endif
 # if defined BULK_FLUXES || defined ECOSIM

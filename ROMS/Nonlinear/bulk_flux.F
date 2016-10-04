@@ -104,6 +104,9 @@
      &                     FORCES(ng) % Tair,                           &
      &                     FORCES(ng) % Uwind,                          &
      &                     FORCES(ng) % Vwind,                          &
+# ifdef ABLM
+     &                     FORCES(ng) % TairB,                          &
+# endif
 # ifdef CLOUDS
      &                     FORCES(ng) % cloud,                          &
 # endif
@@ -149,6 +152,9 @@
 # endif
      &                           alpha, beta, rho, t,                   &
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
+# ifdef ABLM
+     &                           TairB,                                 &
+# endif
 # ifdef CLOUDS
      &                           cloud,                                 &
 # endif
@@ -202,7 +208,12 @@
       real(r8), intent(in) :: t(LBi:,LBj:,:,:,:)
       real(r8), intent(in) :: Hair(LBi:,LBj:)
       real(r8), intent(in) :: Pair(LBi:,LBj:)
+#  ifdef ABLM
+      real(r8), intent(inout) :: Tair(LBi:,LBj:)
+      real(r8), intent(in) :: TairB(LBi:,LBj:)
+#  else
       real(r8), intent(in) :: Tair(LBi:,LBj:)
+#  endif
       real(r8), intent(in) :: Uwind(LBi:,LBj:)
       real(r8), intent(in) :: Vwind(LBi:,LBj:)
 #  ifdef CLOUDS
@@ -249,7 +260,12 @@
       real(r8), intent(in) :: t(LBi:UBi,LBj:UBj,N(ng),3,NT(ng))
       real(r8), intent(in) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Pair(LBi:UBi,LBj:UBj)
+#  ifdef ABLM
+      real(r8), intent(inout) :: Tair(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: TairB(LBi:UBi,LBj:UBj)
+#  else
       real(r8), intent(in) :: Tair(LBi:UBi,LBj:UBj)
+#  endif
       real(r8), intent(in) :: Uwind(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
 #  ifdef CLOUDS
@@ -360,6 +376,19 @@
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: Tauy
 
 # include "set_bounds.h"
+# ifdef ABLM
+!
+!=======================================================================
+!  Atmospheric boundary layer model Tair and Qair advection/diffusion
+!=======================================================================
+!
+! Calculate Tair due to some random function:
+      DO j=Jstr-1,JendR
+        DO i=Istr-1,IendR
+          Tair(i,j) = TairB(i,j) + 1.0_r8
+        END DO
+      END DO
+# endif
 !
 !=======================================================================
 !  Atmosphere-Ocean bulk fluxes parameterization.
