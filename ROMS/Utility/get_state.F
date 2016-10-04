@@ -29,7 +29,7 @@
 #endif
       USE mod_grid
       USE mod_iounits
-#if defined ADJUST_WSTRESS || defined ADJUST_STFLUX
+#if defined ADJUST_WSTRESS || defined ADJUST_STFLUX || defined ABLM
       USE mod_forces
 #endif
 #ifdef FOUR_DVAR
@@ -675,6 +675,39 @@
             END IF
           END IF
         END IF
+
+#  ifdef ABLM
+!
+!  Read in atomspheric air temperature Tair
+!
+        IF (get_var(idTair)) THEN
+          foundit=find_string(var_name, n_var, TRIM(Vname(1,idTair)),   &
+     &                        varid)
+          gtype=var_flag(varid)*r2dvar
+          status=nf_fread2d(ng, IDmod, ncname, ncINPid,                 &
+     &                      Vname(1,idTair), varid,                     &
+     &                      InpRec, gtype, Vsize,                       &
+     &                      LBi, UBi, LBj, UBj,                         &
+     &                      Fscl, Fmin, Fmax,                           &
+# ifdef MASKING
+     &                      GRID(ng) % rmask,                           &
+# endif
+     &                      FORCES(ng) % Tair)
+          IF (status.ne.nf90_noerr) THEN
+            IF (Master) THEN
+              WRITE (stdout,60) string, TRIM(Vname(1,idTair)), InpRec,  &
+     &                          TRIM(ncname)
+            END IF
+            exit_flag=2
+            ioerror=status
+            RETURN
+          ELSE
+            IF (Master) THEN
+              WRITE (stdout,70) TRIM(Vname(2,idTair)), Fmin, Fmax
+            END IF
+          END IF
+        END IF
+#  endif
 
 # ifdef SOLVE3D
 !

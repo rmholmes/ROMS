@@ -107,6 +107,9 @@
           get_var(idFsur)=.TRUE.
           get_var(idUbar)=.TRUE.
           get_var(idVbar)=.TRUE.
+# ifdef ABLM
+          get_var(idTair)=.TRUE.
+# endif
 # ifdef SOLVE3D
           get_var(idUvel)=.TRUE.
           get_var(idVvel)=.TRUE.
@@ -119,6 +122,9 @@
         get_var(idFsur)=.TRUE.
         get_var(idUbar)=.TRUE.
         get_var(idVbar)=.TRUE.
+# ifdef ABLM
+          get_var(idTair)=.TRUE.
+# endif
 # ifdef SOLVE3D
         get_var(idUvel)=.TRUE.
         get_var(idVvel)=.TRUE.
@@ -393,6 +399,10 @@
           have_var(idRu2d)=.TRUE.
         ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idVbar))) THEN
           have_var(idVbar)=.TRUE.
+#ifdef ABLM
+        ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTair))) THEN
+          have_var(idTair)=.TRUE.
+#endif
         ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idRv2d))) THEN
           have_var(idRv2d)=.TRUE.
         ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idKhor))) THEN
