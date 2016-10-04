@@ -148,9 +148,8 @@
 !
 !  Local variable declarations.
 !
-
       integer :: i, j
-!      integer, parameter :: IterMax = 3
+!     integer, parameter :: IterMax = 3
 !      real(r8), parameter :: eps = 1.0E-20_r8
 !      real(r8) :: Wspeed, ZQoL, ZToL
 !      real(r8), dimension(IminS:ImaxS) :: CC
