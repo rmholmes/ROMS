@@ -59,6 +59,8 @@
      &                     LBi, UBi, LBj, UBj,                          &
      &                     IminS, ImaxS, JminS, JmaxS,                  &
      &                     nrhs(ng),                                    &
+     &                     GRID(ng) % pm,                               &
+     &                     GRID(ng) % pn,                               &
 # ifdef MASKING
      &                     GRID(ng) % rmask,                            &
      &                     GRID(ng) % umask,                            &
@@ -85,7 +87,7 @@
       SUBROUTINE ablm_advdif_tile (ng, tile,                            &
      &                           LBi, UBi, LBj, UBj,                    &
      &                           IminS, ImaxS, JminS, JmaxS,            &
-     &                           nrhs,                                  &
+     &                           nrhs, pm, pn,                          &
 # ifdef MASKING
      &                           rmask, umask, vmask,                   &
 # endif
@@ -111,6 +113,8 @@
       integer, intent(in) :: nrhs
 !
 # ifdef ASSUMED_SHAPE
+      real(r8), intent(in) :: pm(LBi:,LBj:)
+      real(r8), intent(in) :: pn(LBi:,LBj:)
 #  ifdef MASKING
       real(r8), intent(in) :: rmask(LBi:,LBj:)
       real(r8), intent(in) :: umask(LBi:,LBj:)
@@ -128,6 +132,8 @@
       real(r8), intent(in) :: TairB(LBi:,LBj:)
 !      real(r8), intent(in) :: HairB(LBi:,LBj:)
 # else
+      real(r8), intent(in) :: pm(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: pn(LBi:UBi,LBj:UBj)
 #  ifdef MASKING
       real(r8), intent(in) :: rmask(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: umask(LBi:UBi,LBj:UBj)
@@ -148,46 +154,152 @@
 !
 !  Local variable declarations.
 !
-      integer :: i, j
-!      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTen
-!      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTenBef
-
+      integer :: i, j, k
+!
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTen !Tair tendency current
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTenBef !Tair tendency previous
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: wVel ! Vertical velocity on rho-points
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: uVel ! Zonal wind on u-points
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: vVel ! Meridional wind on v-points
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: fZon ! Zonal flux on u-points
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: fMer ! Meridional flux on v-points
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: fVer ! Vertical flux on rho-points
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: ABinc ! Adams-Bashforth Increment
+     
+!     Local variables to add as parameters:
+      integer, parameter :: ntatm = 5 ! Number of atmospheric time steps
+      real(r8) :: dtatm               ! Atmospheric time step
+      real(r8), parameter :: zWind = 10.0_r8 ! Height of wind velocities
+      real(r8), parameter :: ablmK = 4.0E04_r8 ! Diffusion coefficient
+      real(r8), parameter :: abEps = 0.01_r8
+      real(r8) :: abFac
+      
 # include "set_bounds.h"
 !
 !=======================================================================
 !  Atmospheric boundary layer model Tair and Qair advection/diffusion
 !=======================================================================
 !
-! Start atmospheric time loop
-!      DO nt=1,ablm_ntatm
+! Get uVel on u-points
+      DO j=Jstr,Jend
+        DO i=IstrU,Iend
+           uVel(i,j) = 0.5_r8*(uWind(i-1,j)+uWind(i,j))
+        END DO
+      END DO
+
+! Get vVel on v-points
+      DO j=JstrV,Jend
+        DO i=Istr,Iend
+           vVel(i,j) = 0.5_r8*(vWind(i,j-1)+vWind(i,j))
+        END DO
+      END DO
+
+! Get wVel from continuity, assuming w(0) = 0
+      DO j=Jstr,JendR
+        DO i=Istr,IendR
+          wVel(i,j) = -(pm(i,j)*(uVel(i,j)-uVel(i-1,j))                 &
+     &                + pn(i,j)*(vVel(i,j)-vVel(i,j-1)))*2.0_r8*zWind
+        END DO
+      END DO
 
 !
 !-----------------------------------------------------------------------
 !  Calculate RHS of Tair advection/diffusion equation
 !-----------------------------------------------------------------------
 !
-!        CALL GAD_2D_RHS()
+! Start atmospheric time loop
+      dtatm = dt(ng)/REAL(ntatm)
+
+      DO k=1,ntatm
+
+! Compute zonal advective flux using second-order centered advection
+        DO j=Jstr,Jend
+          fZon(Jstr,j) = 0.0_r8
+          DO i=IstrU,Iend
+            fZon(i,j) = uVel(i,j)*(Tair(i+1,j)+Tair(i,j))*0.5_r8
+          END DO
+        END DO
+
+! Compute meridional advective flux using second-order centered advection
+        DO i=Istr,Iend
+          fMer(i,Jstr) = 0.0_r8
+        END DO
+        DO j=JstrV,Jend
+          DO i=Istr,Iend
+            fMer(i,j) = vVel(i,j)*(Tair(i,j+1)+Tair(i,j))*0.5_r8
+          END DO
+        END DO
+
+! Compute vertical advective flux using second-order centered advection
+        DO j=Jstr,Jend
+          DO i=Istr,Iend
+            fVer(i,j) = wVel(i,j)*(Tair(i,j)+Tair(i,j))*0.5_r8
+          END DO
+        END DO
+
+!! Compute zonal diffusive flux
+!      DO j=Jstr,Jend
+!        DO i=IstrU,Iend
+!          fZon(i,j) = fZon(i,j) - ablmK*<< TO DO >>
+!        END DO
+!      END DO
+!
+!! Compute meridional diffusive flux
+!      DO j=Jstr,Jend
+!        DO i=IstrU,Iend
+!          fZon(i,j) = fZon(i,j) - ablmK*<< TO DO >>
+!        END DO
+!      END DO
+
+! Compute divergence of the fluxes
+        DO j=Jstr,Jend
+          DO i=Istr,Iend
+            TairTen(i,j) = -(pm(i,j)*(fZon(i,j)-fZon(i-1,j))            &
+     &                     + pn(i,j)*(fMer(i,j)-fMer(i,j-1))            &
+     &                     + 0.5_r8/zWind*fVer(i,j))
+          END DO
+        END DO
 
 !
 !-----------------------------------------------------------------------
 !  Extrapolate to new time tendency using adams-bashforth2
 !-----------------------------------------------------------------------
-!
-!        CALL ADAMS_BASHFORTH2()
+! 
+! Determine Adams-Bashforth extrpolation factor:
+!      IF (<<<First time, have TairTenBef>>>) THEN
+        IF (k.gt.1) THEN ! Just start again for now
+          abFac = 0.0_r8
+        ELSE
+          abFac = 0.5_r8 + abEps
+        END IF
+
+! Extrapolate forward tendency in time, with AB weights:
+        DO j=Jstr,Jend
+          DO i=Istr,Iend
+            ABinc(i,j) = abFac*(TairTen(i,j) - TairTenBef(i,j))
+            TairTenBef(i,j) = TairTen(i,j)
+            TairTen(i,j) = TairTen(i,j) + ABinc(i,j)
+          END DO
+        END DO
 
 !
 !-----------------------------------------------------------------------
 !  Step Tair forward in time
 !-----------------------------------------------------------------------
 !
-!        CALL ABLM_TIMESTEP()
-
-! Calculate Tair due to some random function:
-      DO j=Jstr-1,JendR
-        DO i=Istr-1,IendR
-          Tair(i,j) = TairB(i,j) + 1.0_r8
+! Step forward in time
+        DO j=Jstr,Jend
+          DO i=Istr,Iend
+            Tair(i,j) = Tair(i,j) + dtatm*TairTen(i,j)
+          END DO
         END DO
-      END DO
+
+!! Calculate Tair due to some random function:
+!      DO j=Jstr-1,JendR
+!        DO i=Istr-1,IendR
+!          Tair(i,j) = TairB(i,j) + 1.0_r8
+!        END DO
+!      END DO
 
 !
 !-----------------------------------------------------------------------
@@ -214,6 +326,8 @@
 !-----------------------------------------------------------------------
 !
 !        CALL ABLM_COPY_EDGES()
+
+      END DO ! End atmospheric time loop
 
       RETURN
       END SUBROUTINE ablm_advdif_tile
