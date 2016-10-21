@@ -39,7 +39,7 @@
 # endif
 # ifdef BULK_FLUXES
 #  ifdef ABLM
-      USE ablm_mod, ONLY: ablm_advdif
+      USE ablm_mod, ONLY: ablm_advdif, ablm_diabatic
 #  endif
       USE bulk_flux_mod, ONLY : bulk_flux
 # endif
@@ -364,6 +364,9 @@
                 IF (Nrun.eq.1) CALL bulk_flux (ng, tile)
 #  else
                 CALL bulk_flux (ng, tile)
+#  endif
+#  ifdef ABLM
+                CALL ablm_diabatic(ng,tile)
 #  endif
 # endif
 # ifdef BBL_MODEL

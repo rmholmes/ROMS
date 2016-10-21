@@ -31,7 +31,7 @@
       implicit none
 !
       PRIVATE
-      PUBLIC  :: ablm_advdif !, ablm_diabatic
+      PUBLIC  :: ablm_advdif, ablm_diabatic
 !
       CONTAINS
 !
@@ -327,16 +327,206 @@
      &                    Tair)
 # endif
 
-!
-!-----------------------------------------------------------------------
-!  Reset boundary values to open boundary conditions
-!-----------------------------------------------------------------------
-!
-!        CALL ABLM_COPY_EDGES()
-
       END DO ! End atmospheric time loop
 
       RETURN
       END SUBROUTINE ablm_advdif_tile
+
+!
+!***********************************************************************
+      SUBROUTINE ablm_diabatic (ng, tile)
+!***********************************************************************
+!
+      USE mod_param
+      USE mod_forces
+      USE mod_grid
+      USE mod_stepping
+      USE mod_ocean
+!
+!  Imported variable declarations.
+!
+      integer, intent(in) :: ng, tile
+!
+!  Local variable declarations.
+!
+# include "tile.h"
+!
+# ifdef PROFILE
+      CALL wclock_on (ng, iNLM, 17)
+# endif
+      CALL ablm_diabatic_tile (ng, tile,                                &
+     &                     LBi, UBi, LBj, UBj,                          &
+     &                     IminS, ImaxS, JminS, JmaxS,                  &
+     &                     nrhs(ng),                                    &
+# ifdef MASKING
+     &                     GRID(ng) % rmask,                            &
+     &                     GRID(ng) % umask,                            &
+     &                     GRID(ng) % vmask,                            &
+# endif
+# ifdef WET_DRY
+     &                     GRID(ng) % rmask_wet,                        &
+     &                     GRID(ng) % umask_wet,                        &
+     &                     GRID(ng) % vmask_wet,                        &
+# endif
+!     &                     FORCES(ng) % Hair,                           &
+     &                     FORCES(ng) % Tair,                           &
+     &                     FORCES(ng) % lhflx,                          &
+     &                     FORCES(ng) % shflx,                          &
+     &                     FORCES(ng) % srflx,                          &
+     &                     FORCES(ng) % TairB,                          &
+     &                     OCEAN(ng) % t)
+# ifdef PROFILE
+      CALL wclock_off (ng, iNLM, 17)
+# endif
+
+      RETURN
+      END SUBROUTINE ablm_diabatic
+!
+!***********************************************************************
+      SUBROUTINE ablm_diabatic_tile (ng, tile,                          &
+     &                           LBi, UBi, LBj, UBj,                    &
+     &                           IminS, ImaxS, JminS, JmaxS,            &
+     &                           nrhs,                                  &
+# ifdef MASKING
+     &                           rmask, umask, vmask,                   &
+# endif
+# ifdef WET_DRY
+     &                           rmask_wet, umask_wet, vmask_wet,       &
+# endif
+     &                           Tair, lhflx, shflx, srflx, TairB,      &
+     &                           t)
+!***********************************************************************
+!
+      USE mod_param
+      USE mod_scalars
+!
+      USE exchange_2d_mod
+# ifdef DISTRIBUTE
+      USE mp_exchange_mod, ONLY : mp_exchange2d
+# endif
+!
+!  Imported variable declarations.
+!
+      integer, intent(in) :: ng, tile
+      integer, intent(in) :: LBi, UBi, LBj, UBj
+      integer, intent(in) :: IminS, ImaxS, JminS, JmaxS
+      integer, intent(in) :: nrhs
+!
+# ifdef ASSUMED_SHAPE
+#  ifdef MASKING
+      real(r8), intent(in) :: rmask(LBi:,LBj:)
+      real(r8), intent(in) :: umask(LBi:,LBj:)
+      real(r8), intent(in) :: vmask(LBi:,LBj:)
+#  endif
+#  ifdef WET_DRY
+      real(r8), intent(in) :: rmask_wet(LBi:,LBj:)
+      real(r8), intent(in) :: umask_wet(LBi:,LBj:)
+      real(r8), intent(in) :: vmask_wet(LBi:,LBj:)
+#  endif
+      real(r8), intent(inout) :: Tair(LBi:,LBj:)
+      real(r8), intent(in) :: lhflx(LBi:,LBj:)
+      real(r8), intent(in) :: shflx(LBi:,LBj:)
+      real(r8), intent(in) :: srflx(LBi:,LBj:)
+      real(r8), intent(in) :: TairB(LBi:,LBj:)
+      real(r8), intent(in) :: t(LBi:,LBj:,:,:,:)
+# else
+#  ifdef MASKING
+      real(r8), intent(in) :: rmask(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: umask(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: vmask(LBi:UBi,LBj:UBj)
+#  endif
+#  ifdef WET_DRY
+      real(r8), intent(in) :: rmask_wet(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: umask_wet(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: vmask_wet(LBi:UBi,LBj:UBj)
+#  endif
+      real(r8), intent(inout) :: Tair(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: lhflx(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: shflx(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: srflx(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: TairB(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: t(LBi:UBi,LBj:UBj,N(ng),3,NT(ng))
+# endif
+!
+!  Local variable declarations.
+!
+      integer :: i, j, k
+      real(r8) :: cff, Hscale, TairK
+      real(r8), parameter :: rhoa = 1.3_r8
+      real(r8), parameter :: Cpa = 1004.0_r8
+      real(r8), parameter :: gamma_blk = 0.0098_r8 ! Adiabatic lapse rate (degC/m)
+      real(r8), parameter :: hABLM = 1000.0_r8     ! ABL thickness
+      real(r8), parameter :: CtoK = 273.16_r8      ! Celsius to Kelvin
+
+      real(r8) :: Ttop ! temperature for outgoing longwave calculation
+      real(r8) :: TseaK ! SST (Kelvin)
+      real(r8) :: TairTen ! temperature for outgoing longwave calculation
+      real(r8) :: LWup ! atmospheric upwelled lw radiation
+      real(r8) :: OCup ! oceanic upwelled lw radiation
+      real(r8) :: LWdn ! atmospheric downwelled lw radiation
+      real(r8) :: NETup ! atmospheric upwelled lw radiation
+      real(r8) :: NETdn ! atmospheric downwelled lw radiation
+      
+!
+           
+# include "set_bounds.h"
+!
+!=======================================================================
+!  Atmospheric boundary layer model diabatic steps
+!=======================================================================
+!
+!
+      Hscale=rhoa*Cpa
+      DO j=Jstr-1,JendR
+        DO i=Istr-1,IendR
+          
+          TseaK = t(i,j,N(ng),nrhs,itemp)+CtoK
+          TairK = Tair(i,j)+CtoK
+          Ttop = TairK - gamma_blk * ( hABLM - zWind )
+
+          LWup = 0.5_r8*StefBo*(0.5_r8*TairK+0.5_r8*Ttop)**4
+          LWdn = 0.5_r8*StefBo*TairK**4
+          OCup = emmiss*StefBo*TseaK**4
+
+          NETup = (-srflx(i,j) + LWup + lhflx(i,j))/Hscale
+          NETdn = (-srflx(i,j) - LWdn + lhflx(i,j) +                    &
+     &                  shflx(i,j) + OCup)/Hscale
+
+          TairTen = (NETdn - NETup) / hABLM
+          Tair(i,j) = Tair(i,j) + dt(ng)*TairTen          
+        END DO
+      END DO
+!
+!-----------------------------------------------------------------------
+!  Nudging over land and near boundaries
+!-----------------------------------------------------------------------
+! 
+!      DO j=Jstr-1,JendR
+!        DO i=Istr-1,IendR
+!          Tair(i,j)=Tair(i,j) + (TairB(i,j)-Tair(i,j))*relax(i,j)
+!        END DO
+!      END DO
+
+!
+!-----------------------------------------------------------------------
+!  Exchange boundary data.
+!-----------------------------------------------------------------------
+!
+        IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+          CALL exchange_r2d_tile (ng, tile,                             &
+     &                          LBi, UBi, LBj, UBj,                     &
+     &                          Tair)
+        END IF
+
+# ifdef DISTRIBUTE
+        CALL mp_exchange2d (ng, tile, iNLM, 4,                          &
+     &                    LBi, UBi, LBj, UBj,                           &
+     &                    NghostPoints,                                 &
+     &                    EWperiodic(ng), NSperiodic(ng),               &
+     &                    Tair)
+# endif
+
+      RETURN
+      END SUBROUTINE ablm_diabatic_tile
 #endif
       END MODULE ablm_mod
