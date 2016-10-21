@@ -76,6 +76,7 @@
 # endif
 !     &                     FORCES(ng) % Hair,                           &
      &                     FORCES(ng) % Tair,                           &
+     &                     FORCES(ng) % TairTenPrev,                    &
      &                     FORCES(ng) % Uwind,                          &
      &                     FORCES(ng) % Vwind,                          &
      &                     FORCES(ng) % TairB)
@@ -98,7 +99,7 @@
 # ifdef WET_DRY
      &                           rmask_wet, umask_wet, vmask_wet,       &
 # endif
-     &                           Tair, Uwind, Vwind, TairB)
+     &                           Tair, TairTenPrev, Uwind, Vwind, TairB)
 !***********************************************************************
 !
       USE mod_param
@@ -134,6 +135,7 @@
       real(r8), intent(in) :: vmask_wet(LBi:,LBj:)
 #  endif
       real(r8), intent(inout) :: Tair(LBi:,LBj:)
+      real(r8), intent(inout) :: TairTenPrev(LBi:,LBj:)
 !      real(r8), intent(inout) :: Hair(LBi:,LBj:)
       real(r8), intent(inout) :: Uwind(LBi:,LBj:)
       real(r8), intent(inout) :: Vwind(LBi:,LBj:)
@@ -157,6 +159,7 @@
       real(r8), intent(in) :: vmask_wet(LBi:UBi,LBj:UBj)
 #  endif
       real(r8), intent(inout) :: Tair(LBi:UBi,LBj:UBj)
+      real(r8), intent(inout) :: TairTenPrev(LBi:UBi,LBj:UBj)
 !      real(r8), intent(inout) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Uwind(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
@@ -170,7 +173,6 @@
       real(r8) :: cff
 !
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTen !Tair tendency current
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTenBef !Tair tendency previous
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: wVel ! Vertical velocity on rho-points
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: uVel ! Zonal wind on u-points
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: vVel ! Meridional wind on v-points
@@ -180,10 +182,7 @@
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: ABinc ! Adams-Bashforth Increment
      
 !     Local variables to add as parameters:
-      integer, parameter :: ntatm = 5 ! Number of atmospheric time steps
       real(r8) :: dtatm               ! Atmospheric time step
-      real(r8), parameter :: zWind = 10.0_r8 ! Height of wind velocities
-      real(r8), parameter :: ablmK = 4.0E01_r8 ! Diffusion coefficient
       real(r8), parameter :: abEps = 0.01_r8
       real(r8) :: abFac
       
@@ -281,18 +280,18 @@
 !-----------------------------------------------------------------------
 ! 
 ! Determine Adams-Bashforth extrpolation factor:
-!      IF (<<<First time, have TairTenBef>>>) THEN
-        IF (k.gt.1) THEN ! Just start again for now
-          abFac = 0.5_r8 + abEps
-        ELSE
+        IF (ABfirst) THEN ! First step, don't have TairTenPrev
           abFac = 0.0_r8
+          ABfirst = .FALSE.
+        ELSE ! Otherwise, do have TairTenPrev
+          abFac = 0.5_r8 + abEps
         END IF
 
 ! Extrapolate forward tendency in time, with AB weights:
         DO j=JstrV-1,Jend
           DO i=IstrU-1,Iend
-            ABinc(i,j) = abFac*(TairTen(i,j) - TairTenBef(i,j))
-            TairTenBef(i,j) = TairTen(i,j)
+            ABinc(i,j) = abFac*(TairTen(i,j) - TairTenPrev(i,j))
+            TairTenPrev(i,j) = TairTen(i,j)
             TairTen(i,j) = TairTen(i,j) + ABinc(i,j)
           END DO
         END DO

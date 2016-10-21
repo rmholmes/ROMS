@@ -90,6 +90,7 @@
 #ifdef ABLM
 !  Tair         Surface air temperature (Celsius) internal             !
 !  TairB        Surface air temperature (Celsius) external             !
+!  TairTenPrev  Surface air temperature tendency (previous value)      !
 #else
 !  Tair         Surface air temperature (Celsius)                      !
 #endif
@@ -277,6 +278,7 @@
           real(r8), pointer :: Tair(:,:)
 #  ifdef ABLM
           real(r8), pointer :: TairB(:,:)
+          real(r8), pointer :: TairTenPrev(:,:)
 #  endif
 #  ifndef ANA_TAIR
           real(r8), pointer :: TairG(:,:,:)
@@ -593,6 +595,7 @@
 
 #   ifdef ABLM
       allocate ( FORCES(ng) % TairB(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % TairTenPrev(LBi:UBi,LBj:UBj) )
 #   endif
 
 #  ifndef ANA_TAIR
@@ -954,6 +957,7 @@
             FORCES(ng) % Tair(i,j) = IniVal
 #  ifdef ABLM
             FORCES(ng) % TairB(i,j) = IniVal
+            FORCES(ng) % TairTenPrev(i,j) = IniVal
 #  endif
 # endif
 # if defined BULK_FLUXES || defined ECOSIM

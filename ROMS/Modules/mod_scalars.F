@@ -337,7 +337,21 @@
 #endif
         real(r8) :: gorho0                      ! m4/s2/kg
         real(r8) :: vonKar = 0.41_r8            ! non-dimensional
+#ifdef ABLM
 !
+!-----------------------------------------------------------------------
+!  Constants associated with atmospheric boundary layer model
+!-----------------------------------------------------------------------
+!
+!    ntatm         Number of atmospheric advection/diffusion time steps
+!    zWind         Height of wind velocities
+!    ablmK         Diffusion coefficient
+!    ABfirst       Adams-Bashforth first step counter
+        integer :: ntatm = 5
+        real(r8) :: zWind = 10.0_r8   ! m
+        real(r8) :: ablmK = 4.0E01_r8 ! m2s-1
+        logical :: ABfirst = .TRUE.   ! Overwritten after first step
+#endif
 !-----------------------------------------------------------------------
 !  Various model parameters.  Some of these parameters are overwritten
 !  with the values provided from model standard input script.
