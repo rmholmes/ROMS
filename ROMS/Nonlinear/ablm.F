@@ -58,7 +58,6 @@
       CALL ablm_advdif_tile (ng, tile,                                  &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     IminS, ImaxS, JminS, JmaxS,                  &
-     &                     nrhs(ng),                                    &
      &                     GRID(ng) % pm,                               &
      &                     GRID(ng) % pn,                               &
      &                     GRID(ng) % on_u,                             &
@@ -91,7 +90,7 @@
       SUBROUTINE ablm_advdif_tile (ng, tile,                            &
      &                           LBi, UBi, LBj, UBj,                    &
      &                           IminS, ImaxS, JminS, JmaxS,            &
-     &                           nrhs, pm, pn, on_u, om_v,              &
+     &                           pm, pn, on_u, om_v,                    &
      &                           pmon_u, pnom_v,                        &
 # ifdef MASKING
      &                           rmask, umask, vmask,                   &
@@ -109,13 +108,13 @@
 # ifdef DISTRIBUTE
       USE mp_exchange_mod, ONLY : mp_exchange2d
 # endif
+      USE bc_2d_mod, ONLY: bc_r2d_tile
 !
 !  Imported variable declarations.
 !
       integer, intent(in) :: ng, tile
       integer, intent(in) :: LBi, UBi, LBj, UBj
       integer, intent(in) :: IminS, ImaxS, JminS, JmaxS
-      integer, intent(in) :: nrhs
 !
 # ifdef ASSUMED_SHAPE
       real(r8), intent(in) :: pm(LBi:,LBj:)
@@ -136,8 +135,8 @@
 #  endif
       real(r8), intent(inout) :: Tair(LBi:,LBj:)
 !      real(r8), intent(inout) :: Hair(LBi:,LBj:)
-      real(r8), intent(in) :: Uwind(LBi:,LBj:)
-      real(r8), intent(in) :: Vwind(LBi:,LBj:)
+      real(r8), intent(inout) :: Uwind(LBi:,LBj:)
+      real(r8), intent(inout) :: Vwind(LBi:,LBj:)
       real(r8), intent(in) :: TairB(LBi:,LBj:)
 !      real(r8), intent(in) :: HairB(LBi:,LBj:)
 # else
@@ -194,7 +193,20 @@
 !  Atmospheric boundary layer model Tair and Qair advection/diffusion
 !=======================================================================
 !
-
+!
+!-----------------------------------------------------------------------
+!  Apply lateral boundary conditions
+!-----------------------------------------------------------------------
+!
+      CALL bc_r2d_tile(ng, tile,                                        &
+     &                 LBi, UBi, LBj, UBj,                              &
+     &                 Tair)
+      CALL bc_r2d_tile(ng, tile,                                        &
+     &                 LBi, UBi, LBj, UBj,                              &
+     &                 Uwind)
+      CALL bc_r2d_tile(ng, tile,                                        &
+     &                 LBi, UBi, LBj, UBj,                              &
+     &                 Vwind)
 !
 !-----------------------------------------------------------------------
 !  Calculate RHS of Tair advection/diffusion equation
@@ -203,8 +215,8 @@
 ! Calculate vertical velocity from continuity, assuming w(0) = 0
       DO j=JstrV-1,Jend
         DO i=IstrU-1,Iend
-          wVel(i,j) =  -(pm(i,j)*(uWind(i+1,j)-uWind(i-1,j))            &
-     &                + pn(i,j)*(vWind(i,j+1)-vWind(i,j-1)))*zWind
+          wVel(i,j) =  -(pm(i,j)*(Uwind(i+1,j)-Uwind(i-1,j))            &
+     &                + pn(i,j)*(Vwind(i,j+1)-Vwind(i,j-1)))*zWind
         END DO
       END DO
 
@@ -217,7 +229,7 @@
         DO j=JstrV-2,Jendp2
           DO i=IstrU-1,Iendp2
              cff=0.25_r8*on_u(i,j)
-             fZon(i,j) = cff*(uWind(i-1,j)+uWind(i,j))*                 & 
+             fZon(i,j) = cff*(Uwind(i-1,j)+Uwind(i,j))*                 & 
      &                       (Tair(i-1,j)+Tair(i,j))
           END DO
         END DO
@@ -226,7 +238,7 @@
         DO j=JstrV-1,Jendp2
           DO i=IstrU-2,Iendp2
              cff=0.25_r8*om_v(i,j)
-             fMer(i,j) = cff*(vWind(i,j-1)+vWind(i,j))*                 & 
+             fMer(i,j) = cff*(Vwind(i,j-1)+Vwind(i,j))*                 & 
      &                       (Tair(i,j-1)+Tair(i,j))
           END DO
         END DO
@@ -253,21 +265,6 @@
      &                            *(Tair(i,j)-Tair(i,j-1))
         END DO
       END DO
-
-! Exchange boundaries on zonal and meridional fluxes:
-!      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
-!        CALL exchange_u2d_tile (ng, tile,                               &
-!     &                          IminS, ImaxS, JminS, JmaxS,             &
-!     &                          fZon)
-!        CALL exchange_v2d_tile (ng, tile,                               &
-!     &                          IminS, ImaxS, JminS, JmaxS,             &
-!     &                          fMer)
-!      END IF
-!      CALL mp_exchange2d (ng, tile, iNLM, 2,                            &
-!     &                    IminS, ImaxS, JminS, JmaxS,                   &
-!     &                    NghostPoints,                                 &
-!     &                    EWperiodic(ng), NSperiodic(ng),               &
-!     &                    fZon, fMer)
 
 ! Compute divergence of the fluxes
         DO j=JstrV-1,Jend
