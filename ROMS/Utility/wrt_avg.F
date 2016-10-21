@@ -55,6 +55,9 @@
       integer :: Fcount, gfactor, gtype, i, itrc, status
 
       real(r8) :: scale
+#if defined MASKING && defined ABLM
+      real(r8), allocatable :: dummy_mask(:,:)
+#endif      
 !
       SourceFile='wrt_avg.F'
 !
@@ -1690,11 +1693,21 @@
       IF (Aout(idTair,ng)) THEN
         scale=1.0_r8
         gtype=gfactor*r2dvar
+#if defined MASKING && defined ABLM
+        IF (.not.allocated(dummy_mask)) THEN
+          allocate (dummy_mask(LBi:UBi,LBj:UBj))
+          dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+        END IF
+#endif
         status=nf_fwrite2d(ng, iNLM, AVG(ng)%ncid, AVG(ng)%Vid(idTair), &
      &                     AVG(ng)%Rindex, gtype,                       &
      &                     LBi, UBi, LBj, UBj, scale,                   &
 #   ifdef MASKING
+#    ifdef ABLM
+     &                     dummy_mask,                                  &
+#    else
      &                     GRID(ng) % rmask,                            &
+#    endif
 #   endif
      &                     AVERAGE(ng) % avgTair)
         IF (status.ne.nf90_noerr) THEN

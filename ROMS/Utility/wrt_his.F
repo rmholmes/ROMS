@@ -83,6 +83,9 @@
       real(r8), allocatable :: Vr3d(:,:,:)
       real(r8), allocatable :: Wr3d(:,:,:)
 #endif
+#if defined MASKING && defined ABLM
+      real(r8), allocatable :: dummy_mask(:,:)
+#endif      
 
 # include "set_bounds.h"
 !
@@ -1444,11 +1447,21 @@
       IF (Hout(idTair,ng)) THEN
         scale=1.0_r8
         gtype=gfactor*r2dvar
+#if defined MASKING && defined ABLM
+        IF (.not.allocated(dummy_mask)) THEN
+          allocate (dummy_mask(LBi:UBi,LBj:UBj))
+          dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+        END IF
+#endif
         status=nf_fwrite2d(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idTair), &
      &                     HIS(ng)%Rindex, gtype,                       &
      &                     LBi, UBi, LBj, UBj, scale,                   &
 #  ifdef MASKING
+#   ifdef ABLM
+     &                     dummy_mask,                                  &
+#   else
      &                     GRID(ng) % rmask,                            &
+#   endif
 #  endif
      &                     FORCES(ng) % Tair)
         IF (status.ne.nf90_noerr) THEN
