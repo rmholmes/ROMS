@@ -14,7 +14,8 @@
 !  advection/diffusion of the air temperature and humidity fields.     !
 !  ablm_diabatic alters the air temperature and humidity fields        !
 !  using the surface heat and moisture fluxes calculated in            !
-!  bulk_flux.F. The algorithms used here are adapted from the          !
+!  bulk_flux.F. ablm_nudgcof sets the time-scales for nudging of Tair  !
+!  and Qair to data. The algorithms used here are adapted from the     !
 !  cheapAML package of the MITgcm.                                     !
 ! 
 !  References:                                                         !
@@ -31,7 +32,7 @@
       implicit none
 !
       PRIVATE
-      PUBLIC  :: ablm_advdif, ablm_diabatic
+      PUBLIC  :: ablm_advdif, ablm_diabatic, ablm_nudgcof
 !
       CONTAINS
 !
@@ -342,6 +343,7 @@
       USE mod_grid
       USE mod_stepping
       USE mod_ocean
+      USE mod_clima
 !
 !  Imported variable declarations.
 !
@@ -374,6 +376,7 @@
      &                     FORCES(ng) % shflx,                          &
      &                     FORCES(ng) % srflx,                          &
      &                     FORCES(ng) % TairB,                          &
+     &                     CLIMA(ng) % ABLMnudgcof,                     &
      &                     OCEAN(ng) % t)
 # ifdef PROFILE
       CALL wclock_off (ng, iNLM, 17)
@@ -394,7 +397,7 @@
      &                           rmask_wet, umask_wet, vmask_wet,       &
 # endif
      &                           Tair, lhflx, shflx, srflx, TairB,      &
-     &                           t)
+     &                           ABLMnudgcof, t)
 !***********************************************************************
 !
       USE mod_param
@@ -428,6 +431,7 @@
       real(r8), intent(in) :: shflx(LBi:,LBj:)
       real(r8), intent(in) :: srflx(LBi:,LBj:)
       real(r8), intent(in) :: TairB(LBi:,LBj:)
+      real(r8), intent(in) :: ABLMnudgcof(LBi:,LBj:)
       real(r8), intent(in) :: t(LBi:,LBj:,:,:,:)
 # else
 #  ifdef MASKING
@@ -445,6 +449,7 @@
       real(r8), intent(in) :: shflx(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: srflx(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: TairB(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: ABLMnudgcof(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: t(LBi:UBi,LBj:UBj,N(ng),3,NT(ng))
 # endif
 !
@@ -498,14 +503,16 @@
       END DO
 !
 !-----------------------------------------------------------------------
-!  Nudging over land and near boundaries
+!  Nudging (implicit) over land and near boundaries
 !-----------------------------------------------------------------------
 ! 
-!      DO j=Jstr-1,JendR
-!        DO i=Istr-1,IendR
-!          Tair(i,j)=Tair(i,j) + (TairB(i,j)-Tair(i,j))*relax(i,j)
-!        END DO
-!      END DO
+      DO j=Jstr-1,JendR
+        DO i=Istr-1,IendR
+          cff = ABLMnudgcof(i,j)*dt(ng)
+          Tair(i,j)=Tair(i,j) + (TairB(i,j)-Tair(i,j))*                 &   
+     &                           cff/(1.0_r8+cff)
+        END DO
+      END DO
 
 !
 !-----------------------------------------------------------------------
@@ -528,5 +535,146 @@
 
       RETURN
       END SUBROUTINE ablm_diabatic_tile
+
+!
+!***********************************************************************
+      SUBROUTINE ablm_nudgcof (ng, tile, model)
+!***********************************************************************
+!
+      USE mod_param
+      USE mod_ncparam
+!
+!  Imported variable declarations.
+!
+      integer, intent(in) :: ng, tile, model
+!
+!  Local variable declarations.
+!
+# include "tile.h"
+!
+      CALL ablm_nudgcof_tile (ng, tile, model,                          &
+     &                     LBi, UBi, LBj, UBj,                          &
+     &                     IminS, ImaxS, JminS, JmaxS)
+
+      RETURN
+      END SUBROUTINE ablm_nudgcof
+!
+!***********************************************************************
+      SUBROUTINE ablm_nudgcof_tile (ng, tile, model,                    &
+     &                              LBi, UBi, LBj, UBj,                 &
+     &                              IminS, ImaxS, JminS, JmaxS)
+!***********************************************************************
+!
+      USE mod_param
+      USE mod_parallel
+      USE mod_clima
+      USE mod_grid
+      USE mod_ncparam
+      USE mod_scalars
+#ifdef DISTRIBUTE
+      USE mp_exchange_mod, ONLY : mp_exchange2d
+#endif
+!
+      implicit none
+!
+!  Imported variable declarations.
+!
+      integer, intent(in) :: ng, tile, model
+      integer, intent(in) :: LBi, UBi, LBj, UBj
+      integer, intent(in) :: IminS, ImaxS, JminS, JmaxS
+!
+!  Local variable declarations.
+!
+      integer ::  i, j
+      real(r8) :: mw, rmw
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: wrk
+      integer, parameter :: ABLM_maskwidth = 2       ! Boundary mask width
+      real(r8), parameter :: ABLM_lrelax = 0.1_r8    ! relaxation time-scale land (days)
+      real(r8), parameter :: ABLM_orelax = 0.0_r8    ! relaxation time-scale ocean (days)
+
+#include "set_bounds.h"
+!
+!-----------------------------------------------------------------------
+!  Set up nudging towards data time-scale coefficients (1/s).
+!-----------------------------------------------------------------------
+      mw = ABLM_maskwidth
+      rmw = (REAL(mw,r8)-1.0_r8)
+      IF (mw.ne.1) THEN
+        rmw = 1.0_r8 / rmw
+      END IF
+
+      DO j=JstrT,JendT
+        DO i=IstrT,IendT
+          wrk(i,j)=0.0_r8
+          IF (j.gt.mw) THEN
+            IF (j.lt.Mm(ng)-mw+1) THEN
+              IF (i.le.mw) THEN
+                wrk(i,j) = 1.0_r8 - REAL(i-1,r8)*rmw
+              END IF
+              IF (i.ge.Lm(ng)-mw+1) THEN
+                wrk(i,j) = 1.0_r8 - REAL(Lm(ng)-i,r8)*rmw
+              END IF
+            ELSE
+              wrk(i,j) = 1.0_r8 - REAL(Mm(ng)-j,r8)*rmw
+              IF (i.le.mw) THEN
+                wrk(i,j) = 1.0_r8 - REAL(i-1,r8)*rmw*                   &
+     &                              REAL(Mm(ng)-j,r8)*rmw
+              ELSE IF (i.ge.Lm(ng)-mw+1) THEN
+                wrk(i,j) = 1.0_r8 - REAL(Lm(ng)-i,r8)*rmw*              &
+     &                              REAL(Mm(ng)-j,r8)*rmw
+              END IF
+            END IF
+          ELSE
+            wrk(i,j) = 1.0_r8 - REAL(j-1,r8)*rmw
+            IF (i.le.mw) THEN
+               wrk(i,j) = 1.0_r8 - REAL(i-1,r8)*rmw*                    &
+     &                             REAL(j-1,r8)*rmw
+            ELSE IF (i.ge.Lm(ng)-mw+1) THEN
+               wrk(i,j) = 1.0_r8 - REAL(Lm(ng)-i,r8)*rmw*               &
+     &                             REAL(j-1,r8)*rmw
+            END IF
+          END IF
+#ifdef MASKING
+          IF (GRID(ng)%rmask(i,j).eq.0.0_r8) THEN
+            wrk(i,j) = 1.0_r8
+          END IF
+#endif
+        END DO
+      END DO
+
+      DO j=JstrT,JendT
+        DO i=IstrT,IendT
+          IF (wrk(i,j).eq.0.0_r8) THEN
+            wrk(i,j) = ABLM_orelax
+          ELSE
+            wrk(i,j) = ABLM_lrelax / wrk(i,j)
+          END IF
+        END DO
+      END DO
+
+      DO j=JstrT,JendT
+        DO i=IstrT,IendT
+          IF (wrk(i,j).ne.0.0_r8) THEN
+            CLIMA(ng)%ABLMnudgcof(i,j)=1.0_r8 / wrk(i,j) / 86400.0_r8
+          ELSE
+            CLIMA(ng)%ABLMnudgcof(i,j)=0.0_r8
+          END IF
+        END DO
+      END DO
+
+#ifdef DISTRIBUTE
+!
+!-----------------------------------------------------------------------
+!  Exchage nudging coefficients information.
+!-----------------------------------------------------------------------
+!
+      CALL mp_exchange2d (ng, tile, model, 1,                           &
+     &                      LBi, UBi, LBj, UBj,                         &
+     &                      NghostPoints, .FALSE., .FALSE.,             &
+     &                      CLIMA(ng)%ABLMnudgcof)
+#endif
+      RETURN
+      END SUBROUTINE ablm_nudgcof_tile
 #endif
       END MODULE ablm_mod
+

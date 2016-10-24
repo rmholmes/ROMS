@@ -62,6 +62,9 @@
     (defined MASKING    && (defined READ_WATER || defined WRITE_WATER))
       USE wpoints_mod, ONLY : wpoints
 #endif
+#ifdef ABLM
+      USE ablm_mod, ONLY : ablm_nudgcof
+#endif
 !
       implicit none
 !
@@ -380,6 +383,18 @@
 !$OMP BARRIER
             IF (exit_flag.ne.NoError) RETURN
           END IF
+        END DO
+#endif
+#ifdef ABLM
+!
+!-----------------------------------------------------------------------
+!  Set spatially varying nudging coefficients time scales for ABLM.
+!-----------------------------------------------------------------------
+!
+        DO ng=1,Ngrids
+          DO tile=first_tile(ng),last_tile(ng),+1
+            CALL ablm_nudgcof(ng, tile, iNLM)
+          END DO
         END DO
 #endif
       END IF
