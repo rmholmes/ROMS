@@ -457,11 +457,6 @@
 !
       integer :: i, j, k
       real(r8) :: cff, Hscale, TairK
-      real(r8), parameter :: rhoa = 1.3_r8
-      real(r8), parameter :: Cpa = 1004.0_r8
-      real(r8), parameter :: gamma_blk = 0.0098_r8 ! Adiabatic lapse rate (degC/m)
-      real(r8), parameter :: hABLM = 1000.0_r8     ! ABL thickness
-      real(r8), parameter :: CtoK = 273.16_r8      ! Celsius to Kelvin
 
       real(r8) :: Ttop ! temperature for outgoing longwave calculation
       real(r8) :: TseaK ! SST (Kelvin)
@@ -481,13 +476,13 @@
 !=======================================================================
 !
 !
-      Hscale=rhoa*Cpa
+      Hscale=ABLM_rhoa*blk_Cpa
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
           
-          TseaK = t(i,j,N(ng),nrhs,itemp)+CtoK
-          TairK = Tair(i,j)+CtoK
-          Ttop = TairK - gamma_blk * ( hABLM - zWind )
+          TseaK = t(i,j,N(ng),nrhs,itemp)+273.16_r8
+          TairK = Tair(i,j)+273.16_r8
+          Ttop = TairK - ABLM_lapse * ( hABLM - zWind )
 
           LWup = 0.5_r8*StefBo*(0.5_r8*TairK+0.5_r8*Ttop)**4
           LWdn = 0.5_r8*StefBo*TairK**4
@@ -588,16 +583,13 @@
       integer ::  i, j
       real(r8) :: mw, rmw
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: wrk
-      integer, parameter :: ABLM_maskwidth = 2       ! Boundary mask width
-      real(r8), parameter :: ABLM_lrelax = 0.1_r8    ! relaxation time-scale land (days)
-      real(r8), parameter :: ABLM_orelax = 0.0_r8    ! relaxation time-scale ocean (days)
 
 #include "set_bounds.h"
 !
 !-----------------------------------------------------------------------
 !  Set up nudging towards data time-scale coefficients (1/s).
 !-----------------------------------------------------------------------
-      mw = ABLM_maskwidth
+      mw = ABLM_maskwid
       rmw = (REAL(mw,r8)-1.0_r8)
       IF (mw.ne.1) THEN
         rmw = 1.0_r8 / rmw

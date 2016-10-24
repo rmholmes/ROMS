@@ -347,10 +347,23 @@
 !    zWind         Height of wind velocities
 !    ablmK         Diffusion coefficient
 !    ABfirst       Adams-Bashforth first step counter
-        integer :: ntatm = 5
-        real(r8) :: zWind = 10.0_r8   ! m
-        real(r8) :: ablmK = 4.0E01_r8 ! m2s-1
-        logical :: ABfirst = .TRUE.   ! Overwritten after first step
+!    hABLM         Thickness of atmospheric boundary layer
+!    ABLM_rhoa     Density of air
+!
+!    ablm_maskwid  Width of boundary region for restoring of Tair/Qair to data
+!    ablm_lrelax   Time-scale for relaxation over land and near boundaries
+!    ablm_orelax   Time-scale for relaxation over ocean (normally zero)
+!
+        integer  :: ntatm = 5
+        real(r8) :: zWind = 10.0_r8        ! m
+        real(r8) :: ablmK = 4.0E01_r8      ! m2s-1
+        logical  :: ABfirst = .TRUE.       ! Overwritten after first step
+        real(r8) :: hABLM = 1000.0_r8      ! m
+        real(r8) :: ABLM_rhoa = 1.3_r8     ! kgm-3
+        real(r8) :: ABLM_lapse = 0.0098_r8 ! degC/m
+        integer  :: ABLM_maskwid = 4       ! grid units
+        real(r8) :: ABLM_lrelax = 0.1_r8   ! days
+        real(r8) :: ABLM_orelax = 0.0_r8   ! days
 #endif
 !-----------------------------------------------------------------------
 !  Various model parameters.  Some of these parameters are overwritten
