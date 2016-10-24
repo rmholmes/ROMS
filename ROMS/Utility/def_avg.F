@@ -1470,6 +1470,24 @@
      &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
         END IF
+!
+!  Define atmospheric water vapor.
+!
+        IF (Aout(idQair,ng)) THEN
+          Vinfo( 1)=Vname(1,idQair)
+          WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idQair))
+          Vinfo( 3)=Vname(3,idQair)
+          Vinfo(14)=Vname(4,idQair)
+          Vinfo(16)=Vname(1,idtime)
+#   if defined WRITE_WATER && defined MASKING
+          Vinfo(20)='mask_rho'
+#   endif
+          Vinfo(22)='coordinates'
+          Aval(5)=REAL(Iinfo(1,idQair,ng),r8)
+          status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idQair),  &
+     &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
 #   ifdef EMINUSP
 !
 !  Define evaporation rate.
@@ -2166,6 +2184,9 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTair))) THEN
             got_var(idTair)=.TRUE.
             AVG(ng)%Vid(idTair)=var_id(i)
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idQair))) THEN
+            got_var(idQair)=.TRUE.
+            AVG(ng)%Vid(idQair)=var_id(i)
 #   ifdef EMINUSP
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idevap))) THEN
             got_var(idevap)=.TRUE.
@@ -2608,6 +2629,12 @@
         END IF
         IF (.not.got_var(idTair).and.Aout(idTair,ng)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idTair)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+        IF (.not.got_var(idQair).and.Aout(idQair,ng)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idQair)),          &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN

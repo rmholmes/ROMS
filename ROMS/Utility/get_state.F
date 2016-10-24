@@ -678,7 +678,7 @@
 
 #  ifdef ABLM
 !
-!  Read in atomspheric air temperature Tair
+!  Read in atmospheric air temperature Tair
 !
         IF (get_var(idTair)) THEN
           foundit=find_string(var_name, n_var, TRIM(Vname(1,idTair)),   &
@@ -707,6 +707,38 @@
             END IF
           END IF
         END IF
+#   ifdef ABLM_WATER
+!
+!  Read in atmospheric water vapor Qair
+!
+        IF (get_var(idQair)) THEN
+          foundit=find_string(var_name, n_var, TRIM(Vname(1,idQair)),   &
+     &                        varid)
+          gtype=var_flag(varid)*r2dvar
+          status=nf_fread2d(ng, IDmod, ncname, ncINPid,                 &
+     &                      Vname(1,idQair), varid,                     &
+     &                      InpRec, gtype, Vsize,                       &
+     &                      LBi, UBi, LBj, UBj,                         &
+     &                      Fscl, Fmin, Fmax,                           &
+# ifdef MASKING
+     &                      GRID(ng) % rmask,                           &
+# endif
+     &                      FORCES(ng) % Hair)
+          IF (status.ne.nf90_noerr) THEN
+            IF (Master) THEN
+              WRITE (stdout,60) string, TRIM(Vname(1,idQair)), InpRec,  &
+     &                          TRIM(ncname)
+            END IF
+            exit_flag=2
+            ioerror=status
+            RETURN
+          ELSE
+            IF (Master) THEN
+              WRITE (stdout,70) TRIM(Vname(2,idQair)), Fmin, Fmax
+            END IF
+          END IF
+        END IF
+#   endif
 #  endif
 
 # ifdef SOLVE3D

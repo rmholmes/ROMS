@@ -729,6 +729,21 @@
      &                   SetParAccess = .FALSE.)
           IF (exit_flag.ne.NoError) RETURN
         END IF
+!
+!  Define atmospheric water vapor.
+!
+        IF (Sout(idQair,ng)) THEN
+          Vinfo( 1)=Vname(1,idQair)
+          Vinfo( 2)=Vname(2,idQair)
+          Vinfo( 3)=Vname(3,idQair)
+          Vinfo(14)=Vname(4,idQair)
+          Vinfo(16)=Vname(1,idtime)
+          status=def_var(ng, iNLM, STA(ng)%ncid, STA(ng)%Vid(idQair),   &
+     &                   NF_FOUT, 2, pgrd, Aval, Vinfo, ncname,         &
+     &                   SetFillVal = .TRUE.,                           &
+     &                   SetParAccess = .FALSE.)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
 #  endif
 #  ifdef SHORTWAVE
 !
@@ -1617,6 +1632,9 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTair))) THEN
             got_var(idTair)=.TRUE.
             STA(ng)%Vid(idTair)=var_id(i)
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idQair))) THEN
+            got_var(idQair)=.TRUE.
+            STA(ng)%Vid(idQair)=var_id(i)
 #  endif
 #  ifdef SHORTWAVE
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSrad))) THEN
@@ -1993,6 +2011,12 @@
         END IF
         IF (.not.got_var(idTair).and.Sout(idTair,ng)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idTair)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+        IF (.not.got_var(idQair).and.Sout(idQair,ng)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idQair)),          &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN

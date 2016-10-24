@@ -74,8 +74,17 @@
 !                                                                      !
 !  Surface air humidity.                                               !
 !                                                                      !
+#if defined ABLM_WATER && defined ABLM
+!  Hair         Surface air specific (g/kg) or relative humidity       !
+!                 (percentage). Internal                               !
+!  HairB        Surface air specific (g/kg) or relative humidity       !
+!                 (percentage). External                               !
+!  HairTenPrev Surface air specific (g/kg) or relative humidity        !
+!                 (percentage) tendency (previous value)               !
+#else
 !  Hair         Surface air specific (g/kg) or relative humidity       !
 !                 (percentage).                                        !
+#endif
 !  HairG        Latest two-time snapshots of input "Hair" grided       !
 !                 data used for interpolation.                         !
 !                                                                      !
@@ -272,6 +281,10 @@
 # if defined BULK_FLUXES || defined ECOSIM || \
     (defined SHORTWAVE && defined ANA_SRFLUX)
           real(r8), pointer :: Hair(:,:)
+#  if defined ABLM && defined ABLM_WATER
+          real(r8), pointer :: HairB(:,:)
+          real(r8), pointer :: HairTenPrev(:,:)
+#  endif
 #  ifndef ANA_HUMIDITY
           real(r8), pointer :: HairG(:,:,:)
 #  endif
@@ -586,6 +599,11 @@
 # if defined BULK_FLUXES || defined ECOSIM || \
     (defined SHORTWAVE && defined ANA_SRFLUX)
       allocate ( FORCES(ng) % Hair(LBi:UBi,LBj:UBj) )
+
+#   if defined ABLM && defined ABLM_WATER
+      allocate ( FORCES(ng) % HairB(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % HairTenPrev(LBi:UBi,LBj:UBj) )
+#   endif
 
 #  ifndef ANA_HUMIDITY
       allocate ( FORCES(ng) % HairG(LBi:UBi,LBj:UBj,2) )
@@ -954,6 +972,10 @@
 # if defined BULK_FLUXES || defined ECOSIM || \
     (defined SHORTWAVE && defined ANA_SRFLUX)
             FORCES(ng) % Hair(i,j) = IniVal
+#  if defined ABLM && defined ABLM_WATER
+            FORCES(ng) % HairB(i,j) = IniVal
+            FORCES(ng) % HairTenPrev(i,j) = IniVal
+#  endif
             FORCES(ng) % Tair(i,j) = IniVal
 #  ifdef ABLM
             FORCES(ng) % TairB(i,j) = IniVal

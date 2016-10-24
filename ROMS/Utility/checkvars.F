@@ -109,6 +109,9 @@
           get_var(idVbar)=.TRUE.
 # ifdef ABLM
           get_var(idTair)=.TRUE.
+#  ifdef ABLM_WATER
+          get_var(idQair)=.TRUE.
+#  endif
 # endif
 # ifdef SOLVE3D
           get_var(idUvel)=.TRUE.
@@ -123,7 +126,10 @@
         get_var(idUbar)=.TRUE.
         get_var(idVbar)=.TRUE.
 # ifdef ABLM
-          get_var(idTair)=.TRUE.
+        get_var(idTair)=.TRUE.
+#  ifdef ABLM_WATER
+        get_var(idQair)=.TRUE.
+#  endif
 # endif
 # ifdef SOLVE3D
         get_var(idUvel)=.TRUE.
@@ -402,6 +408,10 @@
 #ifdef ABLM
         ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTair))) THEN
           have_var(idTair)=.TRUE.
+#ifdef ABLM_WATER
+        ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idQair))) THEN
+          have_var(idQair)=.TRUE.
+#endif
 #endif
         ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idRv2d))) THEN
           have_var(idRv2d)=.TRUE.

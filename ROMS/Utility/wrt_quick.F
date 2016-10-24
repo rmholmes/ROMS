@@ -1155,6 +1155,38 @@
           RETURN
         END IF
       END IF
+!
+!  Write out atmospheric water vapor.
+!
+      IF (Qout(idQair,ng)) THEN
+        scale=1.0_r8
+        gtype=gfactor*r2dvar
+#if defined MASKING && defined ABLM && defined ABLM_WATER
+        IF (.not.allocated(dummy_mask)) THEN
+          allocate (dummy_mask(LBi:UBi,LBj:UBj))
+          dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+        END IF
+#endif
+        status=nf_fwrite2d(ng, iNLM, QCK(ng)%ncid, QCK(ng)%Vid(idQair), &
+     &                     QCK(ng)%Rindex, gtype,                       &
+     &                     LBi, UBi, LBj, UBj, scale,                   &
+#  ifdef MASKING
+#   ifdef ABLM
+     &                     dummy_mask,                                  &
+#   else
+     &                     GRID(ng) % rmask,                            &
+#   endif
+#  endif
+     &                     FORCES(ng) % Hair)
+        IF (status.ne.nf90_noerr) THEN
+          IF (Master) THEN
+            WRITE (stdout,10) TRIM(Vname(1,idQair)), QCK(ng)%Rindex
+          END IF
+          exit_flag=3
+          ioerror=status
+          RETURN
+        END IF
+      END IF
 #  ifdef EMINUSP
 !
 !  Write out E-P (m/s).

@@ -165,7 +165,11 @@
       CALL set_2dfld_tile (ng, tile, iNLM, idQair,                      &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     FORCES(ng)%HairG,                            &
+#   if defined ABLM && defined ABLM_WATER
+     &                     FORCES(ng)%HairB,                            &
+#   else
      &                     FORCES(ng)%Hair,                             &
+#   endif
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 #   endif

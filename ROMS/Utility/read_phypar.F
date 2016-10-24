@@ -1653,6 +1653,13 @@
                 RETURN
               END IF
               Npts=load_l(Nval, Cval, Ngrids, Hout(idTair,:))
+            CASE ('Hout(idQair)')
+              IF (idQair.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idQair'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idQair,:))
             CASE ('Hout(idSrad)')
               IF (idSrad.eq.0) THEN
                 IF (Master) WRITE (out,280) 'idSrad'
@@ -1942,6 +1949,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Qout(idLrad,:))
             CASE ('Qout(idTair)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idTair,:))
+            CASE ('Qout(idQair)')
+              Npts=load_l(Nval, Cval, Ngrids, Qout(idQair,:))
             CASE ('Qout(idSrad)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idSrad,:))
             CASE ('Qout(idEmPf)')
@@ -2086,6 +2095,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Aout(idLrad,:))
             CASE ('Aout(idTair)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idTair,:))
+            CASE ('Aout(idQair)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idQair,:))
             CASE ('Aout(idSrad)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSrad,:))
             CASE ('Aout(idevap)')
@@ -4474,6 +4485,9 @@
             IF (Hout(idTair,ng)) WRITE (out,170) Hout(idTair,ng),       &
      &         'Hout(idTair)',                                          &
      &         'Write out atmospheric air temperature.'
+            IF (Hout(idQair,ng)) WRITE (out,170) Hout(idQair,ng),       &
+     &         'Hout(idQair)',                                          &
+     &         'Write out atmospheric water vapor.'
             IF (Hout(idLhea,ng)) WRITE (out,170) Hout(idLhea,ng),       &
      &         'Hout(idLhea)',                                          &
      &         'Write out latent heat flux.'
@@ -4781,6 +4795,9 @@
             IF (Qout(idTair,ng)) WRITE (out,170) Qout(idTair,ng),       &
      &         'Qout(idTair)',                                          &
      &         'Write out atmospheric air temperature.'
+            IF (Qout(idQair,ng)) WRITE (out,170) Qout(idQair,ng),       &
+     &         'Qout(idQair)',                                          &
+     &         'Write out atmospheric water vapor.'
             IF (Qout(idLhea,ng)) WRITE (out,170) Qout(idLhea,ng),       &
      &         'Qout(idLhea)',                                          &
      &         'Write out latent heat flux.'
@@ -4982,6 +4999,9 @@
             IF (Aout(idTair,ng)) WRITE (out,170) Aout(idTair,ng),       &
      &         'Aout(idTair)',                                          &
      &         'Write out atmospheric air temperature.'
+            IF (Aout(idQair,ng)) WRITE (out,170) Aout(idQair,ng),       &
+     &         'Aout(idQair)',                                          &
+     &         'Write out atmospheric water vapor.'
             IF (Aout(idLhea,ng)) WRITE (out,170) Aout(idLhea,ng),       &
      &         'Aout(idLhea)',                                          &
      &         'Write out averaged latent heat flux.'
