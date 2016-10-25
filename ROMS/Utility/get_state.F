@@ -719,7 +719,7 @@
      &                      Vname(1,idQair), varid,                     &
      &                      InpRec, gtype, Vsize,                       &
      &                      LBi, UBi, LBj, UBj,                         &
-     &                      Fscl, Fmin, Fmax,                           &
+     &                      Fscale(idQair,ng), Fmin, Fmax,              &
 # ifdef MASKING
      &                      GRID(ng) % rmask,                           &
 # endif
