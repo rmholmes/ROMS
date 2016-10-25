@@ -739,6 +739,20 @@
                 END DO
 # endif
               END DO
+# ifdef ABLM
+            CASE ('ABLM_KAPPA')
+              Npts=load_r(Nval, Rval, Ngrids, ablmK)
+            CASE ('ABLM_NTATM')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              ntatm=Ivalue(1)
+            CASE ('ABLM_MASKWIDTH')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              ABLM_maskwid=Ivalue(1)
+            CASE ('ABLM_LANDRELAX')
+              Npts=load_r(Nval, Rval, Ngrids, ABLM_lrelax)
+            CASE ('ABLM_H')
+              Npts=load_r(Nval, Rval, Ngrids, hABLM)
+# endif
             CASE ('AKV_BAK')
               Npts=load_r(Nval, Rval, Ngrids, Akv_bak)
             CASE ('ad_AKV_fac')
@@ -3657,6 +3671,18 @@
      &            'Background vertical mixing coefficient (m2/s)',      &
      &            'for tracer ', itrc, TRIM(Vname(1,idTvar(itrc)))
           END DO
+#ifdef ABLM
+            WRITE (out,185) ablmK, 'ABLM_KAPPA',                        &
+     &            'ABLM diffusivity.'
+            WRITE (out,120) ntatm, 'ABLM_NTATM',                        &
+     &            'ABLM number of atmospheric time steps.'
+            WRITE (out,120) ABLM_maskwid, 'ABLM_MASKWIDTH',             &
+     &            'ABLM boundary nudging region width (grid points).'
+            WRITE (out,185) ABLM_lrelax, 'ABLM_LANDRELAX',              &
+     &            'ABLM nudging time scale over land/boundaries (days).'
+            WRITE (out,185) hABLM, 'ABLM_H',                            &
+     &            'ABLM height of boundary layer (m).'
+#endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
      &          'Background vertical mixing coefficient (m2/s)',        &
      &          'for momentum.'

@@ -347,6 +347,7 @@
 !    zWind         Height of wind velocities
 !    ablmK         Diffusion coefficient
 !    ABfirst       Adams-Bashforth first step counter
+!    ABeps         Adams-Bashforth small number
 !    hABLM         Thickness of atmospheric boundary layer
 !    ABLM_rhoa     Density of air
 !
@@ -354,15 +355,16 @@
 !    ablm_lrelax   Time-scale for relaxation over land and near boundaries
 !    ablm_orelax   Time-scale for relaxation over ocean (normally zero)
 !
-        integer  :: ntatm = 5
+        integer  :: ntatm                  !
         real(r8) :: zWind = 10.0_r8        ! m
-        real(r8) :: ablmK = 4.0E01_r8      ! m2s-1
+        real(r8) :: ablmK                  ! m2s-1
         logical  :: ABfirst = .TRUE.       ! Overwritten after first step
-        real(r8) :: hABLM = 1000.0_r8      ! m
+        real(r8) :: ABeps = 0.01_r8        ! 
+        real(r8) :: hABLM                  ! m
         real(r8) :: ABLM_rhoa = 1.3_r8     ! kgm-3
         real(r8) :: ABLM_lapse = 0.0098_r8 ! degC/m
-        integer  :: ABLM_maskwid = 2       ! grid units
-        real(r8) :: ABLM_lrelax = 0.1_r8   ! days
+        integer  :: ABLM_maskwid           ! grid units
+        real(r8) :: ABLM_lrelax            ! days
         real(r8) :: ABLM_orelax = 0.0_r8   ! days
 #endif
 !-----------------------------------------------------------------------
@@ -2316,6 +2318,13 @@
 #endif
       Co=1.0_r8/(2.0_r8+SQRT(2.0_r8))
       gorho0=g/rho0
+#ifdef ABLM
+        ablmK = 1.0E04_r8
+        ntatm = 5
+        ABLM_maskwid = 1
+        ABLM_lrelax = 0.1_r8
+        hABLM = 1000.0_r8
+#endif
       DO ng=1,Ngrids
         EWperiodic(ng)=.FALSE.
         NSperiodic(ng)=.FALSE.

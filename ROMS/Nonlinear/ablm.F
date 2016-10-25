@@ -211,7 +211,6 @@
 
 !     Local variables to add as parameters:
       real(r8) :: dtatm               ! Atmospheric time step
-      real(r8), parameter :: abEps = 0.01_r8
       real(r8) :: abFac
       
 # include "set_bounds.h"
@@ -362,7 +361,7 @@
           abFac = 0.0_r8
           ABfirst = .FALSE.
         ELSE ! Otherwise, do have TairTenPrev
-          abFac = 0.5_r8 + abEps
+          abFac = 0.5_r8 + ABeps
         END IF
 
 ! Extrapolate forward tendency in time, with AB weights:
