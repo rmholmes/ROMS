@@ -1203,6 +1203,24 @@
      &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
         END IF
+!
+!  Define atmospheric water vapor
+!
+        IF (Qout(idQair,ng)) THEN
+          Vinfo( 1)=Vname(1,idQair)
+          Vinfo( 2)=Vname(2,idQair)
+          Vinfo( 3)=Vname(3,idQair)
+          Vinfo(14)=Vname(4,idQair)
+          Vinfo(16)=Vname(1,idtime)
+#  if defined WRITE_WATER && defined MASKING
+          Vinfo(20)='mask_rho'
+#  endif
+          Vinfo(22)='coordinates'
+          Aval(5)=REAL(Iinfo(1,idQair,ng),r8)
+          status=def_var(ng, iNLM, QCK(ng)%ncid, QCK(ng)%Vid(idQair),   &
+     &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
 #  ifdef EMINUSP
 !
 !  Define E-P flux (as computed by bulk_flux.F).
@@ -2305,6 +2323,9 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTair))) THEN
             got_var(idTair)=.TRUE.
             QCK(ng)%Vid(idTair)=var_id(i)
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idQair))) THEN
+            got_var(idQair)=.TRUE.
+            QCK(ng)%Vid(idQair)=var_id(i)
 #  ifdef EMINUSP
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idEmPf))) THEN
             got_var(idEmPf)=.TRUE.
@@ -2821,6 +2842,12 @@
         END IF
         IF (.not.got_var(idTair).and.Qout(idTair,ng)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idTair)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+        IF (.not.got_var(idQair).and.Qout(idQair,ng)) THEN
+          IF (Master) WRITE (stdout,70) TRIM(Vname(1,idQair)),          &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN
