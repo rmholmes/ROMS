@@ -3672,15 +3672,14 @@
      &            'for tracer ', itrc, TRIM(Vname(1,idTvar(itrc)))
           END DO
 #ifdef ABLM
-            WRITE (out,185) ablmK, 'ABLM_KAPPA',                        &
-     &            'ABLM diffusivity.'
+            WRITE (out,200) ablmK, 'ABLM_KAPPA','ABLM diffusivity.'
             WRITE (out,120) ntatm, 'ABLM_NTATM',                        &
      &            'ABLM number of atmospheric time steps.'
             WRITE (out,120) ABLM_maskwid, 'ABLM_MASKWIDTH',             &
      &            'ABLM boundary nudging region width (grid points).'
-            WRITE (out,185) ABLM_lrelax, 'ABLM_LANDRELAX',              &
+            WRITE (out,200) ABLM_lrelax, 'ABLM_LANDRELAX',              &
      &            'ABLM nudging time scale over land/boundaries (days).'
-            WRITE (out,185) hABLM, 'ABLM_H',                            &
+            WRITE (out,150) hABLM, 'ABLM_H',                            &
      &            'ABLM height of boundary layer (m).'
 #endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
