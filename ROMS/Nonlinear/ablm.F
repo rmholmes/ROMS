@@ -105,7 +105,7 @@
 # endif
      &                           Tair, TairTenPrev,                     &
 # ifdef ABLM_WATER
-     &                           Hair, HairTenPrev, Pair                &
+     &                           Hair, HairTenPrev, Pair,               &
 # endif
      &                           Uwind, Vwind)
 !***********************************************************************
@@ -220,27 +220,7 @@
 !  Atmospheric boundary layer model Tair and Qair advection/diffusion
 !=======================================================================
 !
-!
-#ifdef ABLM_WATER
-!-----------------------------------------------------------------------
-!  Convert humidity input to specific humidity (kg/kg)
-!-----------------------------------------------------------------------
-!
-      DO j=JstrV-1,Jend
-        DO i=IstrU-1,Iend
-          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
-     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
-          IF (Hair(i,j).lt.2.0_r8) THEN                !RH fraction
-            Qswitch = .TRUE.
-            cff=cff*Hair(i,j)                          !Vapor pres (mb)
-            Qair(i,j)=0.62197_r8*(cff/(Pair(i,j)-0.378_r8*cff)) !Spec hum (kg/kg)
-          ELSE          !RH input was actually specific humidity in g/kg
-            Qswitch = .FALSE.
-            Qair(i,j)=Hair(i,j)/1000.0_r8                       !Spec Hum (kg/kg)
-          END IF
-        END DO
-      END DO
-#endif
+!      
 !-----------------------------------------------------------------------
 !  Apply lateral boundary conditions
 !-----------------------------------------------------------------------
@@ -251,7 +231,7 @@
 #ifdef ABLM_WATER
       CALL bc_r2d_tile(ng, tile,                                        &
      &                 LBi, UBi, LBj, UBj,                              &
-     &                 Qair)
+     &                 Hair)
 #endif
       CALL bc_r2d_tile(ng, tile,                                        &
      &                 LBi, UBi, LBj, UBj,                              &
@@ -276,6 +256,27 @@
       dtatm = dt(ng)/REAL(ntatm)
 
       DO k=1,ntatm
+
+#ifdef ABLM_WATER
+!-----------------------------------------------------------------------
+!  Convert humidity input to specific humidity (kg/kg)
+!-----------------------------------------------------------------------
+!
+      DO j=JstrV-2,Jendp2
+        DO i=IstrU-2,Iendp2
+          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
+     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+          IF (Hair(i,j).lt.2.0_r8) THEN                !RH fraction
+            Qswitch = .TRUE.
+            cff=cff*Hair(i,j)                          !Vapor pres (mb)
+            Qair(i,j)=0.62197_r8*(cff/(Pair(i,j)-0.378_r8*cff)) !Spec hum (kg/kg)
+          ELSE          !RH input was actually specific humidity in g/kg
+            Qswitch = .FALSE.
+            Qair(i,j)=Hair(i,j)/1000.0_r8                       !Spec Hum (kg/kg)
+          END IF
+        END DO
+      END DO
+#endif
 
 ! Compute zonal advective flux using second-order centered advection
         DO j=JstrV-2,Jendp2
@@ -321,6 +322,7 @@
 #ifdef ABLM_WATER
           fZonQ(i,j) = fZonQ(i,j) - ablmK*pmon_u(i,j)                   &
      &                            *(Qair(i,j)-Qair(i-1,j))
+#endif
         END DO
       END DO
 
@@ -387,10 +389,29 @@
           DO i=IstrU-1,Iend
             Tair(i,j) = Tair(i,j) + dtatm*TairTen(i,j)
 #ifdef ABLM_WATER
-            Qair(i,j) = Qair(i,j) + dtatm*QairTen(i,j)
+            Qair(i,j) = Qair(i,j) + dtatm*HairTen(i,j)
 #endif
           END DO
         END DO
+
+#ifdef ABLM_WATER
+!-----------------------------------------------------------------------
+!  Convert specific humidity back to previous units
+!-----------------------------------------------------------------------
+!
+      DO j=JstrV-2,Jendp2
+        DO i=IstrU-2,Iendp2
+          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
+     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+          IF (Qswitch) THEN                !RH fraction
+             Hair(i,j) = Qair(i,j)/0.62197_r8*Pair(i,j)/cff/            &
+     &                 (1.0_r8 + 0.378_r8/0.62197_r8*Qair(i,j))
+          ELSE          !RH input was actually specific humidity in g/kg
+            Hair(i,j) = 1000.0_r8*Qair(i,j)
+          END IF
+        END DO
+      END DO
+#endif
 
 !
 !-----------------------------------------------------------------------
@@ -404,7 +425,7 @@
 #ifdef ABLM_WATER
           CALL exchange_r2d_tile (ng, tile,                             &
      &                          LBi, UBi, LBj, UBj,                     &
-     &                          Qair)
+     &                          Hair)
 #endif
         END IF
 
@@ -414,31 +435,13 @@
      &                    NghostPoints,                                 &
      &                    EWperiodic(ng), NSperiodic(ng),               &
 #ifdef ABLM_WATER
-     &                    Qair,                                         &
+     &                    Hair,                                         &
 #endif
      &                    Tair)
 # endif
 
       END DO ! End atmospheric time loop
 
-#ifdef ABLM_WATER
-!-----------------------------------------------------------------------
-!  Convert specific humidity back to previous units
-!-----------------------------------------------------------------------
-!
-      DO j=JstrV-1,Jend
-        DO i=IstrU-1,Iend
-          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
-     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
-          IF (Qswitch) THEN                !RH fraction
-             Hair(i,j) = Qair(i,j)/0.62197_r8*Pair(i,j)/cff/            &
-     &                 (1.0_r8 + 0.378_r8/0.62197_r8*Qair(i,j))
-          ELSE          !RH input was actually specific humidity in g/kg
-            Hair(i,j) = 1000.0_r8*Qair(i,j)
-          END IF
-        END DO
-      END DO
-#endif
 
       RETURN
       END SUBROUTINE ablm_advdif_tile
@@ -485,10 +488,11 @@
 #ifdef ABLM_WATER
      &                     FORCES(ng) % Hair,                           &
      &                     FORCES(ng) % HairB,                          &
+     &                     FORCES(ng) % Pair,                           &
+     &                     FORCES(ng) % Q100,                           &
 #endif
      &                     FORCES(ng) % lhflx,                          &
      &                     FORCES(ng) % shflx,                          &
-     &                     FORCES(ng) % srflx,                          &
      &                     CLIMA(ng) % ABLMnudgcof,                     &
      &                     OCEAN(ng) % t)
 # ifdef PROFILE
@@ -511,9 +515,9 @@
 # endif
      &                           Tair, TairB,                           &
 # ifdef ABLM_WATER
-     &                           Hair, HairB,                           &
+     &                           Hair, HairB, Pair, Q100,               &
 # endif
-     &                           lhflx, shflx, srflx,                   &
+     &                           lhflx, shflx,                          &
      &                           ABLMnudgcof, t)
 !***********************************************************************
 !
@@ -548,10 +552,11 @@
 # ifdef ABLM_WATER
       real(r8), intent(inout) :: Hair(LBi:,LBj:)
       real(r8), intent(in) :: HairB(LBi:,LBj:)
+      real(r8), intent(in) :: Pair(LBi:,LBj:)
+      real(r8), intent(in) :: Q100(LBi:,LBj:)
 # endif
       real(r8), intent(in) :: lhflx(LBi:,LBj:)
       real(r8), intent(in) :: shflx(LBi:,LBj:)
-      real(r8), intent(in) :: srflx(LBi:,LBj:)
       real(r8), intent(in) :: ABLMnudgcof(LBi:,LBj:)
       real(r8), intent(in) :: t(LBi:,LBj:,:,:,:)
 # else
@@ -570,10 +575,11 @@
 #  ifdef ABLM_WATER
       real(r8), intent(inout) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: HairB(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: Pair(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: Q100(LBi:UBi,LBj:UBj)
 #  endif
       real(r8), intent(in) :: lhflx(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: shflx(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: srflx(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: ABLMnudgcof(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: t(LBi:UBi,LBj:UBj,N(ng),3,NT(ng))
 # endif
@@ -581,31 +587,62 @@
 !  Local variable declarations.
 !
       integer :: i, j, k
-      real(r8) :: cff, Hscale, TairK
+      real(r8) :: cff, HscaleA, TairK, TseaC, TseaK
 
       real(r8) :: Ttop ! temperature for outgoing longwave calculation
-      real(r8) :: TseaK ! SST (Kelvin)
       real(r8) :: TairTen ! temperature for outgoing longwave calculation
       real(r8) :: LWup ! atmospheric upwelled lw radiation
       real(r8) :: OCup ! oceanic upwelled lw radiation
       real(r8) :: LWdn ! atmospheric downwelled lw radiation
       real(r8) :: NETup ! atmospheric upwelled lw radiation
       real(r8) :: NETdn ! atmospheric downwelled lw radiation
-      
+#ifdef ABLM_WATER
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: Qair    ! Specific humidity (kg/kg)
+      real(r8) :: HairTen, Qsea, HscaleW, evap, entrain, lhvap
+      logical :: Qswitch
+#endif      
 !
            
 # include "set_bounds.h"
+#ifdef ABLM_WATER
+!-----------------------------------------------------------------------
+!  Convert humidity input to specific humidity (kg/kg)
+!-----------------------------------------------------------------------
+!
+      DO j=Jstr-1,JendR
+        DO i=Istr-1,IendR
+          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
+     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+          IF (Hair(i,j).lt.2.0_r8) THEN                !RH fraction
+            Qswitch = .TRUE.
+            cff=cff*Hair(i,j)                          !Vapor pres (mb)
+            Qair(i,j)=0.62197_r8*(cff/(Pair(i,j)-0.378_r8*cff)) !Spec hum (kg/kg)
+          ELSE          !RH input was actually specific humidity in g/kg
+            Qswitch = .FALSE.
+            Qair(i,j)=Hair(i,j)/1000.0_r8                       !Spec Hum (kg/kg)
+          END IF
+        END DO
+      END DO
+#endif
 !
 !=======================================================================
 !  Atmospheric boundary layer model diabatic steps
 !=======================================================================
 !
 !
-      Hscale=ABLM_rhoa*blk_Cpa
+      HscaleA=ABLM_rhoa*blk_Cpa
+# ifdef ABLM_WATER
+      HscaleW=1.0_r8/(rho0*Cp)
+# endif
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
-          
-          TseaK = t(i,j,N(ng),nrhs,itemp)+273.16_r8
+!
+!-----------------------------------------------------------------------
+!  Air temperature diabatic changes
+!-----------------------------------------------------------------------
+! 
+          TseaC = t(i,j,N(ng),nrhs,itemp)
+          TseaK = TseaC+273.16_r8
           TairK = Tair(i,j)+273.16_r8
           Ttop = TairK - ABLM_lapse * ( hABLM - zWind )
 
@@ -613,14 +650,53 @@
           LWdn = 0.5_r8*StefBo*TairK**4
           OCup = emmiss*StefBo*TseaK**4
 
-          NETup = (-srflx(i,j) + LWup + lhflx(i,j))/Hscale
-          NETdn = (-srflx(i,j) - LWdn + lhflx(i,j) +                    &
-     &                  shflx(i,j) + OCup)/Hscale
+          NETup = LWup/HscaleA
+          NETdn = (OCup-LWdn-shflx(i,j))/HscaleA
 
           TairTen = (NETdn - NETup) / hABLM
-          Tair(i,j) = Tair(i,j) + dt(ng)*TairTen          
+          Tair(i,j) = Tair(i,j) + dt(ng)*TairTen
+
+#ifdef ABLM_WATER
+!
+!-----------------------------------------------------------------------
+!  Water vapor diabatic changes
+!-----------------------------------------------------------------------
+! 
+          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
+     &        EXP(17.502_r8*TseaC/(240.97_r8+TseaC))
+          cff=cff*0.98_r8
+          Qsea=0.62197_r8*(cff/(Pair(i,j)-0.378_r8*cff))
+
+          lhvap = (2.501_r8-0.00237_r8*TseaC)*1.0E+6_r8
+          evap = -lhflx(i,j) / HscaleW / lhvap
+          entrain = 0.25*(evap / (Qsea - Qair(i,j)))*Q100(i,j)
+
+          HairTen = (evap - entrain) / hABLM / ABLM_rhoa
+
+          Qair(i,j) = Qair(i,j) + dt(ng)*HairTen
+#endif
         END DO
       END DO
+
+#ifdef ABLM_WATER
+!-----------------------------------------------------------------------
+!  Convert specific humidity back to previous units
+!-----------------------------------------------------------------------
+!
+      DO j=Jstr-1,JendR
+        DO i=Istr-1,IendR
+          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
+     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+          IF (Qswitch) THEN                !RH fraction
+            Hair(i,j) = Qair(i,j)/0.62197_r8*Pair(i,j)/cff/             &
+     &                 (1.0_r8 + 0.378_r8/0.62197_r8*Qair(i,j))
+          ELSE          !RH input was actually specific humidity in g/kg
+            Hair(i,j) = 1000.0_r8*Qair(i,j)
+          END IF
+        END DO
+      END DO
+#endif
+
 !
 !-----------------------------------------------------------------------
 !  Nudging (implicit) over land and near boundaries
@@ -631,6 +707,10 @@
           cff = ABLMnudgcof(i,j)*dt(ng)
           Tair(i,j)=Tair(i,j) + (TairB(i,j)-Tair(i,j))*                 &   
      &                           cff/(1.0_r8+cff)
+#ifdef ABLM_WATER
+          Hair(i,j)=Hair(i,j) + (HairB(i,j)-Hair(i,j))*                 &   
+     &                           cff/(1.0_r8+cff)
+#endif
         END DO
       END DO
 
@@ -643,11 +723,11 @@
           CALL exchange_r2d_tile (ng, tile,                             &
      &                          LBi, UBi, LBj, UBj,                     &
      &                          Tair)
-!#ifdef ABLM_WATER
-!          CALL exchange_r2d_tile (ng, tile,                             &
-!     &                          LBi, UBi, LBj, UBj,                     &
-!     &                          Hair)
-!#endif
+#ifdef ABLM_WATER
+          CALL exchange_r2d_tile (ng, tile,                             &
+     &                          LBi, UBi, LBj, UBj,                     &
+     &                          Hair)
+#endif
         END IF
 
 # ifdef DISTRIBUTE
@@ -655,11 +735,12 @@
      &                    LBi, UBi, LBj, UBj,                           &
      &                    NghostPoints,                                 &
      &                    EWperiodic(ng), NSperiodic(ng),               &
-!#ifdef ABLM_WATER
-!     &                    Hair,                                         &
-!#endif
+#ifdef ABLM_WATER
+     &                    Hair,                                         &
+#endif
      &                    Tair)
 # endif
+
 
       RETURN
       END SUBROUTINE ablm_diabatic_tile

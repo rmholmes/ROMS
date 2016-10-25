@@ -81,6 +81,7 @@
 !                 (percentage). External                               !
 !  HairTenPrev Surface air specific (g/kg) or relative humidity        !
 !                 (percentage) tendency (previous value)               !
+!  Q100         Specific humidity at 100m from bulk_flux.F             !
 #else
 !  Hair         Surface air specific (g/kg) or relative humidity       !
 !                 (percentage).                                        !
@@ -284,6 +285,7 @@
 #  if defined ABLM && defined ABLM_WATER
           real(r8), pointer :: HairB(:,:)
           real(r8), pointer :: HairTenPrev(:,:)
+          real(r8), pointer :: Q100(:,:)
 #  endif
 #  ifndef ANA_HUMIDITY
           real(r8), pointer :: HairG(:,:,:)
@@ -603,6 +605,7 @@
 #   if defined ABLM && defined ABLM_WATER
       allocate ( FORCES(ng) % HairB(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % HairTenPrev(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % Q100(LBi:UBi,LBj:UBj) )
 #   endif
 
 #  ifndef ANA_HUMIDITY
@@ -975,6 +978,7 @@
 #  if defined ABLM && defined ABLM_WATER
             FORCES(ng) % HairB(i,j) = IniVal
             FORCES(ng) % HairTenPrev(i,j) = IniVal
+            FORCES(ng) % Q100(i,j) = IniVal
 #  endif
             FORCES(ng) % Tair(i,j) = IniVal
 #  ifdef ABLM

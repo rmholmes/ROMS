@@ -361,7 +361,7 @@
         real(r8) :: hABLM = 1000.0_r8      ! m
         real(r8) :: ABLM_rhoa = 1.3_r8     ! kgm-3
         real(r8) :: ABLM_lapse = 0.0098_r8 ! degC/m
-        integer  :: ABLM_maskwid = 4       ! grid units
+        integer  :: ABLM_maskwid = 2       ! grid units
         real(r8) :: ABLM_lrelax = 0.1_r8   ! days
         real(r8) :: ABLM_orelax = 0.0_r8   ! days
 #endif
