@@ -341,11 +341,11 @@
         DO j=JstrV-1,Jend
           DO i=IstrU-1,Iend
             TairTen(i,j) = ((fZon(i,j)-fZon(i+1,j)) +                   &
-     &                     (fMer(i,j)-fMer(i,j+1)))*pm(i,j)*pn(i,j)+    &
+     &                     (fMer(i,j)-fMer(i,j+1)))*pm(i,j)*pn(i,j)-    &
      &                     0.5_r8/zWind*fVer(i,j)
 #ifdef ABLM_WATER
             HairTen(i,j) = ((fZonQ(i,j)-fZonQ(i+1,j)) +                 &
-     &                     (fMerQ(i,j)-fMerQ(i,j+1)))*pm(i,j)*pn(i,j)+  &
+     &                     (fMerQ(i,j)-fMerQ(i,j+1)))*pm(i,j)*pn(i,j)-  &
      &                     0.5_r8/zWind*fVerQ(i,j)
 #endif
           END DO
