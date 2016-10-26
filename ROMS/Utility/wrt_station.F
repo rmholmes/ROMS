@@ -711,7 +711,7 @@
 !  Write out atmospheric water vapor.
 !
       IF (Sout(idQair,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_r8/Fscale(idQair,ng)
         CALL extract_sta2d (ng, iNLM, Cgrid, idQair, r2dvar,            &
      &                      LBi, UBi, LBj, UBj,                         &
      &                      scale, FORCES(ng)%Hair,                     &

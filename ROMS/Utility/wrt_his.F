@@ -1477,7 +1477,7 @@
 !  Write out atmospheric water vapor.
 !
       IF (Hout(idQair,ng)) THEN
-        scale=1.0_r8
+        scale=1.0_r8/Fscale(idQair,ng)
         gtype=gfactor*r2dvar
 #if defined MASKING && defined ABLM && defined ABLM_WATER
         IF (.not.allocated(dummy_mask)) THEN
