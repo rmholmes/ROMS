@@ -518,13 +518,18 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' BULK_FLUXES,'
 #endif
+#ifdef ABLM
+      IF (Master) WRITE (stdout,20) 'ABLM',                             &
+     &   'Atmospheric boundary layer model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM,'
+#endif
 #ifdef STATS_ENSO
       IF (Master) WRITE (stdout,20) 'STATS_ENSO',                       &
      &   'Statistical ENSO forcing.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' STATS_ENSO,'
 #endif
-
 #ifdef BVF_MIXING
       IF (Master) WRITE (stdout,20) 'BVF_MIXING',                       &
      &   'Brunt-Vaisala frequency based vertical mixing.'

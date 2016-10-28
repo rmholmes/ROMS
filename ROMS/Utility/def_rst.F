@@ -778,6 +778,40 @@
 #endif
         IF (exit_flag.ne.NoError) RETURN
 
+#ifdef ABLM
+!
+!  Define atmospheric air temperature
+!
+        Vinfo( 1)=Vname(1,idTair)
+        Vinfo( 2)=Vname(2,idTair)
+        Vinfo( 3)=Vname(3,idTair)
+        Vinfo(14)=Vname(4,idTair)
+        Vinfo(16)=Vname(1,idtime)
+        Vinfo(20)='mask_rho'
+        Vinfo(22)='coordinates'
+        Aval(5)=REAL(Iinfo(1,idTair,ng),r8)
+        status=def_var(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idTair),     &
+     &                 NF_FRST, nvd3, t2dgrd, Aval, Vinfo, ncname)
+        IF (exit_flag.ne.NoError) RETURN
+
+# ifdef ABLM_WATER
+!
+!  Define atmospheric water vapor
+!
+        Vinfo( 1)=Vname(1,idQair)
+        Vinfo( 2)=Vname(2,idQair)
+        Vinfo( 3)=Vname(3,idQair)
+        Vinfo(14)=Vname(4,idQair)
+        Vinfo(16)=Vname(1,idtime)
+        Vinfo(20)='mask_rho'
+        Vinfo(22)='coordinates'
+        Aval(5)=REAL(Iinfo(1,idQair,ng),r8)
+        status=def_var(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idQair),     &
+     &                 NF_FRST, nvd3, t2dgrd, Aval, Vinfo, ncname)
+        IF (exit_flag.ne.NoError) RETURN
+# endif
+#endif
+        
 #ifdef PERFECT_RESTART
 !
 !  Define RHS of 2D momentum equation in the XI-direction.
@@ -1551,6 +1585,16 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idFsur))) THEN
             got_var(idFsur)=.TRUE.
             RST(ng)%Vid(idFsur)=var_id(i)
+#ifdef ABLM
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTair))) THEN
+            got_var(idTair)=.TRUE.
+            RST(ng)%Vid(idTair)=var_id(i)
+# ifdef ABLM_WATER
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idQair))) THEN
+            got_var(idQair)=.TRUE.
+            RST(ng)%Vid(idQair)=var_id(i)
+# endif
+#endif
 #ifdef PERFECT_RESTART
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idRzet))) THEN
             got_var(idRzet)=.TRUE.
@@ -1755,6 +1799,22 @@
           exit_flag=3
           RETURN
         END IF
+#ifdef ABLM
+        IF (.not.got_var(idTair)) THEN
+          IF (Master) WRITE (stdout,40) TRIM(Vname(1,idTair)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+# ifdef ABLM_WATER
+        IF (.not.got_var(idQair)) THEN
+          IF (Master) WRITE (stdout,40) TRIM(Vname(1,idQair)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+# endif
+#endif
 #ifdef PERFECT_RESTART
         IF (.not.got_var(idRzet)) THEN
           IF (Master) WRITE (stdout,40) TRIM(Vname(1,idRzet)),          &

@@ -99,6 +99,9 @@
      &                     MIXING(ng) % beta,                           &
      &                     OCEAN(ng) % rho,                             &
      &                     OCEAN(ng) % t,                               &
+#ifdef ABLM_WATER
+     &                     FORCES(ng) % Q100,                           &
+#endif
      &                     FORCES(ng) % Hair,                           &
      &                     FORCES(ng) % Pair,                           &
      &                     FORCES(ng) % Tair,                           &
@@ -148,6 +151,9 @@
      &                           rmask_wet, umask_wet, vmask_wet,       &
 # endif
      &                           alpha, beta, rho, t,                   &
+# ifdef ABLM_WATER
+     &                           Q100,                                  &
+# endif
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
 # ifdef CLOUDS
      &                           cloud,                                 &
@@ -200,6 +206,9 @@
       real(r8), intent(in) :: beta(LBi:,LBj:)
       real(r8), intent(in) :: rho(LBi:,LBj:,:)
       real(r8), intent(in) :: t(LBi:,LBj:,:,:,:)
+#  ifdef ABLM_WATER
+      real(r8), intent(out) :: Q100(LBi:,LBj:)
+#  endif
       real(r8), intent(in) :: Hair(LBi:,LBj:)
       real(r8), intent(in) :: Pair(LBi:,LBj:)
       real(r8), intent(in) :: Tair(LBi:,LBj:)
@@ -247,6 +256,9 @@
       real(r8), intent(in) :: beta(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: rho(LBi:UBi,LBj:UBj,N(ng))
       real(r8), intent(in) :: t(LBi:UBi,LBj:UBj,N(ng),3,NT(ng))
+#  ifdef ABLM_WATER
+      real(r8), intent(in) :: Q100(LBi:UBi,LBj:UBj)
+#  endif
       real(r8), intent(in) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Pair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Tair(LBi:UBi,LBj:UBj)
@@ -770,6 +782,13 @@
 # endif
 # ifdef WET_DRY
           Tauy(i,j)=Tauy(i,j)*rmask_wet(i,j)
+# endif
+# ifdef ABLM_WATER
+!
+!  Compute specific humidity at 100m.
+!
+          Q100(i,j) = Qsea(i) + Qstar(i)*(LOG(100.0_r8/ZoQ(i)) -        &
+     &                               bulk_psit(100.0_r8/L(i),pi))
 # endif
         END DO
       END DO

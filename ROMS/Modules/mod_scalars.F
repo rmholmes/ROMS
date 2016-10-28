@@ -337,6 +337,36 @@
 #endif
         real(r8) :: gorho0                      ! m4/s2/kg
         real(r8) :: vonKar = 0.41_r8            ! non-dimensional
+#ifdef ABLM
+!
+!-----------------------------------------------------------------------
+!  Constants associated with atmospheric boundary layer model
+!-----------------------------------------------------------------------
+!
+!    ntatm         Number of atmospheric advection/diffusion time steps
+!    zWind         Height of wind velocities
+!    ablmK         Diffusion coefficient
+!    ABfirst       Adams-Bashforth first step counter
+!    ABeps         Adams-Bashforth small number
+!    hABLM         Thickness of atmospheric boundary layer
+!    ABLM_rhoa     Density of air
+!
+!    ablm_maskwid  Width of boundary region for restoring of Tair/Qair to data
+!    ablm_lrelax   Time-scale for relaxation over land and near boundaries
+!    ablm_orelax   Time-scale for relaxation over ocean (normally zero)
+!
+        integer  :: ntatm                  !
+        real(r8) :: zWind = 10.0_r8        ! m
+        real(r8) :: ablmK                  ! m2s-1
+        logical  :: ABfirst = .TRUE.       ! Overwritten after first step
+        real(r8) :: ABeps = 0.01_r8        ! 
+        real(r8) :: hABLM                  ! m
+        real(r8) :: ABLM_rhoa = 1.3_r8     ! kgm-3
+        real(r8) :: ABLM_lapse = 0.0098_r8 ! degC/m
+        integer  :: ABLM_maskwid           ! grid units
+        real(r8) :: ABLM_lrelax            ! days
+        real(r8) :: ABLM_orelax = 0.0_r8   ! days
+#endif
 #ifdef STATS_ENSO
 !
 !-----------------------------------------------------------------------
@@ -377,7 +407,6 @@
         real(r8), allocatable :: stenIanom(:)      ! degC
         logical, allocatable  :: stenUpdte(:)
 #endif
-!
 !-----------------------------------------------------------------------
 !  Various model parameters.  Some of these parameters are overwritten
 !  with the values provided from model standard input script.
@@ -2347,6 +2376,13 @@
 #endif
       Co=1.0_r8/(2.0_r8+SQRT(2.0_r8))
       gorho0=g/rho0
+#ifdef ABLM
+        ablmK = 1.0E04_r8
+        ntatm = 5
+        ABLM_maskwid = 1
+        ABLM_lrelax = 0.1_r8
+        hABLM = 1000.0_r8
+#endif
       DO ng=1,Ngrids
         EWperiodic(ng)=.FALSE.
         NSperiodic(ng)=.FALSE.

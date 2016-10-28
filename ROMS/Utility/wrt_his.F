@@ -83,6 +83,9 @@
       real(r8), allocatable :: Vr3d(:,:,:)
       real(r8), allocatable :: Wr3d(:,:,:)
 #endif
+#if defined MASKING && defined ABLM
+      real(r8), allocatable :: dummy_mask(:,:)
+#endif      
 
 # include "set_bounds.h"
 !
@@ -1446,6 +1449,70 @@
         IF (status.ne.nf90_noerr) THEN
           IF (Master) THEN
             WRITE (stdout,10) TRIM(Vname(1,idLrad)), HIS(ng)%Rindex
+          END IF
+          exit_flag=3
+          ioerror=status
+          RETURN
+        END IF
+      END IF
+!
+!  Write out atmospheric air temperature.
+!
+      IF (Hout(idTair,ng)) THEN
+        scale=1.0_r8
+        gtype=gfactor*r2dvar
+#if defined MASKING && defined ABLM
+        IF (.not.allocated(dummy_mask)) THEN
+          allocate (dummy_mask(LBi:UBi,LBj:UBj))
+          dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+        END IF
+#endif
+        status=nf_fwrite2d(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idTair), &
+     &                     HIS(ng)%Rindex, gtype,                       &
+     &                     LBi, UBi, LBj, UBj, scale,                   &
+#  ifdef MASKING
+#   ifdef ABLM
+     &                     dummy_mask,                                  &
+#   else
+     &                     GRID(ng) % rmask,                            &
+#   endif
+#  endif
+     &                     FORCES(ng) % Tair)
+        IF (status.ne.nf90_noerr) THEN
+          IF (Master) THEN
+            WRITE (stdout,10) TRIM(Vname(1,idTair)), HIS(ng)%Rindex
+          END IF
+          exit_flag=3
+          ioerror=status
+          RETURN
+        END IF
+      END IF
+!
+!  Write out atmospheric water vapor.
+!
+      IF (Hout(idQair,ng)) THEN
+        scale=1.0_r8/Fscale(idQair,ng)
+        gtype=gfactor*r2dvar
+#if defined MASKING && defined ABLM && defined ABLM_WATER
+        IF (.not.allocated(dummy_mask)) THEN
+          allocate (dummy_mask(LBi:UBi,LBj:UBj))
+          dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+        END IF
+#endif
+        status=nf_fwrite2d(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idQair), &
+     &                     HIS(ng)%Rindex, gtype,                       &
+     &                     LBi, UBi, LBj, UBj, scale,                   &
+#  ifdef MASKING
+#   ifdef ABLM
+     &                     dummy_mask,                                  &
+#   else
+     &                     GRID(ng) % rmask,                            &
+#   endif
+#  endif
+     &                     FORCES(ng) % Hair)
+        IF (status.ne.nf90_noerr) THEN
+          IF (Master) THEN
+            WRITE (stdout,10) TRIM(Vname(1,idQair)), HIS(ng)%Rindex
           END IF
           exit_flag=3
           ioerror=status

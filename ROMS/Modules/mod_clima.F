@@ -67,6 +67,11 @@
 !                 3D momentum data.                                    !
 !   Tnudgcof    Time-scale (1/sec) coefficients for nudging towards    !
 !                 tracer data.                                         !
+#ifdef ABLM
+!  ABLMnudgcof  Time-scale (1/sec) coefficients for nudging Tair (and  !
+!               Qair) towards data for atmospheric boundary layer      !
+!               model                                                  !
+#endif
 !                                                                      !
 !=======================================================================
 !
@@ -112,7 +117,9 @@
 
           real(r8), pointer :: Tnudgcof(:,:,:,:)
 #endif
-
+#ifdef ABLM
+          real(r8), pointer :: ABLMnudgcof(:,:)
+#endif
 #if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
     defined SO_SEMI
@@ -218,6 +225,9 @@
       IF (ANY(LnudgeTCLM(:,ng))) THEN
         allocate ( CLIMA(ng) % Tnudgcof(LBi:UBi,LBj:UBj,N(ng),NTCLM(ng)) )
       END IF
+#endif
+#ifdef ABLM
+        allocate ( CLIMA(ng) % ABLMnudgcof(LBi:UBi,LBj:UBj) )
 #endif
 
 #if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
@@ -412,7 +422,13 @@
         END DO
       END IF
 #endif
-
+#ifdef ABLM
+        DO j=Jmin,Jmax
+          DO i=Imin,Imax
+            CLIMA(ng) % ABLMnudgcof(i,j) = IniVal
+          END DO
+        END DO
+#endif
 #if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
     defined SO_SEMI

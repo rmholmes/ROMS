@@ -739,6 +739,20 @@
                 END DO
 # endif
               END DO
+# ifdef ABLM
+            CASE ('ABLM_KAPPA')
+              Npts=load_r(Nval, Rval, Ngrids, ablmK)
+            CASE ('ABLM_NTATM')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              ntatm=Ivalue(1)
+            CASE ('ABLM_MASKWIDTH')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              ABLM_maskwid=Ivalue(1)
+            CASE ('ABLM_LANDRELAX')
+              Npts=load_r(Nval, Rval, Ngrids, ABLM_lrelax)
+            CASE ('ABLM_H')
+              Npts=load_r(Nval, Rval, Ngrids, hABLM)
+# endif
 # ifdef STATS_ENSO
             CASE ('stenMean')
               Npts=load_r(Nval, Rval, Ngrids, stenMean)
@@ -1675,6 +1689,20 @@
                 RETURN
               END IF
               Npts=load_l(Nval, Cval, Ngrids, Hout(idLrad,:))
+            CASE ('Hout(idTair)')
+              IF (idTair.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idTair'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idTair,:))
+            CASE ('Hout(idQair)')
+              IF (idQair.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idQair'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idQair,:))
             CASE ('Hout(idSrad)')
               IF (idSrad.eq.0) THEN
                 IF (Master) WRITE (out,280) 'idSrad'
@@ -1962,6 +1990,10 @@
               Npts=load_l(Nval, Cval, Ngrids, Qout(idShea,:))
             CASE ('Qout(idLrad)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idLrad,:))
+            CASE ('Qout(idTair)')
+              Npts=load_l(Nval, Cval, Ngrids, Qout(idTair,:))
+            CASE ('Qout(idQair)')
+              Npts=load_l(Nval, Cval, Ngrids, Qout(idQair,:))
             CASE ('Qout(idSrad)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idSrad,:))
             CASE ('Qout(idEmPf)')
@@ -2104,6 +2136,10 @@
               Npts=load_l(Nval, Cval, Ngrids, Aout(idShea,:))
             CASE ('Aout(idLrad)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idLrad,:))
+            CASE ('Aout(idTair)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idTair,:))
+            CASE ('Aout(idQair)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idQair,:))
             CASE ('Aout(idSrad)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSrad,:))
             CASE ('Aout(idevap)')
@@ -3664,6 +3700,17 @@
      &            'Background vertical mixing coefficient (m2/s)',      &
      &            'for tracer ', itrc, TRIM(Vname(1,idTvar(itrc)))
           END DO
+# ifdef ABLM
+            WRITE (out,200) ablmK, 'ABLM_KAPPA','ABLM diffusivity.'
+            WRITE (out,120) ntatm, 'ABLM_NTATM',                        &
+     &            'ABLM number of atmospheric time steps.'
+            WRITE (out,120) ABLM_maskwid, 'ABLM_MASKWIDTH',             &
+     &            'ABLM boundary nudging region width (grid points).'
+            WRITE (out,200) ABLM_lrelax, 'ABLM_LANDRELAX',              &
+     &            'ABLM nudging time scale over land/boundaries (days).'
+            WRITE (out,150) hABLM, 'ABLM_H',                            &
+     &            'ABLM height of boundary layer (m).'
+# endif
 # ifdef STATS_ENSO
           WRITE (out,210) stenMean(ng), 'stenMean',                     &
      &          'Climatological value of SST index (degC).'
@@ -4524,6 +4571,12 @@
             IF (Hout(idLrad,ng)) WRITE (out,170) Hout(idLrad,ng),       &
      &         'Hout(idLrad)',                                          &
      &         'Write out longwave radiation flux.'
+            IF (Hout(idTair,ng)) WRITE (out,170) Hout(idTair,ng),       &
+     &         'Hout(idTair)',                                          &
+     &         'Write out atmospheric air temperature.'
+            IF (Hout(idQair,ng)) WRITE (out,170) Hout(idQair,ng),       &
+     &         'Hout(idQair)',                                          &
+     &         'Write out atmospheric water vapor.'
             IF (Hout(idLhea,ng)) WRITE (out,170) Hout(idLhea,ng),       &
      &         'Hout(idLhea)',                                          &
      &         'Write out latent heat flux.'
@@ -4828,6 +4881,12 @@
             IF (Qout(idLrad,ng)) WRITE (out,170) Qout(idLrad,ng),       &
      &         'Qout(idLrad)',                                          &
      &         'Write out longwave radiation flux.'
+            IF (Qout(idTair,ng)) WRITE (out,170) Qout(idTair,ng),       &
+     &         'Qout(idTair)',                                          &
+     &         'Write out atmospheric air temperature.'
+            IF (Qout(idQair,ng)) WRITE (out,170) Qout(idQair,ng),       &
+     &         'Qout(idQair)',                                          &
+     &         'Write out atmospheric water vapor.'
             IF (Qout(idLhea,ng)) WRITE (out,170) Qout(idLhea,ng),       &
      &         'Qout(idLhea)',                                          &
      &         'Write out latent heat flux.'
@@ -5026,6 +5085,12 @@
             IF (Aout(idLrad,ng)) WRITE (out,170) Aout(idLrad,ng),       &
      &         'Aout(idLrad)',                                          &
      &         'Write out averaged longwave radiation flux.'
+            IF (Aout(idTair,ng)) WRITE (out,170) Aout(idTair,ng),       &
+     &         'Aout(idTair)',                                          &
+     &         'Write out atmospheric air temperature.'
+            IF (Aout(idQair,ng)) WRITE (out,170) Aout(idQair,ng),       &
+     &         'Aout(idQair)',                                          &
+     &         'Write out atmospheric water vapor.'
             IF (Aout(idLhea,ng)) WRITE (out,170) Aout(idLhea,ng),       &
      &         'Aout(idLhea)',                                          &
      &         'Write out averaged latent heat flux.'

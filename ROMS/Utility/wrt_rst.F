@@ -22,6 +22,9 @@
       USE mod_iounits
       USE mod_mixing
       USE mod_ncparam
+#ifdef ABLM
+      USE mod_forces
+#endif
       USE mod_netcdf
       USE mod_ocean
       USE mod_scalars
@@ -53,6 +56,10 @@
       integer :: ntmp(1)
 # endif
       real(r8) :: scale
+#if defined MASKING && defined ABLM
+      real(r8), allocatable :: dummy_mask(:,:)
+#endif
+
 !
       LBi=LBOUND(GRID(ng)%h,DIM=1)
       UBi=UBOUND(GRID(ng)%h,DIM=1)
@@ -358,6 +365,62 @@
         ioerror=status
         RETURN
       END IF
+#ifdef ABLM
+!
+!  Write out atmospheric air temperature
+!
+      scale=1.0_r8
+      gtype=gfactor*r2dvar
+# ifdef MASKING
+      IF (.not.allocated(dummy_mask)) THEN
+        allocate (dummy_mask(LBi:UBi,LBj:UBj))
+        dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+      END IF
+# endif
+      status=nf_fwrite2d(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idTair),   &
+     &                   RST(ng)%Rindex, gtype,                         &
+     &                   LBi, UBi, LBj, UBj, scale,                     &
+# ifdef MASKING
+     &                     dummy_mask,                                  &
+# endif
+     &                   FORCES(ng) % Tair)
+      IF (status.ne.nf90_noerr) THEN
+        IF (Master) THEN
+          WRITE (stdout,10) TRIM(Vname(1,idTair)), RST(ng)%Rindex
+        END IF
+        exit_flag=3
+        ioerror=status
+        RETURN
+      END IF
+# ifdef ABLM_WATER
+!
+!  Write out atmospheric water vapor
+!
+      scale=1.0_r8/Fscale(idQair,ng)
+      gtype=gfactor*r2dvar
+#  ifdef MASKING
+      IF (.not.allocated(dummy_mask)) THEN
+        allocate (dummy_mask(LBi:UBi,LBj:UBj))
+        dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+      END IF
+#  endif
+      status=nf_fwrite2d(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idQair),   &
+     &                   RST(ng)%Rindex, gtype,                         &
+     &                   LBi, UBi, LBj, UBj, scale,                     &
+#  ifdef MASKING
+     &                     dummy_mask,                                  &
+#  endif
+     &                   FORCES(ng) % Hair)
+      IF (status.ne.nf90_noerr) THEN
+        IF (Master) THEN
+          WRITE (stdout,10) TRIM(Vname(1,idQair)), RST(ng)%Rindex
+        END IF
+        exit_flag=3
+        ioerror=status
+        RETURN
+      END IF
+# endif
+#endif
 #ifdef PERFECT_RESTART
 !
 !  Write out RHS of 2D momentum equation in the XI-direction.

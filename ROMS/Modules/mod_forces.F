@@ -74,8 +74,18 @@
 !                                                                      !
 !  Surface air humidity.                                               !
 !                                                                      !
+#if defined ABLM_WATER && defined ABLM
+!  Hair         Surface air specific (g/kg) or relative humidity       !
+!                 (percentage). Internal                               !
+!  HairB        Surface air specific (g/kg) or relative humidity       !
+!                 (percentage). External                               !
+!  HairTenPrev Surface air specific (g/kg) or relative humidity        !
+!                 (percentage) tendency (previous value)               !
+!  Q100         Specific humidity at 100m from bulk_flux.F             !
+#else
 !  Hair         Surface air specific (g/kg) or relative humidity       !
 !                 (percentage).                                        !
+#endif
 !  HairG        Latest two-time snapshots of input "Hair" grided       !
 !                 data used for interpolation.                         !
 !                                                                      !
@@ -87,7 +97,13 @@
 !                                                                      !
 !  Surface air temperature.                                            !
 !                                                                      !
+#ifdef ABLM
+!  Tair         Surface air temperature (Celsius) internal             !
+!  TairB        Surface air temperature (Celsius) external             !
+!  TairTenPrev  Surface air temperature tendency (previous value)      !
+#else
 !  Tair         Surface air temperature (Celsius)                      !
+#endif
 !  TairG        Latest two-time snapshots of input "Tair" grided       !
 !                 data used for interpolation.                         !
 !  Surface Winds.                                                      !
@@ -301,6 +317,11 @@
 # if defined BULK_FLUXES || defined ECOSIM || \
     (defined SHORTWAVE && defined ANA_SRFLUX)
           real(r8), pointer :: Hair(:,:)
+#  if defined ABLM && defined ABLM_WATER
+          real(r8), pointer :: HairB(:,:)
+          real(r8), pointer :: HairTenPrev(:,:)
+          real(r8), pointer :: Q100(:,:)
+#  endif
 #  ifndef ANA_HUMIDITY
           real(r8), pointer :: HairG(:,:,:)
 #   ifdef STATS_ENSO
@@ -309,6 +330,10 @@
 #   endif
 #  endif
           real(r8), pointer :: Tair(:,:)
+#  ifdef ABLM
+          real(r8), pointer :: TairB(:,:)
+          real(r8), pointer :: TairTenPrev(:,:)
+#  endif
 #  ifndef ANA_TAIR
           real(r8), pointer :: TairG(:,:,:)
 #   ifdef STATS_ENSO
@@ -638,6 +663,12 @@
     (defined SHORTWAVE && defined ANA_SRFLUX)
       allocate ( FORCES(ng) % Hair(LBi:UBi,LBj:UBj) )
 
+#   if defined ABLM && defined ABLM_WATER
+      allocate ( FORCES(ng) % HairB(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % HairTenPrev(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % Q100(LBi:UBi,LBj:UBj) )
+#   endif
+
 #  ifndef ANA_HUMIDITY
       allocate ( FORCES(ng) % HairG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
@@ -647,6 +678,11 @@
 #  endif
 
       allocate ( FORCES(ng) % Tair(LBi:UBi,LBj:UBj) )
+
+#   ifdef ABLM
+      allocate ( FORCES(ng) % TairB(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % TairTenPrev(LBi:UBi,LBj:UBj) )
+#   endif
 
 #  ifndef ANA_TAIR
       allocate ( FORCES(ng) % TairG(LBi:UBi,LBj:UBj,2) )
@@ -1026,7 +1062,16 @@
 # if defined BULK_FLUXES || defined ECOSIM || \
     (defined SHORTWAVE && defined ANA_SRFLUX)
             FORCES(ng) % Hair(i,j) = IniVal
+#  if defined ABLM && defined ABLM_WATER
+            FORCES(ng) % HairB(i,j) = IniVal
+            FORCES(ng) % HairTenPrev(i,j) = IniVal
+            FORCES(ng) % Q100(i,j) = IniVal
+#  endif
             FORCES(ng) % Tair(i,j) = IniVal
+#  ifdef ABLM
+            FORCES(ng) % TairB(i,j) = IniVal
+            FORCES(ng) % TairTenPrev(i,j) = IniVal
+#  endif
 # endif
 # if defined BULK_FLUXES || defined ECOSIM
             FORCES(ng) % Uwind(i,j) = IniVal

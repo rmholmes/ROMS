@@ -55,6 +55,9 @@
       integer :: Fcount, gfactor, gtype, i, itrc, status
 
       real(r8) :: scale
+#if defined MASKING && defined ABLM
+      real(r8), allocatable :: dummy_mask(:,:)
+#endif      
 !
       SourceFile='wrt_avg.F'
 !
@@ -1692,6 +1695,70 @@
         IF (status.ne.nf90_noerr) THEN
           IF (Master) THEN
             WRITE (stdout,10) TRIM(Vname(1,idLrad)), AVG(ng)%Rindex
+          END IF
+          exit_flag=3
+          ioerror=status
+          RETURN
+        END IF
+      END IF
+!
+!  Write out atmospheric air temperature.
+!
+      IF (Aout(idTair,ng)) THEN
+        scale=1.0_r8
+        gtype=gfactor*r2dvar
+#if defined MASKING && defined ABLM
+        IF (.not.allocated(dummy_mask)) THEN
+          allocate (dummy_mask(LBi:UBi,LBj:UBj))
+          dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+        END IF
+#endif
+        status=nf_fwrite2d(ng, iNLM, AVG(ng)%ncid, AVG(ng)%Vid(idTair), &
+     &                     AVG(ng)%Rindex, gtype,                       &
+     &                     LBi, UBi, LBj, UBj, scale,                   &
+#   ifdef MASKING
+#    ifdef ABLM
+     &                     dummy_mask,                                  &
+#    else
+     &                     GRID(ng) % rmask,                            &
+#    endif
+#   endif
+     &                     AVERAGE(ng) % avgTair)
+        IF (status.ne.nf90_noerr) THEN
+          IF (Master) THEN
+            WRITE (stdout,10) TRIM(Vname(1,idTair)), AVG(ng)%Rindex
+          END IF
+          exit_flag=3
+          ioerror=status
+          RETURN
+        END IF
+      END IF
+!
+!  Write out atmospheric water vapor.
+!
+      IF (Aout(idQair,ng)) THEN
+        scale=1.0_r8/Fscale(idQair,ng)
+        gtype=gfactor*r2dvar
+#if defined MASKING && defined ABLM && defined ABLM_WATER
+        IF (.not.allocated(dummy_mask)) THEN
+          allocate (dummy_mask(LBi:UBi,LBj:UBj))
+          dummy_mask(LBi:UBi,LBj:UBj)=1.0_r8
+        END IF
+#endif
+        status=nf_fwrite2d(ng, iNLM, AVG(ng)%ncid, AVG(ng)%Vid(idQair), &
+     &                     AVG(ng)%Rindex, gtype,                       &
+     &                     LBi, UBi, LBj, UBj, scale,                   &
+#   ifdef MASKING
+#    ifdef ABLM
+     &                     dummy_mask,                                  &
+#    else
+     &                     GRID(ng) % rmask,                            &
+#    endif
+#   endif
+     &                     AVERAGE(ng) % avgQair)
+        IF (status.ne.nf90_noerr) THEN
+          IF (Master) THEN
+            WRITE (stdout,10) TRIM(Vname(1,idQair)), AVG(ng)%Rindex
           END IF
           exit_flag=3
           ioerror=status

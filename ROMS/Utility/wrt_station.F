@@ -705,6 +705,38 @@
      &                        varid = STA(ng)%Vid(idLrad))
         IF (exit_flag.ne.NoError) RETURN
       END IF
+!
+!  Write out atmospheric air temperature.
+!
+      IF (Sout(idTair,ng)) THEN
+        scale=1.0_r8
+        CALL extract_sta2d (ng, iNLM, Cgrid, idTair, r2dvar,            &
+     &                      LBi, UBi, LBj, UBj,                         &
+     &                      scale, FORCES(ng)%Tair,                     &
+     &                      Nstation(ng), Xpos, Ypos, psta)
+        CALL netcdf_put_fvar (ng, iNLM, STA(ng)%name,                   &
+     &                        TRIM(Vname(1,idTair)), psta,              &
+     &                        (/1,STA(ng)%Rindex/), (/Nstation(ng),1/), &
+     &                        ncid = STA(ng)%ncid,                      &
+     &                        varid = STA(ng)%Vid(idTair))
+        IF (exit_flag.ne.NoError) RETURN
+      END IF
+!
+!  Write out atmospheric water vapor.
+!
+      IF (Sout(idQair,ng)) THEN
+        scale=1.0_r8/Fscale(idQair,ng)
+        CALL extract_sta2d (ng, iNLM, Cgrid, idQair, r2dvar,            &
+     &                      LBi, UBi, LBj, UBj,                         &
+     &                      scale, FORCES(ng)%Hair,                     &
+     &                      Nstation(ng), Xpos, Ypos, psta)
+        CALL netcdf_put_fvar (ng, iNLM, STA(ng)%name,                   &
+     &                        TRIM(Vname(1,idQair)), psta,              &
+     &                        (/1,STA(ng)%Rindex/), (/Nstation(ng),1/), &
+     &                        ncid = STA(ng)%ncid,                      &
+     &                        varid = STA(ng)%Vid(idQair))
+        IF (exit_flag.ne.NoError) RETURN
+      END IF
 
 #  endif
 #  ifdef SHORTWAVE
