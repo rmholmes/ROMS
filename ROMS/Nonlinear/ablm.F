@@ -65,16 +65,6 @@
      &                     GRID(ng) % om_v,                             &
      &                     GRID(ng) % pmon_u,                           &
      &                     GRID(ng) % pnom_v,                           &
-# ifdef MASKING
-     &                     GRID(ng) % rmask,                            &
-     &                     GRID(ng) % umask,                            &
-     &                     GRID(ng) % vmask,                            &
-# endif
-# ifdef WET_DRY
-     &                     GRID(ng) % rmask_wet,                        &
-     &                     GRID(ng) % umask_wet,                        &
-     &                     GRID(ng) % vmask_wet,                        &
-# endif
      &                     FORCES(ng) % Tair,                           &
      &                     FORCES(ng) % TairTenPrev,                    &
 # ifdef ABLM_WATER
@@ -97,12 +87,6 @@
      &                           IminS, ImaxS, JminS, JmaxS,            &
      &                           pm, pn, on_u, om_v,                    &
      &                           pmon_u, pnom_v,                        &
-# ifdef MASKING
-     &                           rmask, umask, vmask,                   &
-# endif
-# ifdef WET_DRY
-     &                           rmask_wet, umask_wet, vmask_wet,       &
-# endif
      &                           Tair, TairTenPrev,                     &
 # ifdef ABLM_WATER
      &                           Hair, HairTenPrev, Pair,               &
@@ -132,16 +116,6 @@
       real(r8), intent(in) :: om_v(LBi:,LBj:)
       real(r8), intent(in) :: pmon_u(LBi:,LBj:)
       real(r8), intent(in) :: pnom_v(LBi:,LBj:)
-#  ifdef MASKING
-      real(r8), intent(in) :: rmask(LBi:,LBj:)
-      real(r8), intent(in) :: umask(LBi:,LBj:)
-      real(r8), intent(in) :: vmask(LBi:,LBj:)
-#  endif
-#  ifdef WET_DRY
-      real(r8), intent(in) :: rmask_wet(LBi:,LBj:)
-      real(r8), intent(in) :: umask_wet(LBi:,LBj:)
-      real(r8), intent(in) :: vmask_wet(LBi:,LBj:)
-#  endif
       real(r8), intent(inout) :: Tair(LBi:,LBj:)
       real(r8), intent(inout) :: TairTenPrev(LBi:,LBj:)
 #  ifdef ABLM_WATER
@@ -158,16 +132,6 @@
       real(r8), intent(in) :: om_v(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: pmon_u(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: pnom_v(LBi:UBi,LBj:UBj)
-#  ifdef MASKING
-      real(r8), intent(in) :: rmask(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: umask(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: vmask(LBi:UBi,LBj:UBj)
-#  endif
-#  ifdef WET_DRY
-      real(r8), intent(in) :: rmask_wet(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: umask_wet(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: vmask_wet(LBi:UBi,LBj:UBj)
-#  endif
       real(r8), intent(inout) :: Tair(LBi:UBi,LBj:UBj)
       real(r8), intent(inout) :: TairTenPrev(LBi:UBi,LBj:UBj)
 #  ifdef ABLM_WATER
@@ -474,13 +438,6 @@
      &                     nrhs(ng),                                    &
 # ifdef MASKING
      &                     GRID(ng) % rmask,                            &
-     &                     GRID(ng) % umask,                            &
-     &                     GRID(ng) % vmask,                            &
-# endif
-# ifdef WET_DRY
-     &                     GRID(ng) % rmask_wet,                        &
-     &                     GRID(ng) % umask_wet,                        &
-     &                     GRID(ng) % vmask_wet,                        &
 # endif
      &                     FORCES(ng) % Tair,                           &
      &                     FORCES(ng) % TairB,                          &
@@ -507,10 +464,7 @@
      &                           IminS, ImaxS, JminS, JmaxS,            &
      &                           nrhs,                                  &
 # ifdef MASKING
-     &                           rmask, umask, vmask,                   &
-# endif
-# ifdef WET_DRY
-     &                           rmask_wet, umask_wet, vmask_wet,       &
+     &                           rmask,                                 &
 # endif
      &                           Tair, TairB,                           &
 # ifdef ABLM_WATER
@@ -538,13 +492,6 @@
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
       real(r8), intent(in) :: rmask(LBi:,LBj:)
-      real(r8), intent(in) :: umask(LBi:,LBj:)
-      real(r8), intent(in) :: vmask(LBi:,LBj:)
-#  endif
-#  ifdef WET_DRY
-      real(r8), intent(in) :: rmask_wet(LBi:,LBj:)
-      real(r8), intent(in) :: umask_wet(LBi:,LBj:)
-      real(r8), intent(in) :: vmask_wet(LBi:,LBj:)
 #  endif
       real(r8), intent(inout) :: Tair(LBi:,LBj:)
       real(r8), intent(in) :: TairB(LBi:,LBj:)
@@ -561,13 +508,6 @@
 # else
 #  ifdef MASKING
       real(r8), intent(in) :: rmask(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: umask(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: vmask(LBi:UBi,LBj:UBj)
-#  endif
-#  ifdef WET_DRY
-      real(r8), intent(in) :: rmask_wet(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: umask_wet(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: vmask_wet(LBi:UBi,LBj:UBj)
 #  endif
       real(r8), intent(inout) :: Tair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: TairB(LBi:UBi,LBj:UBj)
@@ -653,6 +593,10 @@
           NETdn = (OCup-LWdn-shflx(i,j))/HscaleA
 
           TairTen = (NETdn - NETup) / hABLM
+#ifdef MASKING
+          TairTen = TairTen*rmask(i,j)
+#endif
+
           Tair(i,j) = Tair(i,j) + dt(ng)*TairTen
 
 #ifdef ABLM_WATER
@@ -671,6 +615,9 @@
           entrain = 0.25*(evap / (Qsea - Qair(i,j)))*Q100(i,j)
 
           HairTen = (evap - entrain) / hABLM / ABLM_rhoa
+#ifdef MASKING
+          HairTen = HairTen*rmask(i,j)
+#endif
 
           Qair(i,j) = Qair(i,j) + dt(ng)*HairTen
 #endif
