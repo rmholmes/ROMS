@@ -49,6 +49,9 @@
 !                DimIDs(30) => Number of 3D variables time levels (2). !
 !                DimIDs(31) => Number of 2D variables time levels (3). !
 !                DimIDs(32) => Number of sediment tracers.             !
+#ifdef STATS_ENSO
+!                DimIDs(33) => StenIndex dimension (length stenNdays)  !
+#endif
 !                                                                      !
 !  On Output:                                                          !
 !                                                                      !
@@ -89,6 +92,9 @@
 
       integer :: brydim, i, ie, is, j, lstr, varid
       integer :: srdim, stadim, status, swdim, trcdim, usrdim
+#ifdef STATS_ENSO
+      integer :: stendim
+#endif
 #ifdef SEDIMENT
       integer :: seddim
 #endif
@@ -137,6 +143,9 @@
       srdim=DimIDs(9)
       swdim=DimIDs(10)
       trcdim=DimIDs(11)
+#ifdef STATS_ENSO
+      stendim=DimIDs(33)
+#endif
 #ifdef SEDIMENT
       seddim=DimIDs(32)
 #endif
@@ -1431,6 +1440,127 @@
       Vinfo(10)='.TRUE.'
       status=def_var(ng, model, ncid, varid, nf90_int,                  &
      &               1, (/trcdim/), Aval, Vinfo, ncname,                &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
+#ifdef STATS_ENSO
+      Vinfo( 1)='stenMean'
+      Vinfo( 2)='Climatological value of SST index'
+      Vinfo( 3)='degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRegnN'
+      Vinfo( 2)='SST index region northern boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRegnE'
+      Vinfo( 2)='SST index region eastern boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRegnS'
+      Vinfo( 2)='SST index region southern boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRegnW'
+      Vinfo( 2)='SST index region western boundary'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRuwnd'
+      Vinfo( 2)='Coupling coefficient of Uwind pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRvwnd'
+      Vinfo( 2)='Coupling coefficient of Vwind pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRqair'
+      Vinfo( 2)='Coupling coefficient of Qair pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRtair'
+      Vinfo( 2)='Coupling coefficient of Tair pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRpair'
+      Vinfo( 2)='Coupling coefficient of Pair pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRsrad'
+      Vinfo( 2)='Coupling coefficient of swrad pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRlrad'
+      Vinfo( 2)='Coupling coefficient of lwrad_down pattern onto SST in'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenNdays'
+      Vinfo( 2)='Number of days to average SST index over'
+      Vinfo( 3)=''
+      status=def_var(ng, model, ncid, varid, nf90_int,                  &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenCount'
+      Vinfo( 2)='Counter for current day of stenNdays'
+      Vinfo( 3)=''
+      status=def_var(ng, model, ncid, varid, nf90_int,                  &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenIndex'
+      Vinfo( 2)='the SST index over the last stenNdays'
+      Vinfo( 3)='degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/stendim/), Aval, Vinfo, ncname,               &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 #endif

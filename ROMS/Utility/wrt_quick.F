@@ -110,6 +110,20 @@
      &                      ncid = QCK(ng)%ncid,                        &
      &                      varid = QCK(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
+#ifdef STATS_ENSO
+!
+!  Write out SST index and current count.
+!
+      CALL netcdf_put_ivar (ng, iNLM, QCK(ng)%name, 'stenCount',        &
+     &                      stenCount(ng), (/0/), (/0/),                &
+     &                      ncid = QCK(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, iNLM, QCK(ng)%name, 'stenIndex',        &
+     &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
+     &                      ncid = QCK(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
 
 #if defined SEDIMENT && defined SED_MORPH
 !

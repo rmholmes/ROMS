@@ -84,6 +84,11 @@
 !  NDM3d      Number of diagnostic 3D momentum fields.                 !
 !  NDrhs      Number of diagnostic 3D right-hand-side fields.          !
 !                                                                      !
+#ifdef STATS_ENSO
+!  stenNdays  Number of days to average SST index over                 !
+#endif
+!                                                                      !
+!                                                                      !
 !=======================================================================
 !
       USE mod_kinds
@@ -443,6 +448,9 @@
 !
       integer :: NBT = 0
 !
+#ifdef STATS_ENSO
+      integer :: stenNdays = 0
+#endif
 !-----------------------------------------------------------------------
 !  Sediment tracers parameters.
 !-----------------------------------------------------------------------

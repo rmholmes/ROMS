@@ -49,7 +49,7 @@
       integer :: i, j, recdim, stadim
       integer :: status
 
-      integer :: DimIDs(32), pgrd(2)
+      integer :: DimIDs(33), pgrd(2)
       integer :: Vsize(4)
 
       integer :: def_dim
@@ -149,6 +149,11 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
+#ifdef STATS_ENSO
+        status=def_dim(ng, iNLM, STA(ng)%ncid, ncname, 'stendim',       &
+     &                 stenNdays, DimIDs(33))
+        IF (exit_flag.ne.NoError) RETURN
+#endif
 # ifdef FOUR_DVAR
         status=def_dim(ng, iNLM, STA(ng)%ncid, ncname, 'Nstate',        &
      &                 NstateVar(ng), DimIDs(29))

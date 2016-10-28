@@ -415,6 +415,41 @@
           IF (exit_flag.ne.NoError) RETURN
         END IF
 # endif
+# ifdef STATS_ENSO
+!
+! Read in SST index and current count.
+!
+! Inquire variable:
+      CALL netcdf_inq_var (ng, IDmod, ncname,                           &
+     &                     MyVarName = 'stenCount')
+
+! Read variables if present:
+      IF (exit_flag.eq.NoError) THEN
+          CALL netcdf_get_fvar (ng, IDmod, ncname, 'stenIndex',         &
+     &                          stenIndex(:,ng),                        &
+     &                          ncid = ncINPid,                         &
+     &                          start = (/1/),                          &
+     &                          total = (/stenNdays/),                  &
+     &                          min_val = Fmin, max_val = Fmax)
+          IF (exit_flag.ne.NoError) RETURN
+          IF (Master) THEN
+            WRITE (stdout,70) 'stenIndex', Fmin, Fmax
+          END IF
+
+          CALL netcdf_get_ivar (ng, IDmod, ncname, 'stenCount',         &
+     &                          stenCount(ng),                          &
+     &                          ncid = ncINPid,                         &
+     &                          start = (/1/),                          &
+     &                          total = (/1/))
+          IF (exit_flag.ne.NoError) RETURN
+          IF (Master) THEN
+            WRITE (stdout,80) 'stenCount', stenCount
+          END IF
+      ELSE
+         exit_flag = NoError
+         ioerror = 0
+      END IF
+# endif
 # if defined SEDIMENT && defined SED_MORPH
 !
 !  Read in time-evolving bathymetry (m).
@@ -4581,6 +4616,8 @@
      &        'at time record = ',i3,/,18x,'in input NetCDF file: ',a)
   70  FORMAT (16x,'- ',a,/,19x,'(Min = ',1p,e15.8,                      &
      &        ' Max = ',1p,e15.8,')')
-
+#ifdef STATS_ENSO
+  80  FORMAT (16x,'- ',a,i3.0)
+#endif
       RETURN
       END SUBROUTINE get_state

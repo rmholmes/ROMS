@@ -193,6 +193,7 @@
         integer  :: idKhor        ! convolution horizontal diffusion
         integer  :: idKver        ! convolution vertical diffusion
         integer  :: idLdwn        ! downwelling longwave radiation flux
+        integer  :: idLdwnP       ! downwelling longwave radiation flux
         integer  :: idLhea        ! net latent heat flux
         integer  :: idLrad        ! net longwave radiation flux
         integer  :: idMadH        ! ADM interpolation weights
@@ -221,7 +222,9 @@
         integer  :: idOvar        ! observations global variance
         integer  :: idOvel        ! omega vertical velocity
         integer  :: idQair        ! surface air humidity
+        integer  :: idQairP       ! surface air humidity anomaly
         integer  :: idPair        ! surface air pressure
+        integer  :: idPairP       ! surface air pressure anomaly
         integer  :: idPbar        ! streamfunction
         integer  :: idPwet        ! wet/dry mask on PSI-points
         integer  :: idpthR        ! depths of RHO-points
@@ -249,6 +252,7 @@
         integer  :: idSinW        ! SIN(omega(k)*t)
         integer  :: idSin2        ! SIN(omega(k)*t)*SIN(omega(l)*t)
         integer  :: idSrad        ! net shortwave radiation flux
+        integer  :: idSradP       ! net shortwave radiation flux anomaly
         integer  :: idSSHc        ! SSH climatology
         integer  :: idSSSc        ! SSS climatology
         integer  :: idSSTc        ! SST climatology
@@ -257,6 +261,7 @@
         integer  :: idsfwf        ! surface freswater flux
         integer  :: idTLmo        ! TLM at observation locations
         integer  :: idTair        ! surface air temperature
+        integer  :: idTairP       ! surface air temperature anomaly
         integer  :: idTdif        ! vertical T-diffusion coefficient
         integer  :: idTice        ! temperature of ice surface
         integer  :: idtime        ! ocean time
@@ -274,6 +279,7 @@
         integer  :: idU3Sd        ! 3D U-Stokes drift velocity
         integer  :: idUads        ! 3D U-velocity adjoint sensitivity
         integer  :: idUair        ! surface U-wind
+        integer  :: idUairP       ! surface U-wind perturbation
         integer  :: idUbar        ! 2D U-velocity
         integer  :: idUbas        ! 2D U-velocity adjoint sensitivity
         integer  :: idUbcl        ! 2D U-velocity climatology
@@ -307,6 +313,7 @@
         integer  :: idV3Sd        ! 3D U-Stokes drift velocity
         integer  :: idVads        ! 3D V-velocity adjoint sensitivity
         integer  :: idVair        ! surface V-wind
+        integer  :: idVairP       ! surface V-wind anomaly
         integer  :: idVbar        ! 2D V-velocity
         integer  :: idVbas        ! 2D V-velocity adjoint sensitivity
         integer  :: idVbcl        ! 2D V-velocity climatology
@@ -1100,16 +1107,26 @@
               idVwet=varid
             CASE ('idPair')
               idPair=varid
+            CASE ('idPairP')
+              idPairP=varid
             CASE ('idTair')
               idTair=varid
+            CASE ('idTairP')
+              idTairP=varid
             CASE ('idQair')
               idQair=varid
+            CASE ('idQairP')
+              idQairP=varid
             CASE ('idCfra')
               idCfra=varid
             CASE ('idSrad')
               idSrad=varid
+            CASE ('idSradP')
+              idSradP=varid
             CASE ('idLdwn')
               idLdwn=varid
+            CASE ('idLdwnP')
+              idLdwnP=varid
             CASE ('idLrad')
               idLrad=varid
             CASE ('idLhea')
@@ -1124,8 +1141,12 @@
               idevap=varid
             CASE ('idUair')
               idUair=varid
+            CASE ('idUairP')
+              idUairP=varid
             CASE ('idVair')
               idVair=varid
+            CASE ('idVairP')
+              idVairP=varid
             CASE ('idWamp')
               idWamp=varid
             CASE ('idWbrk')

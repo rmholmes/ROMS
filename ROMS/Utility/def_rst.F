@@ -51,7 +51,7 @@
       integer :: i, j, nvd3, nvd4, nvd5
       integer :: recdim, status, varid
 
-      integer :: DimIDs(32)
+      integer :: DimIDs(33)
       integer :: r2dgrd(4), ru2dgrd(4), rv2dgrd(4)
       integer :: sp2dgrd(3), sr2dgrd(3), su2dgrd(3), sv2dgrd(3)
       integer :: sr3dgrd(4), su3dgrd(4), sv3dgrd(4)
@@ -227,6 +227,11 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
+#ifdef STATS_ENSO
+        status=def_dim(ng, iNLM, RST(ng)%ncid, ncname, 'stendim',       &
+     &                 stenNdays, DimIDs(33))
+        IF (exit_flag.ne.NoError) RETURN
+#endif
 #ifdef FOUR_DVAR
         status=def_dim(ng, iNLM, RST(ng)%ncid, ncname, 'Nstate',        &
      &                 NstateVar(ng), DimIDs(29))

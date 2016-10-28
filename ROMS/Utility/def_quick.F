@@ -44,7 +44,7 @@
 
       integer :: i, j, ifield, itrc, nvd3, nvd4, varid
       integer :: recdim, status
-      integer :: DimIDs(32), t2dgrd(3), u2dgrd(3), v2dgrd(3)
+      integer :: DimIDs(33), t2dgrd(3), u2dgrd(3), v2dgrd(3)
       integer :: Vsize(4)
 
       integer :: def_dim
@@ -217,6 +217,11 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
+#ifdef STATS_ENSO
+        status=def_dim(ng, iNLM, QCK(ng)%ncid, ncname, 'stendim',       &
+     &                 stenNdays, DimIDs(33))
+        IF (exit_flag.ne.NoError) RETURN
+#endif
         status=def_dim(ng, iNLM, QCK(ng)%ncid, ncname,                  &
      &                 TRIM(ADJUSTL(Vname(5,idtime))),                  &
      &                 nf90_unlimited, DimIDs(12))

@@ -337,6 +337,46 @@
 #endif
         real(r8) :: gorho0                      ! m4/s2/kg
         real(r8) :: vonKar = 0.41_r8            ! non-dimensional
+#ifdef STATS_ENSO
+!
+!-----------------------------------------------------------------------
+!  Constants associated with statistical ENSO forcing
+!-----------------------------------------------------------------------
+!
+!    stenMean       Climatological value of SST index
+!    stenRegnN      SST index region northern boundary
+!    stenRegnE      SST index region eastern boundary
+!    stenRegnS      SST index region southern boundary
+!    stenRegnW      SST index region western boundary
+!    stenRuwnd      Coupling coefficient of Uwind pattern onto SST index
+!    stenRvwnd      Coupling coefficient of Uwind pattern onto SST index
+!    stenRqair      Coupling coefficient of Qair pattern onto SST index
+!    stenRtair      Coupling coefficient of Tair pattern onto SST index
+!    stenRpair      Coupling coefficient of Pair pattern onto SST index
+!    stenRsrad      Coupling coefficient of swrad pattern onto SST index
+!    stenRlrad      Coupling coefficient of lwrad_down pattern onto SST index
+!
+!    stenCount      Counter for current day of stenNdays
+!    stenIndex      the SST index over the last stenNdays
+!    stenIanom      Current averaged Index anomaly
+!    stenUpdte      Current Index has been updated
+        real(r8), allocatable :: stenMean(:)       ! degC
+        real(r8), allocatable :: stenRegnN(:)       ! degrees
+        real(r8), allocatable :: stenRegnE(:)       ! degrees
+        real(r8), allocatable :: stenRegnS(:)       ! degrees
+        real(r8), allocatable :: stenRegnW(:)       ! degrees
+        real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRvwnd(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRqair(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRtair(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRpair(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRsrad(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRlrad(:)      ! degC^(-1)
+        integer, allocatable  :: stenCount(:)
+        real(r8), allocatable :: stenIndex(:,:)    ! degC
+        real(r8), allocatable :: stenIanom(:)      ! degC
+        logical, allocatable  :: stenUpdte(:)
+#endif
 !
 !-----------------------------------------------------------------------
 !  Various model parameters.  Some of these parameters are overwritten
@@ -1781,6 +1821,24 @@
       allocate ( tl_VolCons(4,Ngrids) )
 #endif
 
+#ifdef STATS_ENSO
+      allocate ( stenMean(Ngrids) )
+      allocate ( stenRegnN(Ngrids) )
+      allocate ( stenRegnE(Ngrids) )
+      allocate ( stenRegnS(Ngrids) )
+      allocate ( stenRegnW(Ngrids) )
+      allocate ( stenRuwnd(Ngrids) )
+      allocate ( stenRvwnd(Ngrids) )
+      allocate ( stenRqair(Ngrids) )
+      allocate ( stenRtair(Ngrids) )
+      allocate ( stenRpair(Ngrids) )
+      allocate ( stenRsrad(Ngrids) )
+      allocate ( stenRlrad(Ngrids) )
+      allocate ( stenCount(Ngrids) )
+      allocate ( stenIndex(stenNdays,Ngrids) )
+      allocate ( stenIanom(Ngrids) )
+      allocate ( stenUpdte(Ngrids) )
+#endif
       allocate ( Lsponge(Ngrids) )
       allocate ( LuvSponge(Ngrids) )
       allocate ( LtracerSponge(MT,Ngrids) )
@@ -2341,6 +2399,14 @@
           tl_tnu4(itrc,ng)=IniVal
           tnu4(itrc,ng)=IniVal
         END DO
+#ifdef STATS_ENSO
+        stenCount(ng)=0
+        DO i=1,stenNdays
+          stenIndex(i,ng) = 0.0_r8
+        END DO
+        stenIanom(ng)=0.0_r8
+        stenUpdte(ng)=.FALSE.
+#endif
         ad_Akv_fac(ng)=1.0_r8
         tl_Akv_fac(ng)=1.0_r8
         ad_visc2(ng)=IniVal

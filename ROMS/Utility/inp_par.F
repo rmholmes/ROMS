@@ -945,6 +945,8 @@
         Fscale(idTbot(itemp),ng)=cff*Fscale(idTbot(itemp),ng)
         Fscale(idSrad,ng)=cff*Fscale(idSrad,ng)
         Fscale(idLdwn,ng)=cff*Fscale(idLdwn,ng)
+        Fscale(idSradP,ng)=cff*Fscale(idSradP,ng)
+        Fscale(idLdwnP,ng)=cff*Fscale(idLdwnP,ng)
         Fscale(idLrad,ng)=cff*Fscale(idLrad,ng)
         Fscale(idLhea,ng)=cff*Fscale(idLhea,ng)
         Fscale(idShea,ng)=cff*Fscale(idShea,ng)

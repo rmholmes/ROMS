@@ -837,3 +837,10 @@
 #if !defined VISC_3DCOEF && defined UV_SMAGORINSKY
 # define VISC_3DCOEF
 #endif
+
+/* 
+** STATS_ENSO check
+*/
+#ifdef STATS_ENSO
+# define AVERAGES /* This is need to calculate time-averaged SST index */
+#endif

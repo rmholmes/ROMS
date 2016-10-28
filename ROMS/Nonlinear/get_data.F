@@ -51,6 +51,9 @@
       integer :: ILB, IUB, JLB, JUB
       integer :: LBi, UBi, LBj, UBj
       integer :: i, ic, my_tile
+#ifdef STATS_ENSO
+      integer :: j
+#endif
 !
 !  Lower and upper bounds for nontiled (global values) boundary arrays.
 !
@@ -124,8 +127,35 @@
 # ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 # endif
+# ifdef STATS_ENSO
+     &                FORCES(ng) % UwindOG)
+# else
      &                FORCES(ng) % UwindG)
+# endif
       IF (exit_flag.ne.NoError) RETURN
+# ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idUairP, ncFRCid(idUairP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#  ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#  endif
+     &                FORCES(ng) % UwindPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%UwindG(i,j,1)=FORCES(ng)%UwindOG(i,j,1)+         &
+     &      stenIanom(ng)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,1)
+            FORCES(ng)%UwindG(i,j,2)=FORCES(ng)%UwindOG(i,j,2)+         &
+     &      stenIanom(ng)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,2)
+          END DO
+        END DO
+      END IF
+# endif
 
       CALL get_2dfld (ng , iNLM, idVair, ncFRCid(idVair,ng),            &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
@@ -133,8 +163,35 @@
 # ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 # endif
+# ifdef STATS_ENSO
+     &                FORCES(ng) % VwindOG)
+# else
      &                FORCES(ng) % VwindG)
+# endif
       IF (exit_flag.ne.NoError) RETURN
+# ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng , iNLM, idVairP, ncFRCid(idVairP,ng),          &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+# ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+# endif
+     &                FORCES(ng) % VwindPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%VwindG(i,j,1)=FORCES(ng)%VwindOG(i,j,1)+         &
+     &      stenIanom(ng)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,1)
+            FORCES(ng)%VwindG(i,j,2)=FORCES(ng)%VwindOG(i,j,2)+         &
+     &      stenIanom(ng)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,2)
+          END DO
+        END DO
+      END IF
+# endif
 #endif
 
 #ifndef AIR_OCEAN
@@ -205,8 +262,35 @@
 # ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 # endif
+# ifdef STATS_ENSO
+     &                FORCES(ng) % PairOG)
+# else
      &                FORCES(ng) % PairG)
+# endif
       IF (exit_flag.ne.NoError) RETURN
+# ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idPairP, ncFRCid(idPairP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#  ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#  endif
+     &                FORCES(ng) % PairPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%PairG(i,j,1)=FORCES(ng)%PairOG(i,j,1)+           &
+     &      stenIanom(ng)*stenRpair(ng)*FORCES(ng)%PairPG(i,j,1)
+            FORCES(ng)%PairG(i,j,2)=FORCES(ng)%PairOG(i,j,2)+           &
+     &      stenIanom(ng)*stenRpair(ng)*FORCES(ng)%PairPG(i,j,2)
+          END DO
+        END DO
+      END IF
+# endif
 #endif
 
 #if !defined ANA_WWAVE && defined WAVE_DATA
@@ -334,8 +418,35 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % srflxOG)
+#  else
      &                FORCES(ng) % srflxG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idSradP, ncFRCid(idSradP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#   endif
+     &                FORCES(ng) % srflxPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%srflxG(i,j,1)=FORCES(ng)%srflxOG(i,j,1)+         &
+     &      stenIanom(ng)*stenRsrad(ng)*FORCES(ng)%srflxPG(i,j,1)
+            FORCES(ng)%srflxG(i,j,2)=FORCES(ng)%srflxOG(i,j,2)+         &
+     &      stenIanom(ng)*stenRsrad(ng)*FORCES(ng)%srflxPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#  endif
 # endif
 
 # if defined RED_TIDE && defined DAILY_SHORTWAVE
@@ -382,8 +493,35 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % lrflxOG)
+#  else
      &                FORCES(ng) % lrflxG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idLdwnP, ncFRCid(idLdwnP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#   endif
+     &                FORCES(ng) % lrflxPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%lrflxG(i,j,1)=FORCES(ng)%lrflxOG(i,j,1)+         &
+     &      stenIanom(ng)*stenRlrad(ng)*FORCES(ng)%lrflxPG(i,j,1)
+            FORCES(ng)%lrflxG(i,j,2)=FORCES(ng)%lrflxOG(i,j,2)+         &
+     &      stenIanom(ng)*stenRlrad(ng)*FORCES(ng)%lrflxPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#  endif
 # endif
 
 # if !defined ANA_TAIR && \
@@ -400,8 +538,35 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % TairOG)
+#  else
      &                FORCES(ng) % TairG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idTairP, ncFRCid(idTairP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#   endif
+     &                FORCES(ng) % TairPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%TairG(i,j,1)=FORCES(ng)%TairOG(i,j,1)+           &
+     &      stenIanom(ng)*stenRtair(ng)*FORCES(ng)%TairPG(i,j,1)
+            FORCES(ng)%TairG(i,j,2)=FORCES(ng)%TairOG(i,j,2)+           &
+     &      stenIanom(ng)*stenRtair(ng)*FORCES(ng)%TairPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#  endif
 # endif
 
 # if !defined ANA_HUMIDITY && (defined BULK_FLUXES || defined ECOSIM)
@@ -416,8 +581,35 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % HairOG)
+#  else
      &                FORCES(ng) % HairG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idQairP, ncFRCid(idQairP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#   endif
+     &                FORCES(ng) % HairPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%HairG(i,j,1)=FORCES(ng)%HairOG(i,j,1)+           &
+     &      stenIanom(ng)*stenRqair(ng)*FORCES(ng)%HairPG(i,j,1)
+            FORCES(ng)%HairG(i,j,2)=FORCES(ng)%HairOG(i,j,2)+           &
+     &      stenIanom(ng)*stenRqair(ng)*FORCES(ng)%HairPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#  endif
 # endif
 
 # if !defined ANA_RAIN && defined BULK_FLUXES
@@ -648,6 +840,9 @@
 # endif
 #endif
 
+#ifdef STATS_ENSO
+      stenUpdte(ng) = .FALSE.
+#endif
 #ifdef RED_TIDE
 !
 !-----------------------------------------------------------------------

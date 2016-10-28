@@ -739,6 +739,35 @@
                 END DO
 # endif
               END DO
+# ifdef STATS_ENSO
+            CASE ('stenMean')
+              Npts=load_r(Nval, Rval, Ngrids, stenMean)
+            CASE ('stenRegnN')
+              Npts=load_r(Nval, Rval, Ngrids, stenRegnN)
+            CASE ('stenRegnE')
+              Npts=load_r(Nval, Rval, Ngrids, stenRegnE)
+            CASE ('stenRegnS')
+              Npts=load_r(Nval, Rval, Ngrids, stenRegnS)
+            CASE ('stenRegnW')
+              Npts=load_r(Nval, Rval, Ngrids, stenRegnW)
+            CASE ('stenNdays')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              stenNdays=Ivalue(1)
+            CASE ('stenRuwnd')
+              Npts=load_r(Nval, Rval, Ngrids, stenRuwnd)
+            CASE ('stenRvwnd')
+              Npts=load_r(Nval, Rval, Ngrids, stenRvwnd)
+            CASE ('stenRqair')
+              Npts=load_r(Nval, Rval, Ngrids, stenRqair)
+            CASE ('stenRtair')
+              Npts=load_r(Nval, Rval, Ngrids, stenRtair)
+            CASE ('stenRpair')
+              Npts=load_r(Nval, Rval, Ngrids, stenRpair)
+            CASE ('stenRsrad')
+              Npts=load_r(Nval, Rval, Ngrids, stenRsrad)
+            CASE ('stenRlrad')
+              Npts=load_r(Nval, Rval, Ngrids, stenRlrad)
+# endif
             CASE ('AKV_BAK')
               Npts=load_r(Nval, Rval, Ngrids, Akv_bak)
             CASE ('ad_AKV_fac')
@@ -3635,6 +3664,41 @@
      &            'Background vertical mixing coefficient (m2/s)',      &
      &            'for tracer ', itrc, TRIM(Vname(1,idTvar(itrc)))
           END DO
+# ifdef STATS_ENSO
+          WRITE (out,210) stenMean(ng), 'stenMean',                     &
+     &          'Climatological value of SST index (degC).'
+          WRITE (out,120) stenNdays, 'stenNdays',                       &
+     &          'Number of days to average SST index over.'
+          WRITE (out,210) stenRegnN(ng), 'stenRegnN',                   &
+     &          'SST index region northern boundary.'
+          WRITE (out,210) stenRegnE(ng), 'stenRegnE',                   &
+     &          'SST index region eastern boundary.'
+          WRITE (out,210) stenRegnS(ng), 'stenRegnS',                   &
+     &          'SST index region southern boundary.'
+          WRITE (out,210) stenRegnW(ng), 'stenRegnW',                   &
+     &          'SST index region western boundary.'
+          WRITE (out,210) stenRuwnd(ng), 'stenRuwnd',                   &
+     &          'Coupling coefficient of Uwind pattern onto',           &
+     &          'SST index (1/degC).'
+          WRITE (out,210) stenRvwnd(ng), 'stenRvwnd',                   &
+     &          'Coupling coefficient of Vwind pattern onto',           &
+     &          'SST index (1/degC).'
+          WRITE (out,210) stenRqair(ng), 'stenRqair',                   &
+     &          'Coupling coefficient of Qair pattern onto',            &
+     &          'SST index (1/degC).'
+          WRITE (out,210) stenRpair(ng), 'stenRpair',                   &
+     &          'Coupling coefficient of Pair pattern onto',            &
+     &          'SST index (1/degC).'
+          WRITE (out,210) stenRtair(ng), 'stenRtair',                   &
+     &          'Coupling coefficient of Tair pattern onto',            &
+     &          'SST index (1/degC).'
+          WRITE (out,210) stenRsrad(ng), 'stenRsrad',                   &
+     &          'Coupling coefficient of swrad pattern onto',           &
+     &          'SST index (1/degC).'
+          WRITE (out,210) stenRlrad(ng), 'stenRlrad',                   &
+     &          'Coupling coefficient of lwrad_down pattern onto',      &
+     &          'SST index (1/degC).'
+# endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
      &          'Background vertical mixing coefficient (m2/s)',        &
      &          'for momentum.'

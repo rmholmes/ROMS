@@ -50,7 +50,7 @@
 #ifdef ADJUST_BOUNDARY
       integer :: IorJdim, brecdim
 #endif
-      integer :: DimIDs(32), t2dgrd(3), u2dgrd(3), v2dgrd(3)
+      integer :: DimIDs(33), t2dgrd(3), u2dgrd(3), v2dgrd(3)
 #ifdef ADJUST_BOUNDARY
       integer :: t2dobc(4)
 #endif
@@ -235,6 +235,11 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
+#ifdef STATS_ENSO
+        status=def_dim(ng, iNLM, HIS(ng)%ncid, ncname, 'stendim',       &
+     &                 stenNdays, DimIDs(33))
+        IF (exit_flag.ne.NoError) RETURN
+#endif
 #ifdef FOUR_DVAR
         status=def_dim(ng, iNLM, HIS(ng)%ncid, ncname, 'Nstate',        &
      &                 NstateVar(ng), DimIDs(29))
