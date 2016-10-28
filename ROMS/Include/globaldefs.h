@@ -837,3 +837,14 @@
 #if !defined VISC_3DCOEF && defined UV_SMAGORINSKY
 # define VISC_3DCOEF
 #endif
+
+/*
+** Check ABLM options
+*/
+#ifdef ABLM_WATER
+# define ABLM
+#endif
+#ifdef ABLM
+# define BULK_FLUXES
+#endif
+
