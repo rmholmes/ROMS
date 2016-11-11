@@ -116,6 +116,11 @@
 !                 horizontal RHO-points.                               !
 !  VwindG       Latest two-time snapshots of input "Vwind" grided      !
 !                 data used for interpolation.                         !
+#ifdef SET_WINDSPEED
+!  wMag         Surface wind magnitude (m/s) at horizontal RHO-points. !
+!  wMagG        Latest two-time snapshots of input "wMag" grided       !
+!                 data used for interpolation.                         !
+#endif
 !                                                                      !
 !  Rain fall rate.                                                     !
 !                                                                      !
@@ -355,6 +360,10 @@
           real(r8), pointer :: UwindOG(:,:,:)
           real(r8), pointer :: VwindOG(:,:,:)
 #   endif
+#  endif
+#  ifdef SET_WINDSPEED
+          real(r8), pointer :: wMag(:,:)
+          real(r8), pointer :: wMagG(:,:,:)
 #  endif
 # endif
 
@@ -706,6 +715,10 @@
       allocate ( FORCES(ng) % UwindOG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindOG(LBi:UBi,LBj:UBj,2) )
 #   endif
+#  endif
+#  ifdef SET_WINDSPEED
+      allocate ( FORCES(ng) % wMag(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % wMagG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
 
@@ -1077,6 +1090,9 @@
             FORCES(ng) % Uwind(i,j) = IniVal
             FORCES(ng) % Vwind(i,j) = IniVal
 # endif
+# if defined BULK_FLUXES && defined SET_WINDSPEED
+            FORCES(ng) % wMag(i,j) = IniVal
+# endif
 # ifdef BULK_FLUXES
             FORCES(ng) % rain(i,j) = IniVal
 #  ifdef EMINUSP
@@ -1132,6 +1148,10 @@
             FORCES(ng) % VwindOG(i,j,1) = IniVal
             FORCES(ng) % VwindOG(i,j,2) = IniVal
 #   endif
+#  endif
+#  ifdef SET_WINDSPEED
+            FORCES(ng) % wMagG(i,j,1) = IniVal
+            FORCES(ng) % wMagG(i,j,2) = IniVal
 #  endif
 # endif
 # if !defined ANA_RAIN && defined BULK_FLUXES

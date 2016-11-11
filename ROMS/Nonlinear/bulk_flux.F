@@ -107,6 +107,9 @@
      &                     FORCES(ng) % Tair,                           &
      &                     FORCES(ng) % Uwind,                          &
      &                     FORCES(ng) % Vwind,                          &
+# ifdef SET_WINDSPEED
+     &                     FORCES(ng) % wMag,                           &
+# endif
 # ifdef CLOUDS
      &                     FORCES(ng) % cloud,                          &
 # endif
@@ -155,6 +158,9 @@
      &                           Q100,                                  &
 # endif
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
+# ifdef SET_WINDSPEED
+     &                           extWmag,                             &
+# endif
 # ifdef CLOUDS
      &                           cloud,                                 &
 # endif
@@ -214,6 +220,9 @@
       real(r8), intent(in) :: Tair(LBi:,LBj:)
       real(r8), intent(in) :: Uwind(LBi:,LBj:)
       real(r8), intent(in) :: Vwind(LBi:,LBj:)
+#  ifdef SET_WINDSPEED
+      real(r8), intent(in) :: extWmag(LBi:,LBj:)
+#  endif
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:,LBj:)
 #  endif
@@ -264,6 +273,9 @@
       real(r8), intent(in) :: Tair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Uwind(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
+#  ifdef SET_WINDSPEED
+      real(r8), intent(in) :: extWmag(LBi:UBi,LBj:UBj)
+#  endif
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:UBi,LBj:UBj)
 #  endif
@@ -384,7 +396,11 @@
 !
 !  Input bulk parameterization fields.
 !
+# ifdef SET_WINDSPEED
+          Wmag(i)=extWmag(i,j)
+# else
           Wmag(i)=SQRT(Uwind(i,j)*Uwind(i,j)+Vwind(i,j)*Vwind(i,j))
+# endif
           PairM=Pair(i,j)
           TairC(i)=Tair(i,j)
           TairK(i)=TairC(i)+273.16_r8

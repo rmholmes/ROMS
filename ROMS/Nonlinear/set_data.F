@@ -267,6 +267,15 @@
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 
+#   ifdef SET_WINDSPEED
+      CALL set_2dfld_tile (ng, tile, iNLM, idSair,                      &
+     &                     LBi, UBi, LBj, UBj,                          &
+     &                     FORCES(ng)%wMagG,                            &
+     &                     FORCES(ng)%wMag,                             &
+     &                     update)
+      IF (exit_flag.ne.NoError) RETURN
+#   endif
+
 #    ifdef CURVGRID
 !
 !  If input point surface winds or interpolated from coarse data, rotate
