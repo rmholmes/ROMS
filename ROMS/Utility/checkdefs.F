@@ -518,11 +518,23 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' BULK_FLUXES,'
 #endif
+#ifdef SET_WINDSPEED
+      IF (Master) WRITE (stdout,20) 'SET_WINDSPEED',                    &
+     &   'Atmospheric boundary layer model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM,'
+#endif
 #ifdef ABLM
       IF (Master) WRITE (stdout,20) 'ABLM',                             &
      &   'Atmospheric boundary layer model.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' ABLM,'
+# ifdef ABLM_WATER
+      IF (Master) WRITE (stdout,20) 'ABLM_WATER',                       &
+     &   'Atmospheric boundary layer model Qair.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM_WATER,'
+# endif
 #endif
 #ifdef STATS_ENSO
       IF (Master) WRITE (stdout,20) 'STATS_ENSO',                       &
