@@ -771,6 +771,10 @@
               Npts=load_r(Nval, Rval, Ngrids, stenRuwnd)
             CASE ('stenRvwnd')
               Npts=load_r(Nval, Rval, Ngrids, stenRvwnd)
+#ifdef SET_WINDSPEED
+            CASE ('stenRwmag')
+              Npts=load_r(Nval, Rval, Ngrids, stenRwmag)
+#endif
             CASE ('stenRqair')
               Npts=load_r(Nval, Rval, Ngrids, stenRqair)
             CASE ('stenRtair')

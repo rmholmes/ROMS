@@ -379,7 +379,8 @@
 !    stenRegnS      SST index region southern boundary
 !    stenRegnW      SST index region western boundary
 !    stenRuwnd      Coupling coefficient of Uwind pattern onto SST index
-!    stenRvwnd      Coupling coefficient of Uwind pattern onto SST index
+!    stenRvwnd      Coupling coefficient of Vwind pattern onto SST index
+!    stenRwmag      Coupling coefficient of wMag pattern onto SST index
 !    stenRqair      Coupling coefficient of Qair pattern onto SST index
 !    stenRtair      Coupling coefficient of Tair pattern onto SST index
 !    stenRpair      Coupling coefficient of Pair pattern onto SST index
@@ -397,6 +398,9 @@
         real(r8), allocatable :: stenRegnW(:)       ! degrees
         real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
         real(r8), allocatable :: stenRvwnd(:)      ! degC^(-1)
+#ifdef SET_WINDSPEED
+        real(r8), allocatable :: stenRwmag(:)      ! degC^(-1)
+#endif
         real(r8), allocatable :: stenRqair(:)      ! degC^(-1)
         real(r8), allocatable :: stenRtair(:)      ! degC^(-1)
         real(r8), allocatable :: stenRpair(:)      ! degC^(-1)
@@ -1858,6 +1862,9 @@
       allocate ( stenRegnW(Ngrids) )
       allocate ( stenRuwnd(Ngrids) )
       allocate ( stenRvwnd(Ngrids) )
+#ifdef SET_WINDSPEED
+      allocate ( stenRwmag(Ngrids) )
+#endif
       allocate ( stenRqair(Ngrids) )
       allocate ( stenRtair(Ngrids) )
       allocate ( stenRpair(Ngrids) )

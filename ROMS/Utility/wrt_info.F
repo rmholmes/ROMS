@@ -484,6 +484,13 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
+#ifdef SET_WINDSPEED
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRwmag',             &
+     &                      stenRwmag(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
+
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRqair',             &
      &                      stenRqair(ng), (/0/), (/0/),                &
      &                      ncid = ncid)

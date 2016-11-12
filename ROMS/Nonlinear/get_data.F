@@ -201,11 +201,38 @@
       CALL get_2dfld (ng, iNLM, idSair, ncFRCid(idSair,ng),             &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
      &                LBi, UBi, LBj, UBj, 2, 1,                         &
-# ifdef MASKING
+#  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
-# endif
+#  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % wMagOG)
+#  else
      &                FORCES(ng) % wMagG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng , iNLM, idSairP, ncFRCid(idSairP,ng),          &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#   endif
+     &                FORCES(ng) % wMagPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%wMagG(i,j,1)=FORCES(ng)%wMagOG(i,j,1)+           &
+     &      stenIanom(ng)*stenRwmag(ng)*FORCES(ng)%wMagPG(i,j,1)
+            FORCES(ng)%wMagG(i,j,2)=FORCES(ng)%wMagOG(i,j,2)+           &
+     &      stenIanom(ng)*stenRwmag(ng)*FORCES(ng)%wMagPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#  endif
 # endif
 #endif
 

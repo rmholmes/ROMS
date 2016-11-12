@@ -174,6 +174,11 @@
 !  VwindPG      Surface wind anomaly in the ETA-direction (m/s)        !
 !               at horizontal RHO-points, two-time snapshots.          !
 !  VwindOG      Dummy location for background VwindG input             !
+#ifdef SET_WINDSPEED
+!  wMagPG       Surface wind magnitude anomaly (m/s) at horizontal     ! 
+!               RHO-points, two-time snapshots.                        !
+!  wMagOG      Dummy location for background wMagG input               !
+#endif
 !  PairPG       Surface air pressure anomaly (mb), two-time snapshots. !
 !  PairOG       Dummy location for background PairG input              !
 !  TairPG       Surface air temperature anomaly (Celsius), two-time    !
@@ -351,19 +356,25 @@
 # if defined BULK_FLUXES || defined ECOSIM
           real(r8), pointer :: Uwind(:,:)
           real(r8), pointer :: Vwind(:,:)
+#  ifdef SET_WINDSPEED
+          real(r8), pointer :: wMag(:,:)
+#  endif
 #  ifndef ANA_WINDS
           real(r8), pointer :: UwindG(:,:,:)
           real(r8), pointer :: VwindG(:,:,:)
+#   ifdef SET_WINDSPEED
+          real(r8), pointer :: wMagG(:,:,:)
+#   endif
 #   ifdef STATS_ENSO
           real(r8), pointer :: UwindPG(:,:,:)
           real(r8), pointer :: VwindPG(:,:,:)
           real(r8), pointer :: UwindOG(:,:,:)
           real(r8), pointer :: VwindOG(:,:,:)
+#   ifdef SET_WINDSPEED
+          real(r8), pointer :: wMagPG(:,:,:)
+          real(r8), pointer :: wMagOG(:,:,:)
 #   endif
-#  endif
-#  ifdef SET_WINDSPEED
-          real(r8), pointer :: wMag(:,:)
-          real(r8), pointer :: wMagG(:,:,:)
+#   endif
 #  endif
 # endif
 
@@ -705,20 +716,25 @@
 # if defined BULK_FLUXES || defined ECOSIM
       allocate ( FORCES(ng) % Uwind(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % Vwind(LBi:UBi,LBj:UBj) )
-
+#  ifdef SET_WINDSPEED
+      allocate ( FORCES(ng) % wMag(LBi:UBi,LBj:UBj) )
+#  endif
 #  ifndef ANA_WINDS
       allocate ( FORCES(ng) % UwindG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindG(LBi:UBi,LBj:UBj,2) )
+#   ifdef SET_WINDSPEED
+      allocate ( FORCES(ng) % wMagG(LBi:UBi,LBj:UBj,2) )
+#   endif
 #   ifdef STATS_ENSO
       allocate ( FORCES(ng) % UwindPG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindPG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % UwindOG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindOG(LBi:UBi,LBj:UBj,2) )
+#    ifdef SET_WINDSPEED
+      allocate ( FORCES(ng) % wMagPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % wMagOG(LBi:UBi,LBj:UBj,2) )
+#    endif
 #   endif
-#  endif
-#  ifdef SET_WINDSPEED
-      allocate ( FORCES(ng) % wMag(LBi:UBi,LBj:UBj) )
-      allocate ( FORCES(ng) % wMagG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
 
@@ -1089,9 +1105,9 @@
 # if defined BULK_FLUXES || defined ECOSIM
             FORCES(ng) % Uwind(i,j) = IniVal
             FORCES(ng) % Vwind(i,j) = IniVal
-# endif
-# if defined BULK_FLUXES && defined SET_WINDSPEED
+#  ifdef SET_WINDSPEED
             FORCES(ng) % wMag(i,j) = IniVal
+#  endif
 # endif
 # ifdef BULK_FLUXES
             FORCES(ng) % rain(i,j) = IniVal
@@ -1138,6 +1154,10 @@
             FORCES(ng) % UwindG(i,j,2) = IniVal
             FORCES(ng) % VwindG(i,j,1) = IniVal
             FORCES(ng) % VwindG(i,j,2) = IniVal
+#   ifdef SET_WINDSPEED
+            FORCES(ng) % wMagG(i,j,1) = IniVal
+            FORCES(ng) % wMagG(i,j,2) = IniVal
+#   endif
 #   ifdef STATS_ENSO
             FORCES(ng) % UwindPG(i,j,1) = IniVal
             FORCES(ng) % UwindPG(i,j,2) = IniVal
@@ -1147,11 +1167,13 @@
             FORCES(ng) % UwindOG(i,j,2) = IniVal
             FORCES(ng) % VwindOG(i,j,1) = IniVal
             FORCES(ng) % VwindOG(i,j,2) = IniVal
+#    ifdef SET_WINDSPEED
+            FORCES(ng) % wMagPG(i,j,1) = IniVal
+            FORCES(ng) % wMagPG(i,j,2) = IniVal
+            FORCES(ng) % wMagOG(i,j,1) = IniVal
+            FORCES(ng) % wMagOG(i,j,2) = IniVal
+#    endif
 #   endif
-#  endif
-#  ifdef SET_WINDSPEED
-            FORCES(ng) % wMagG(i,j,1) = IniVal
-            FORCES(ng) % wMagG(i,j,2) = IniVal
 #  endif
 # endif
 # if !defined ANA_RAIN && defined BULK_FLUXES

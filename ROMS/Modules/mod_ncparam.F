@@ -281,6 +281,7 @@
         integer  :: idUair        ! surface U-wind
         integer  :: idUairP       ! surface U-wind perturbation
         integer  :: idSair        ! surface wind speed magnitude
+        integer  :: idSairP       ! surface wind speed magnitude anomaly
         integer  :: idUbar        ! 2D U-velocity
         integer  :: idUbas        ! 2D U-velocity adjoint sensitivity
         integer  :: idUbcl        ! 2D U-velocity climatology
@@ -1146,6 +1147,8 @@
               idUairP=varid
             CASE ('idSair')
               idSair=varid
+            CASE ('idSairP')
+              idSairP=varid
             CASE ('idVair')
               idVair=varid
             CASE ('idVairP')

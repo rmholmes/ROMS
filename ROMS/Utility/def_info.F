@@ -1500,6 +1500,16 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
+#ifdef SET_WINDSPEED
+      Vinfo( 1)='stenRwmag'
+      Vinfo( 2)='Coupling coefficient of wMag pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
+
       Vinfo( 1)='stenRqair'
       Vinfo( 2)='Coupling coefficient of Qair pattern onto SST index'
       Vinfo( 3)='1/degC'

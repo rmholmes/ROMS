@@ -1725,6 +1725,15 @@
   'r2dvar'
   1.0d0
 
+'wMagP'                                            ! Input
+  'wind speed magnitude anomaly'
+  'meter second-1'                                 ! [m/s]
+  'wMag anomaly, scalar, series'
+  'prt_time'
+  'idSairP'
+  'r2dvar'
+  1.0d0
+
 'PairP'                                            ! Input
   'surface air pressure anomaly'
   'millibar'                                       ! [millibar]
