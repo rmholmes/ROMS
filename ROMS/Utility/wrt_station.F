@@ -620,6 +620,20 @@
      &                        varid = STA(ng)%Vid(idVair))
         IF (exit_flag.ne.NoError) RETURN
       END IF
+
+      IF (Sout(idSair,ng)) THEN
+        scale=1.0_r8
+        CALL extract_sta2d (ng, iNLM, Cgrid, idSair, r2dvar,            &
+     &                      LBi, UBi, LBj, UBj,                         &
+     &                      scale, FORCES(ng)%Uwind,                    &
+     &                      Nstation(ng), Xpos, Ypos, psta)
+        CALL netcdf_put_fvar (ng, iNLM, STA(ng)%name,                   &
+     &                        TRIM(Vname(1,idSair)), psta,              &
+     &                        (/1,STA(ng)%Rindex/), (/Nstation(ng),1/), &
+     &                        ncid = STA(ng)%ncid,                      &
+     &                        varid = STA(ng)%Vid(idSair))
+        IF (exit_flag.ne.NoError) RETURN
+      END IF
 #  endif
 !
 !  Write out surface net heat flux.

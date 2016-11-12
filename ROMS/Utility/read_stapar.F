@@ -187,6 +187,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Sout(idUair,:))
             CASE ('Sout(idVair)')
               Npts=load_l(Nval, Cval, Ngrids, Sout(idVair,:))
+            CASE ('Sout(idSair)')
+              Npts=load_l(Nval, Cval, Ngrids, Sout(idSair,:))
 #  endif
             CASE ('Sout(idTsur)')
               Npts=load_l(Nval, Cval, NAT*Ngrids, Lsta)
@@ -618,6 +620,9 @@
             IF (Sout(idVair,ng)) WRITE (out,90) Sout(idVair,ng),        &
      &          'Sout(idVair)',                                         &
      &          'Write out surface V-wind component.'
+            IF (Sout(idSair,ng)) WRITE (out,90) Sout(idSair,ng),        &
+     &          'Sout(idSair)',                                         &
+     &          'Write out surface wind speed magnitude.'
 #  endif
             IF (Sout(idTsur(itemp),ng)) WRITE (out,90)                  &
      &          Sout(idTsur(itemp),ng), 'Sout(idTsur)',                 &

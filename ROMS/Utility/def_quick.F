@@ -1099,6 +1099,22 @@
      &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
         END IF
+
+        IF (Qout(idSair,ng)) THEN
+          Vinfo( 1)=Vname(1,idSair)
+          Vinfo( 2)=Vname(2,idSair)
+          Vinfo( 3)=Vname(3,idSair)
+          Vinfo(14)=Vname(4,idSair)
+          Vinfo(16)=Vname(1,idtime)
+#  if defined WRITE_WATER && defined MASKING
+          Vinfo(20)='mask_rho'
+#  endif
+          Vinfo(22)='coordinates'
+          Aval(5)=REAL(Iinfo(1,idSair,ng),r8)
+          status=def_var(ng, iNLM, QCK(ng)%ncid, QCK(ng)%Vid(idSair),   &
+     &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
 # endif
 !
 !  Define surface active tracer fluxes.
@@ -2314,6 +2330,9 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idVair))) THEN
             got_var(idVair)=.TRUE.
             QCK(ng)%Vid(idVair)=var_id(i)
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSair))) THEN
+            got_var(idSair)=.TRUE.
+            QCK(ng)%Vid(idSair)=var_id(i)
 # endif
 # ifdef BULK_FLUXES
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idLhea))) THEN
@@ -2821,6 +2840,12 @@
         END IF
         IF (.not.got_var(idVair).and.Qout(idVair,ng)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idVair)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+        IF (.not.got_var(idSair).and.Qout(idSair,ng)) THEN
+          IF (Master) WRITE (stdout,70) TRIM(Vname(1,idSair)),          &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN

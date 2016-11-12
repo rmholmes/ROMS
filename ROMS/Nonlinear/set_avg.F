@@ -667,6 +667,18 @@
             END DO
           END DO
         END IF
+
+        IF (Aout(idSair,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgwMag(i,j)=FORCES(ng)%wMag(i,j)
+#   ifdef WET_DRY
+              AVERAGE(ng)%avgwMag(i,j)=AVERAGE(ng)%avgwMag(i,j)*        &
+     &                                  GRID(ng)%rmask_full(i,j)
+#   endif
+            END DO
+          END DO
+        END IF
 #  endif
 
         IF (Aout(idTsur(itemp),ng)) THEN
@@ -1695,6 +1707,18 @@
      &                                  GRID(ng)%rmask_full(i,j)*       &
 #   endif
      &                                  FORCES(ng)%Vwind(i,j)
+            END DO
+          END DO
+        END IF
+
+        IF (Aout(idSair,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgwMag(i,j)=AVERAGE(ng)%avgwMag(i,j)+        &
+#   ifdef WET_DRY
+     &                                  GRID(ng)%rmask_full(i,j)*       &
+#   endif
+     &                                  FORCES(ng)%wMag(i,j)
             END DO
           END DO
         END IF
@@ -3060,6 +3084,27 @@
      &                          NghostPoints,                           &
      &                          EWperiodic(ng), NSperiodic(ng),         &
      &                          AVERAGE(ng)%avgVwind)
+#   endif
+          END IF
+        END IF
+
+        IF (Aout(idSair,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgwMag(i,j)=rfac(i,j)*                       &
+     &                                  AVERAGE(ng)%avgwMag(i,j)
+            END DO
+          END DO
+          IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+            CALL exchange_r2d_tile (ng, tile,                           &
+     &                              LBi, UBi, LBj, UBj,                 &
+     &                              AVERAGE(ng)%avgwMag)
+#   ifdef DISTRIBUTE
+            CALL mp_exchange2d (ng, tile, iNLM, 1,                      &
+     &                          LBi, UBi, LBj, UBj,                     &
+     &                          NghostPoints,                           &
+     &                          EWperiodic(ng), NSperiodic(ng),         &
+     &                          AVERAGE(ng)%avgwMag)
 #   endif
           END IF
         END IF

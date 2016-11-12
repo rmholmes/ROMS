@@ -1653,6 +1653,13 @@
                 RETURN
               END IF
               Npts=load_l(Nval, Cval, Ngrids, Hout(idVair,:))
+            CASE ('Hout(idSair)')
+              IF (idSair.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idSair'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idSair,:))
 # endif
 #endif
             CASE ('Hout(idTsur)')
@@ -1974,6 +1981,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Qout(idUair,:))
             CASE ('Qout(idVair)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idVair,:))
+            CASE ('Qout(idSair)')
+              Npts=load_l(Nval, Cval, Ngrids, Qout(idSair,:))
 # endif
 #endif
             CASE ('Qout(idTsur)')
@@ -2120,6 +2129,8 @@
               Npts=load_l(Nval, Cval, Ngrids, Aout(idUair,:))
             CASE ('Aout(idVair)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idVair,:))
+            CASE ('Aout(idSair)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idSair,:))
 #  endif
 # endif
             CASE ('Aout(idTsur)')
@@ -4555,6 +4566,9 @@
             IF (Hout(idVair,ng)) WRITE (out,170) Hout(idVair,ng),       &
      &         'Hout(idVair)',                                          &
      &         'Write out surface V-wind component.'
+            IF (Hout(idSair,ng)) WRITE (out,170) Hout(idSair,ng),       &
+     &         'Hout(idSair)',                                          &
+     &         'Write out surface wind speed magnitude.'
 # endif
             IF (Hout(idTsur(itemp),ng)) WRITE (out,170)                 &
      &          Hout(idTsur(itemp),ng), 'Hout(idTsur)',                 &
@@ -4865,6 +4879,9 @@
             IF (Qout(idVair,ng)) WRITE (out,170) Qout(idVair,ng),       &
      &         'Qout(idVair)',                                          &
      &         'Write out surface V-wind component.'
+            IF (Qout(idSair,ng)) WRITE (out,170) Qout(idSair,ng),       &
+     &         'Qout(idSair)',                                          &
+     &         'Write out surface wind speed magnitude.'
 # endif
             IF (Qout(idTsur(itemp),ng)) WRITE (out,170)                 &
      &          Qout(idTsur(itemp),ng), 'Qout(idTsur)',                 &
@@ -5069,6 +5086,9 @@
             IF (Aout(idVair,ng)) WRITE (out,170) Aout(idVair,ng),       &
      &         'Aout(idVair)',                                          &
      &         'Write out averaged surface V-wind component.'
+            IF (Aout(idSair,ng)) WRITE (out,170) Aout(idSair,ng),       &
+     &         'Aout(idSair)',                                          &
+     &         'Write out averaged surface wind speed magnitude.'
 #  endif
             IF (Aout(idTsur(itemp),ng)) WRITE (out,170)                 &
      &          Aout(idTsur(itemp),ng), 'Aout(idTsur)',                 &

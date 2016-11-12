@@ -206,6 +206,7 @@
 #  if defined BULK_FLUXES || defined ECOSIM
           real(r8), pointer :: avgUwind(:,:)
           real(r8), pointer :: avgVwind(:,:)
+          real(r8), pointer :: avgwMag(:,:)
 #  endif
           real(r8), pointer :: avgstf(:,:)
           real(r8), pointer :: avgswf(:,:)
@@ -434,6 +435,9 @@
       END IF
       IF (Aout(idVair,ng)) THEN
         allocate ( AVERAGE(ng) % avgVwind(LBi:UBi,LBj:UBj) )
+      END IF
+      IF (Aout(idSair,ng)) THEN
+        allocate ( AVERAGE(ng) % avgwMag(LBi:UBi,LBj:UBj) )
       END IF
 #  endif
       IF (Aout(idTsur(itemp),ng)) THEN
@@ -930,6 +934,13 @@
         DO j=Jmin,Jmax
           DO i=Imin,Imax
             AVERAGE(ng) % avgVwind(i,j) = IniVal
+          END DO
+        END DO
+      END IF
+      IF (Aout(idSair,ng)) THEN
+        DO j=Jmin,Jmax
+          DO i=Imin,Imax
+            AVERAGE(ng) % avgwMag(i,j) = IniVal
           END DO
         END DO
       END IF
