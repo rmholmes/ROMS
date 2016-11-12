@@ -1574,7 +1574,7 @@
 #   ifdef MASKING
      &                     GRID(ng) % rmask,                            &
 #   endif
-     &                     AVERAGE(ng) % avgUwind)
+     &                     AVERAGE(ng) % avgwMag)
         IF (status.ne.nf90_noerr) THEN
           IF (Master) THEN
             WRITE (stdout,10) TRIM(Vname(1,idSair)), AVG(ng)%Rindex

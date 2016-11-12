@@ -1044,7 +1044,7 @@
 #  ifdef MASKING
      &                     GRID(ng) % rmask,                            &
 #  endif
-     &                     FORCES(ng) % Uwind)
+     &                     FORCES(ng) % wMag)
         IF (status.ne.nf90_noerr) THEN
           IF (Master) THEN
             WRITE (stdout,10) TRIM(Vname(1,idSair)), QCK(ng)%Rindex
