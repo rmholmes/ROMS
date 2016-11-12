@@ -3727,37 +3727,42 @@
      &            'ABLM height of boundary layer (m).'
 # endif
 # ifdef STATS_ENSO
-          WRITE (out,210) stenMean(ng), 'stenMean',                     &
+          WRITE (out,140) stenMean(ng), 'stenMean',                     &
      &          'Climatological value of SST index (degC).'
           WRITE (out,120) stenNdays, 'stenNdays',                       &
      &          'Number of days to average SST index over.'
-          WRITE (out,210) stenRegnN(ng), 'stenRegnN',                   &
+          WRITE (out,150) stenRegnN(ng), 'stenRegnN',                   &
      &          'SST index region northern boundary.'
-          WRITE (out,210) stenRegnE(ng), 'stenRegnE',                   &
+          WRITE (out,150) stenRegnE(ng), 'stenRegnE',                   &
      &          'SST index region eastern boundary.'
-          WRITE (out,210) stenRegnS(ng), 'stenRegnS',                   &
+          WRITE (out,150) stenRegnS(ng), 'stenRegnS',                   &
      &          'SST index region southern boundary.'
-          WRITE (out,210) stenRegnW(ng), 'stenRegnW',                   &
+          WRITE (out,150) stenRegnW(ng), 'stenRegnW',                   &
      &          'SST index region western boundary.'
-          WRITE (out,210) stenRuwnd(ng), 'stenRuwnd',                   &
+          WRITE (out,160) stenRuwnd(ng), 'stenRuwnd',                   &
      &          'Coupling coefficient of Uwind pattern onto',           &
      &          'SST index (1/degC).'
-          WRITE (out,210) stenRvwnd(ng), 'stenRvwnd',                   &
+          WRITE (out,160) stenRvwnd(ng), 'stenRvwnd',                   &
      &          'Coupling coefficient of Vwind pattern onto',           &
      &          'SST index (1/degC).'
-          WRITE (out,210) stenRqair(ng), 'stenRqair',                   &
+# ifdef SET_WINDSPEED
+          WRITE (out,160) stenRwmag(ng), 'stenRwmag',                   &
+     &          'Coupling coefficient of wmag pattern onto',            &
+     &          'SST index (1/degC).'
+# endif
+          WRITE (out,160) stenRqair(ng), 'stenRqair',                   &
      &          'Coupling coefficient of Qair pattern onto',            &
      &          'SST index (1/degC).'
-          WRITE (out,210) stenRpair(ng), 'stenRpair',                   &
+          WRITE (out,160) stenRpair(ng), 'stenRpair',                   &
      &          'Coupling coefficient of Pair pattern onto',            &
      &          'SST index (1/degC).'
-          WRITE (out,210) stenRtair(ng), 'stenRtair',                   &
+          WRITE (out,160) stenRtair(ng), 'stenRtair',                   &
      &          'Coupling coefficient of Tair pattern onto',            &
      &          'SST index (1/degC).'
-          WRITE (out,210) stenRsrad(ng), 'stenRsrad',                   &
+          WRITE (out,160) stenRsrad(ng), 'stenRsrad',                   &
      &          'Coupling coefficient of swrad pattern onto',           &
      &          'SST index (1/degC).'
-          WRITE (out,210) stenRlrad(ng), 'stenRlrad',                   &
+          WRITE (out,160) stenRlrad(ng), 'stenRlrad',                   &
      &          'Coupling coefficient of lwrad_down pattern onto',      &
      &          'SST index (1/degC).'
 # endif
