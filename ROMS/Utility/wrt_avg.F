@@ -1565,6 +1565,7 @@
         END IF
       END IF
 
+#ifdef SET_WINDSPEED
       IF (Aout(idSair,ng)) THEN
         scale=1.0_r8
         gtype=gfactor*r2dvar
@@ -1584,6 +1585,7 @@
           RETURN
         END IF
       END IF
+#endif
 #  endif
 !
 !  Write out surface net heat flux.

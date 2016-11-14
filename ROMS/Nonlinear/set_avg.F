@@ -667,7 +667,7 @@
             END DO
           END DO
         END IF
-
+#ifdef SET_WINDSPEED
         IF (Aout(idSair,ng)) THEN
           DO j=JstrR,JendR
             DO i=IstrR,IendR
@@ -679,6 +679,7 @@
             END DO
           END DO
         END IF
+#endif
 #  endif
 
         IF (Aout(idTsur(itemp),ng)) THEN
@@ -1711,6 +1712,7 @@
           END DO
         END IF
 
+#ifdef SET_WINDSPEED
         IF (Aout(idSair,ng)) THEN
           DO j=JstrR,JendR
             DO i=IstrR,IendR
@@ -1722,6 +1724,7 @@
             END DO
           END DO
         END IF
+#endif
 #  endif
 
         IF (Aout(idTsur(itemp),ng)) THEN
@@ -3088,6 +3091,7 @@
           END IF
         END IF
 
+#ifdef SET_WINDSPEED
         IF (Aout(idSair,ng)) THEN
           DO j=JstrR,JendR
             DO i=IstrR,IendR
@@ -3108,6 +3112,7 @@
 #   endif
           END IF
         END IF
+#endif
 #  endif
 
         IF (Aout(idTsur(itemp),ng)) THEN

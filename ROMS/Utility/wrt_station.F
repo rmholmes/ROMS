@@ -621,6 +621,7 @@
         IF (exit_flag.ne.NoError) RETURN
       END IF
 
+#ifdef SET_WINDSPEED
       IF (Sout(idSair,ng)) THEN
         scale=1.0_r8
         CALL extract_sta2d (ng, iNLM, Cgrid, idSair, r2dvar,            &
@@ -634,6 +635,7 @@
      &                        varid = STA(ng)%Vid(idSair))
         IF (exit_flag.ne.NoError) RETURN
       END IF
+#endif
 #  endif
 !
 !  Write out surface net heat flux.
