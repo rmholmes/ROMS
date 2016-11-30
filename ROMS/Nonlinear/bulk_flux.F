@@ -159,7 +159,7 @@
 # endif
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
 # ifdef SET_WINDSPEED
-     &                           extWmag,                             &
+     &                           extWmag,                               &
 # endif
 # ifdef CLOUDS
      &                           cloud,                                 &
@@ -397,7 +397,7 @@
 !  Input bulk parameterization fields.
 !
 # ifdef SET_WINDSPEED
-          Wmag(i)=extWmag(i,j)
+          Wmag(i)=MAX(0.0_r8,extWmag(i,j))
 # else
           Wmag(i)=SQRT(Uwind(i,j)*Uwind(i,j)+Vwind(i,j)*Vwind(i,j))
 # endif
