@@ -752,6 +752,10 @@
               Npts=load_r(Nval, Rval, Ngrids, ABLM_lrelax)
             CASE ('ABLM_H')
               Npts=load_r(Nval, Rval, Ngrids, hABLM)
+#  ifdef ABLM_CONVTHR
+            CASE ('ABLM_CVTHRES')
+              Npts=load_r(Nval, Rval, Ngrids, ABLM_cvthres)
+#  endif
 # endif
 # ifdef STATS_ENSO
             CASE ('stenMean')
@@ -3725,6 +3729,10 @@
      &            'ABLM nudging time scale over land/boundaries (days).'
             WRITE (out,150) hABLM, 'ABLM_H',                            &
      &            'ABLM height of boundary layer (m).'
+#  ifdef ABLM_CONVTHR
+            WRITE (out,200) ABLM_cvthres, 'ABLM_CVTHRES',               &
+     &            'ABLM convection threshold on Tair (degC).'
+#  endif
 # endif
 # ifdef STATS_ENSO
           WRITE (out,140) stenMean(ng), 'stenMean',                     &

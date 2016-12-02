@@ -160,6 +160,7 @@
 ** BULK_FLUXES         use if bulk fluxes computation                        **
 ** ABLM                use if atmospheric boundary layer model               **
 ** ABLM_WATER          use if atmospheric boundary layer model Qair          **
+** ABLM_CONVTHR        use if convective threshold on Tair in ABLM           **
 ** SET_WINDSPEED       use if set wind speed magnitude explicitely           **
 ** NL_BULK_FLUXES      use bulk fluxes computed by nonlinear model           **
 ** COOL_SKIN           use if cool skin correction                           **

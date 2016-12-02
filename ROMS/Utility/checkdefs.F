@@ -542,6 +542,18 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' STATS_ENSO,'
 #endif
+#ifdef ABLM_WATER
+      IF (Master) WRITE (stdout,20) 'ABLM_WATER',                       &
+     &   'Atmospheric boundary layer model Qair.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM_WATER,'
+#endif
+#ifdef ABLM_CONVTHR
+      IF (Master) WRITE (stdout,20) 'ABLM_CONVTHR',                     &
+     &   'Convective threshold for ABLM.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM_CONVTHR,'
+#endif
 #ifdef BVF_MIXING
       IF (Master) WRITE (stdout,20) 'BVF_MIXING',                       &
      &   'Brunt-Vaisala frequency based vertical mixing.'

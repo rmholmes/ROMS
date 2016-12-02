@@ -351,6 +351,8 @@
 !    hABLM         Thickness of atmospheric boundary layer
 !    ABLM_rhoa     Density of air
 !
+!    ABLM_cvthres  Convection threshold on Tair
+!
 !    ablm_maskwid  Width of boundary region for restoring of Tair/Qair to data
 !    ablm_lrelax   Time-scale for relaxation over land and near boundaries
 !    ablm_orelax   Time-scale for relaxation over ocean (normally zero)
@@ -366,6 +368,7 @@
         integer  :: ABLM_maskwid           ! grid units
         real(r8) :: ABLM_lrelax            ! days
         real(r8) :: ABLM_orelax = 0.0_r8   ! days
+        real(r8) :: ABLM_cvthres           ! degC
 #endif
 #ifdef STATS_ENSO
 !
@@ -2389,6 +2392,7 @@
         ABLM_maskwid = 1
         ABLM_lrelax = 0.1_r8
         hABLM = 1000.0_r8
+        ABLM_cvthres = 28.0_r8
 #endif
       DO ng=1,Ngrids
         EWperiodic(ng)=.FALSE.
