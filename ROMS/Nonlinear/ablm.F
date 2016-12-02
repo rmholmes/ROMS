@@ -657,9 +657,16 @@
           Hair(i,j)=Hair(i,j) + (HairB(i,j)-Hair(i,j))*                 &   
      &                           cff/(1.0_r8+cff)
 #endif
+# ifdef ABLM_CONVTHR
+!
+!-----------------------------------------------------------------------
+!  Apply a convective threshold limit to Tair
+!-----------------------------------------------------------------------
+! 
+          Tair(i,j) = MIN(ABLM_cvthres,Tair(i,j))
+# endif
         END DO
       END DO
-
 !
 !-----------------------------------------------------------------------
 !  Exchange boundary data.

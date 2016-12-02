@@ -752,6 +752,10 @@
               Npts=load_r(Nval, Rval, Ngrids, ABLM_lrelax)
             CASE ('ABLM_H')
               Npts=load_r(Nval, Rval, Ngrids, hABLM)
+#  ifdef ABLM_CONVTHR
+            CASE ('ABLM_CVTHRES')
+              Npts=load_r(Nval, Rval, Ngrids, ABLM_cvthres)
+#  endif
 # endif
             CASE ('AKV_BAK')
               Npts=load_r(Nval, Rval, Ngrids, Akv_bak)
@@ -3681,6 +3685,10 @@
      &            'ABLM nudging time scale over land/boundaries (days).'
             WRITE (out,150) hABLM, 'ABLM_H',                            &
      &            'ABLM height of boundary layer (m).'
+# ifdef ABLM_CONVTHR
+            WRITE (out,200) ABLM_cvthres, 'ABLM_CVTHRES',               &
+     &            'ABLM convection threshold on Tair (degC).'
+# endif
 #endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
      &          'Background vertical mixing coefficient (m2/s)',        &
