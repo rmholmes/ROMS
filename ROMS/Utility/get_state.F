@@ -445,6 +445,13 @@
           IF (Master) THEN
             WRITE (stdout,80) 'stenCount', stenCount
           END IF
+! Calculate stenIanom:
+        stenIanom(ng)=0.0_r8
+        DO i=1,stenNdays
+          stenIanom(ng)=stenIanom(ng) + stenIndex(i,ng)
+        END DO
+        stenIanom(ng)=stenIanom(ng)/stenNdays
+        stenUpdte(ng)=.TRUE.
       ELSE
          exit_flag = NoError
          ioerror = 0
