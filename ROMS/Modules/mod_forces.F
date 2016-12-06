@@ -562,8 +562,8 @@
 !  Nonlinear model state
 !
 # ifdef STATS_ENSO
-      allocate ( FORCES(ng) % SSTiClimG(2)
-      allocate ( FORCES(ng) % SSTiClim
+      allocate ( FORCES(ng) % SSTiClimG(2) )
+      allocate ( FORCES(ng) % SSTiClim )
 # endif
       allocate ( FORCES(ng) % sustr(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % svstr(LBi:UBi,LBj:UBj) )
