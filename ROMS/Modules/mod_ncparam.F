@@ -260,6 +260,7 @@
         integer  :: idSWCW        ! SIN(omega(k)*t)*COS(omega(l)*t)
         integer  :: idsfwf        ! surface freswater flux
         integer  :: idTLmo        ! TLM at observation locations
+        integer  :: idSsti        ! SST index climatology
         integer  :: idTair        ! surface air temperature
         integer  :: idTairP       ! surface air temperature anomaly
         integer  :: idTdif        ! vertical T-diffusion coefficient
@@ -1111,6 +1112,8 @@
               idPair=varid
             CASE ('idPairP')
               idPairP=varid
+            CASE ('idSsti')
+              idSsti=varid
             CASE ('idTair')
               idTair=varid
             CASE ('idTairP')
