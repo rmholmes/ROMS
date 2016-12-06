@@ -56,6 +56,9 @@
 !  avgDV_avg1 time-averaged v-flux for 3D momentum coupling.           !
 !  avgDV_avg2 time-averaged v-flux for 3D momentum coupling.           !
 # endif
+# ifdef STATS_ENSO
+!  avgSSTiClim time-averaged SST index climatology                     !
+# endif
 !                                                                      !
 !  Time-averaged surface and bottom fluxes.                            !
 !                                                                      !
@@ -187,6 +190,12 @@
 
           real(r8), pointer :: avgDV_avg1(:,:)
           real(r8), pointer :: avgDV_avg2(:,:)
+# endif
+# ifdef STATS_ENSO
+!
+!  Time-averaged SST index climatology.
+!
+          real(r8), pointer :: avgSSTiClim
 # endif
 !
 !  Time-averaged surface and bottom fluxes.
@@ -400,6 +409,12 @@
       IF (Aout(idVfx2,ng)) THEN
         allocate ( AVERAGE(ng) % avgDV_avg2(LBi:UBi,LBj:UBj) )
       END IF
+# endif
+# ifdef STATS_ENSO
+!
+!  Time-averaged SST index climatology
+!
+      allocate ( AVERAGE(ng) % avgSSTiClim )
 # endif
 !
 !  Time-averaged surface and bottom fluxes.
@@ -864,6 +879,12 @@
           END DO
         END DO
       END IF
+# endif
+# ifdef STATS_ENSO
+!
+!  Time-averaged SST index climatology.
+!
+      AVERAGE(ng) % avgSSTiClim = IniVal
 # endif
 !
 !  Time-averaged surface and bottom fluxes.

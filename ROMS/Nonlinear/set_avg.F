@@ -580,6 +580,12 @@
           END DO
         END IF
 # endif
+# ifdef STATS_ENSO
+!
+!  Initialize SST index climatology.
+!
+        AVERAGE(ng)%avgSSTiClim = FORCES(ng)%SSTiClim
+# endif
 !
 !  Initialize surface and bottom fluxes.
 !
@@ -1588,6 +1594,13 @@
           END DO
         END IF
 # endif
+# ifdef STATS_ENSO
+!
+!  Accumulate SST index climatology.
+!
+        AVERAGE(ng)%avgSSTiClim = AVERAGE(ng)%avgSSTiClim+              &
+     &                         FORCES(ng)%SSTiClim
+# endif
 !
 !  Accumulate surface and bottom fluxes.
 !
@@ -2561,6 +2574,10 @@
         END DO
 #ifdef STATS_ENSO
 !
+!  Calculate time-averaged SST index climatology
+!
+        AVERAGE(ng)%avgSSTiClim = fac*AVERAGE(ng)%avgSSTiClim
+!
 !-----------------------------------------------------------------------
 !  Calculate SST index for statistical ENSO model 
 !-----------------------------------------------------------------------
@@ -2602,7 +2619,8 @@
           CALL mp_reduce (ng, iNLM, Nreduce, buffer, op_handle)
           area=buffer(1)
           index=buffer(2)
-          stenIndex(stenCount(ng),ng) = index/area - stenMean(ng)
+          stenIndex(stenCount(ng),ng) = index/area -                    &
+     &                                  AVERAGE(ng)%avgSSTiClim
         END IF
         stenIanom(ng)=0.0_r8
         DO i=1,stenNdays
