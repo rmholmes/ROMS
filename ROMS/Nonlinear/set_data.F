@@ -755,6 +755,19 @@
 !
       CALL ana_spinning (ng, tile, iNLM)
 # endif
+# ifdef STATS_ENSO
+!
+!-----------------------------------------------------------------------
+!  Mean SST index values
+!-----------------------------------------------------------------------
+!
+          CALL set_ngfld (ng, iNLM, idSsti, 1, 1, 1,                    &
+     &                    1, 1, 1,                                      &
+     &                    FORCES(ng) % SSTiClimG,                       &
+     &                    FORCES(ng) % SSTiClim,                        &
+     &                    update)
+          IF (exit_flag.ne.NoError) RETURN
+# endif
 !
 !-----------------------------------------------------------------------
 !  Set point Sources/Sinks (river runoff).
