@@ -1707,6 +1707,15 @@
 !------------------------------------------------------------------------------
 !
 
+'SSTiClim'                                         ! Input
+  'SST index climatology'
+  'Celsius'                                        ! [degC]
+  'SST index climatology, scalar, series'
+  'prt_time'
+  'idSsti'
+  'nulvar'
+  1.0d0
+
 'UwindP'                                            ! Input
   'surface u-wind anomaly'
   'meter second-1'                                 ! [m/s]

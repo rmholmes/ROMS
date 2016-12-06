@@ -168,6 +168,8 @@
 !  avcos        Cosine of average zenith angle of downwelling          !
 !                 spectral photons.                                    !
 #ifdef STATS_ENSO
+!  SSTiClimG    SST index climatology, two-time snapshots              !
+!  SSTiClim     SST index climatology                                  !
 !  UwindPG      Surface wind anomaly in the XI-direction (m/s)         !
 !               at horizontal RHO-points, two-time snapshots.          !
 !  UwindOG      Dummy location for background UwindG input             !
@@ -206,6 +208,10 @@
 !
 !  Nonlinear model state.
 !
+# ifdef STATS_ENSO
+          real(r8), pointer :: SSTiClimG(:)
+          real(r8), pointer :: SSTiClim
+# endif
           real(r8), pointer :: sustr(:,:)
           real(r8), pointer :: svstr(:,:)
 #if !defined ANA_SMFLUX     && !defined BULK_FLUXES || \
@@ -555,6 +561,10 @@
 !
 !  Nonlinear model state
 !
+# ifdef STATS_ENSO
+      allocate ( FORCES(ng) % SSTiClimG(2)
+      allocate ( FORCES(ng) % SSTiClim
+# endif
       allocate ( FORCES(ng) % sustr(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % svstr(LBi:UBi,LBj:UBj) )
 
@@ -966,6 +976,11 @@
 !  Nonlinear model state.
 !
       IF ((model.eq.0).or.(model.eq.iNLM)) THEN
+#ifdef STATS_ENSO
+        FORCES(ng) % SSTiClimG(1) = IniVal
+        FORCES(ng) % SSTiClimG(2) = IniVal
+        FORCES(ng) % SSTiClim = IniVal
+#endif
         DO j=Jmin,Jmax
           DO i=Imin,Imax
 #ifdef ADJUST_WSTRESS
