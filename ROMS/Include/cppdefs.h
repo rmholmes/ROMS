@@ -162,6 +162,12 @@
 ** ABLM_WATER          use if atmospheric boundary layer model Qair          **
 ** ABLM_CONVTHR        use if convective threshold on Tair in ABLM           **
 ** SET_WINDSPEED       use if set wind speed magnitude explicitely           **
+** SET_WINDQUAD        if this option (and SET_WINDSPEED) is selected,       **
+**                     then the Uwind and Vwind input fields are             **
+**                     instead interpreted as Uwind*wMag and                 **
+**                     Vwind*wMag quadratic terms (used to get correct       **
+**                     mean wind stress when using time-average Uwind        **
+**                     and Vwind fields).                                    **
 ** NL_BULK_FLUXES      use bulk fluxes computed by nonlinear model           **
 ** COOL_SKIN           use if cool skin correction                           **
 ** LONGWAVE            use if computing net longwave radiation               **

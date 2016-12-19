@@ -785,14 +785,22 @@
 !  Compute wind stress components (N/m2), Tau.
 !
           cff=rhoAir(i)*Cd*Wspeed
+# ifdef SET_WINDSPEED && SET_WINDQUAD
+          Taux(i,j)=(cff/Wspeed*Uwind(i,j)+Taur*SIGN(1.0_r8,Uwind(i,j)))
+# else
           Taux(i,j)=(cff*Uwind(i,j)+Taur*SIGN(1.0_r8,Uwind(i,j)))
+# endif
 # ifdef MASKING
           Taux(i,j)=Taux(i,j)*rmask(i,j)
 # endif
 # ifdef WET_DRY
           Taux(i,j)=Taux(i,j)*rmask_wet(i,j)
 # endif
+# ifdef SET_WINDSPEED && SET_WINDQUAD
+          Tauy(i,j)=(cff/Wspeed*Vwind(i,j)+Taur*SIGN(1.0_r8,Vwind(i,j)))
+# else
           Tauy(i,j)=(cff*Vwind(i,j)+Taur*SIGN(1.0_r8,Vwind(i,j)))
+# endif
 # ifdef MASKING
           Tauy(i,j)=Tauy(i,j)*rmask(i,j)
 # endif
