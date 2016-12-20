@@ -70,7 +70,9 @@
 # ifdef ABLM_WATER
      &                     FORCES(ng) % Hair,                           &
      &                     FORCES(ng) % HairTenPrev,                    &
+#  ifdef ABLM_RELHUM
      &                     FORCES(ng) % Pair,                           &
+#  endif
 # endif
      &                     FORCES(ng) % Uwind,                          &
      &                     FORCES(ng) % Vwind)
@@ -89,7 +91,10 @@
      &                           pmon_u, pnom_v,                        &
      &                           Tair, TairTenPrev,                     &
 # ifdef ABLM_WATER
-     &                           Hair, HairTenPrev, Pair,               &
+     &                           Hair, HairTenPrev,                     &
+#  ifdef ABLM_RELHUM
+     &                           Pair,                                  &
+#  endif
 # endif
      &                           Uwind, Vwind)
 !***********************************************************************
@@ -121,7 +126,9 @@
 #  ifdef ABLM_WATER
       real(r8), intent(inout) :: Hair(LBi:,LBj:)
       real(r8), intent(inout) :: HairTenPrev(LBi:,LBj:)
+#   ifdef ABLM_RELHUM
       real(r8), intent(inout) :: Pair(LBi:,LBj:)
+#   endif
 #  endif
       real(r8), intent(inout) :: Uwind(LBi:,LBj:)
       real(r8), intent(inout) :: Vwind(LBi:,LBj:)
@@ -137,7 +144,9 @@
 #  ifdef ABLM_WATER
       real(r8), intent(inout) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(inout) :: HairTenPrev(LBi:UBi,LBj:UBj)
+#   ifdef ABLM_RELHUM
       real(r8), intent(inout) :: Pair(LBi:UBi,LBj:UBj)
+#   endif
 #  endif
       real(r8), intent(in) :: Uwind(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
@@ -147,14 +156,11 @@
 !
       integer :: i, j, k
       real(r8) :: cff
-#ifdef ABLM_WATER
-      logical :: Qswitch
-#endif
 !
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: TairTen !Tair tendency current
 #ifdef ABLM_WATER
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: HairTen !Hair tendency current
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: Qair    ! Specific humidity (kg/kg)
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: Qair    ! Specific humidity (g/kg)
 #endif
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: wVel ! Vertical velocity on rho-points
       real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: uVel ! Zonal wind on u-points
@@ -220,23 +226,18 @@
 
       DO k=1,ntatm
 
-#ifdef ABLM_WATER
+#ifdef ABLM_WATER && ABLM_RELHUM
 !-----------------------------------------------------------------------
-!  Convert humidity input to specific humidity (kg/kg)
+!  Convert relative humidity to specific humidity (g/kg)
 !-----------------------------------------------------------------------
 !
       DO j=JstrV-2,Jendp2
         DO i=IstrU-2,Iendp2
-          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
-     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
-          IF (Hair(i,j).lt.2.0_r8) THEN                !RH fraction
-            Qswitch = .TRUE.
-            cff=cff*Hair(i,j)                          !Vapor pres (mb)
-            Qair(i,j)=0.62197_r8*(cff/(Pair(i,j)-0.378_r8*cff)) !Spec hum (kg/kg)
-          ELSE          !RH input was actually specific humidity in g/kg
-            Qswitch = .FALSE.
-            Qair(i,j)=Hair(i,j)/1000.0_r8                       !Spec Hum (kg/kg)
-          END IF
+           cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*              &
+     &          EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+           cff=cff*Hair(i,j)    !Vapor pres (mb)
+           Qair(i,j)=1000.0_r8*0.62197_r8*                              &
+     &          (cff/(Pair(i,j)-0.378_r8*cff)) !Spec hum (g/kg)
         END DO
       END DO
 #endif
@@ -357,21 +358,17 @@
           END DO
         END DO
 
-#ifdef ABLM_WATER
+#ifdef ABLM_WATER && ABLM_RELHUM
 !-----------------------------------------------------------------------
-!  Convert specific humidity back to previous units
+!  Convert specific humidity back to relative humidity
 !-----------------------------------------------------------------------
 !
       DO j=JstrV-2,Jendp2
         DO i=IstrU-2,Iendp2
-          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
-     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
-          IF (Qswitch) THEN                !RH fraction
-             Hair(i,j) = Qair(i,j)/0.62197_r8*Pair(i,j)/cff/            &
-     &                 (1.0_r8 + 0.378_r8/0.62197_r8*Qair(i,j))
-          ELSE          !RH input was actually specific humidity in g/kg
-            Hair(i,j) = 1000.0_r8*Qair(i,j)
-          END IF
+           cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*              &
+     &          EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+           Hair(i,j) = Qair(i,j)/1000.0_r8/0.62197_r8*Pair(i,j)/cff/    &
+     &          (1.0_r8 + 0.378_r8/0.62197_r8*Qair(i,j)/1000.0_r8)
         END DO
       END DO
 #endif
@@ -536,30 +533,24 @@
       real(r8) :: NETup ! atmospheric upwelled lw radiation
       real(r8) :: NETdn ! atmospheric downwelled lw radiation
 #ifdef ABLM_WATER
-      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: Qair    ! Specific humidity (kg/kg)
+      real(r8), dimension(IminS:ImaxS,JminS:JmaxS) :: Qair    ! Specific humidity (g/kg)
       real(r8) :: HairTen, Qsea, HscaleW, evap, entrain, lhvap
-      logical :: Qswitch
 #endif      
 !
            
 # include "set_bounds.h"
-#ifdef ABLM_WATER
+#ifdef ABLM_WATER && ABLM_RELHUM
 !-----------------------------------------------------------------------
-!  Convert humidity input to specific humidity (kg/kg)
+!  Convert relative humidity to specific humidity (g/kg)
 !-----------------------------------------------------------------------
 !
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
-          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
-     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
-          IF (Hair(i,j).lt.2.0_r8) THEN                !RH fraction
-            Qswitch = .TRUE.
-            cff=cff*Hair(i,j)                          !Vapor pres (mb)
-            Qair(i,j)=0.62197_r8*(cff/(Pair(i,j)-0.378_r8*cff)) !Spec hum (kg/kg)
-          ELSE          !RH input was actually specific humidity in g/kg
-            Qswitch = .FALSE.
-            Qair(i,j)=Hair(i,j)/1000.0_r8                       !Spec Hum (kg/kg)
-          END IF
+           cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*              &
+     &          EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+           cff=cff*Hair(i,j)    !Vapor pres (mb)
+           Qair(i,j)=1000.0_r8*0.62197_r8*                              &
+     &          (cff/(Pair(i,j)-0.378_r8*cff)) !Spec hum (g/kg)
         END DO
       END DO
 #endif
@@ -612,33 +603,29 @@
 
           lhvap = (2.501_r8-0.00237_r8*TseaC)*1.0E+6_r8
           evap = -lhflx(i,j) / HscaleW / lhvap
-          entrain = 0.25*(evap / (Qsea - Qair(i,j)))*Q100(i,j)
+          entrain = 0.25*(evap/(Qsea - Qair(i,j)/1000.0_r8))*Q100(i,j)
 
           HairTen = (evap - entrain) / hABLM / ABLM_rhoa
 #ifdef MASKING
           HairTen = HairTen*rmask(i,j)
 #endif
 
-          Qair(i,j) = Qair(i,j) + dt(ng)*HairTen
+          Qair(i,j) = Qair(i,j) + dt(ng)*HairTen*1000.0_r8
 #endif
         END DO
       END DO
 
-#ifdef ABLM_WATER
+#ifdef ABLM_WATER && ABLM_RELHUM
 !-----------------------------------------------------------------------
-!  Convert specific humidity back to previous units
+!  Convert specific humidity back to relative humidity
 !-----------------------------------------------------------------------
 !
-      DO j=Jstr-1,JendR
-        DO i=Istr-1,IendR
-          cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*               &
-     &        EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
-          IF (Qswitch) THEN                !RH fraction
-            Hair(i,j) = Qair(i,j)/0.62197_r8*Pair(i,j)/cff/             &
-     &                 (1.0_r8 + 0.378_r8/0.62197_r8*Qair(i,j))
-          ELSE          !RH input was actually specific humidity in g/kg
-            Hair(i,j) = 1000.0_r8*Qair(i,j)
-          END IF
+      DO j=JstrV-2,Jendp2
+        DO i=IstrU-2,Iendp2
+           cff=(1.0007_r8+3.46E-6_r8*Pair(i,j))*6.1121_r8*              &
+     &          EXP(17.502_r8*Tair(i,j)/(240.97_r8+Tair(i,j)))
+           Hair(i,j) = Qair(i,j)/1000.0_r8/0.62197_r8*Pair(i,j)/cff/    &
+     &          (1.0_r8 + 0.378_r8/0.62197_r8*Qair(i,j)/1000.0_r8)
         END DO
       END DO
 #endif
