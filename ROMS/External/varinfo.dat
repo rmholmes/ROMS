@@ -1378,13 +1378,13 @@
   1.0d0
 
 'Qair'                                             ! Input
-  'surface air relative humidity'                  !  relative    or  specific
-  'percentage'                                     ! [percentage  or  g/kg    ]
+  'surface air specific humidity'                  !  relative    or  specific
+  'g/kg'                                           ! [percentage  or  g/kg    ]
   'Qair, scalar, series'
   'qair_time'
   'idQair'
   'r2dvar'                                         ! relative        specific
-  0.01d0                                           ! 1/100      or   1.0
+  1.0d0                                            ! 1/100      or   1.0
 
 'cloud'                                            ! Input
   'cloud fraction'
@@ -1762,13 +1762,13 @@
   1.0d0
 
 'QairP'                                            ! Input
-  'surface air relative humidity anomaly'          !  relative    or  specific
-  'percentage'                                     ! [percentage  or  g/kg    ]
+  'surface air specific humidity anomaly'          !  relative    or  specific
+  'g/kg'                                           ! [percentage  or  g/kg    ]
   'Qair anomaly, scalar, series'
   'prt_time'
   'idQairP'
   'r2dvar'                                         ! relative        specific
-  0.01d0                                           ! 1/100      or   1.0
+  1.0d0                                            ! 1/100      or   1.0
 
 'swradP'                                           ! Input/Output
   'solar shortwave radiation flux anomaly'
