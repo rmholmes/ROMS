@@ -838,20 +838,3 @@
 # define VISC_3DCOEF
 #endif
 
-/*
-** Check atmospheric boundary layer model options
-*/
-#ifdef ABLM_WATER
-# define ABLM
-#endif
-#ifdef ABLM
-# define BULK_FLUXES /* bulk fluxes needed to calculate air-sea fluxes
-                        for ablm_diabatic */
-#endif
-
-/* 
-** STATS_ENSO check
-*/
-#ifdef STATS_ENSO
-# define AVERAGES /* This is need to calculate time-averaged SST index */
-#endif

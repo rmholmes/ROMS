@@ -524,41 +524,41 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' RELATIVE_HUMIDITY,'
 #endif
-#ifdef SET_WINDSPEED
+#ifdef SET_WINDSPEED && defined BULK_FLUXES
       IF (Master) WRITE (stdout,20) 'SET_WINDSPEED',                    &
-     &   'Atmospheric boundary layer model.'
+     &   'Wind speed magnitude is explicetely set as separate input.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+13)=' ABLM,'
+      Coptions(is:is+13)=' SET_WINDSPEED,'
 #endif
-#ifdef ABLM
+#ifdef ABLM && defined BULK_FLUXES
       IF (Master) WRITE (stdout,20) 'ABLM',                             &
      &   'Atmospheric boundary layer model.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' ABLM,'
+# ifdef ABLM_CONVTHR
+      IF (Master) WRITE (stdout,20) 'ABLM_CONVTHR',                     &
+     &   'Convective threshold for ABLM.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM_CONVTHR,'
+# endif
 # ifdef ABLM_WATER
       IF (Master) WRITE (stdout,20) 'ABLM_WATER',                       &
      &   'Atmospheric boundary layer model Qair.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' ABLM_WATER,'
+#  ifdef ABLM_RELHUM
+      IF (Master) WRITE (stdout,20) 'ABLM_RELHUM',                      &
+     &   'ABLM assumes input Hair is relative humidity fraction.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM_RELHUM,'
+#  endif
 # endif
 #endif
-#ifdef STATS_ENSO
+#ifdef STATS_ENSO && defined BULK_FLUXES
       IF (Master) WRITE (stdout,20) 'STATS_ENSO',                       &
      &   'Statistical ENSO forcing.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' STATS_ENSO,'
-#endif
-#ifdef ABLM_WATER
-      IF (Master) WRITE (stdout,20) 'ABLM_WATER',                       &
-     &   'Atmospheric boundary layer model Qair.'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+13)=' ABLM_WATER,'
-#endif
-#ifdef ABLM_CONVTHR
-      IF (Master) WRITE (stdout,20) 'ABLM_CONVTHR',                     &
-     &   'Convective threshold for ABLM.'
-      is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+13)=' ABLM_CONVTHR,'
 #endif
 #ifdef BVF_MIXING
       IF (Master) WRITE (stdout,20) 'BVF_MIXING',                       &
@@ -2682,6 +2682,16 @@
      &          /,13x,'Use distributed-memory (MPI) in parallel runs.')
       END IF
 #endif
-
+#ifdef STATS_ENSO && defined BULK_FLUXES && !defined AVERAGES
+! 
+!  Stop if trying to run STATS_ENSO without AVERAGES defined.
+!
+      IF (Master) THEN
+        WRITE (stdout,270)
+ 270    FORMAT (/,' CHECKDEFS - AVERAGES is needed to calculate SST',   &
+     &            ' index for STATS_ENSO.')
+        exit_flag=5
+      END IF
+#endif
       RETURN
       END SUBROUTINE checkdefs
