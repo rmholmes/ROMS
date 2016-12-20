@@ -158,6 +158,8 @@
 **   sea surface temperature; (3) provide net longwave radiation (default).  **
 **                                                                           **
 ** BULK_FLUXES         use if bulk fluxes computation                        **
+** RELATIVE_HUMIDITY   use if input is relative humidity fraction instead of **
+**                     specific humidity.                                    **
 ** ABLM                use if atmospheric boundary layer model               **
 ** ABLM_WATER          use if atmospheric boundary layer model Qair          **
 ** ABLM_RELHUM         use if input Hair is relative humidity fraction (Not  **

@@ -504,12 +504,12 @@
 !
 !  Compute specific humidity, Q (kg/kg).
 !
-          IF (RH.lt.2.0_r8) THEN                       !RH fraction
+# ifdef RELATIVE_HUMIDITY
             cff=cff*RH                                 !Vapor pres (mb)
             Q(i)=0.62197_r8*(cff/(PairM-0.378_r8*cff)) !Spec hum (kg/kg)
-          ELSE          !RH input was actually specific humidity in g/kg
+# else
             Q(i)=RH/1000.0_r8                          !Spec Hum (kg/kg)
-          END IF
+# endif
 !
 !  Compute water saturation vapor pressure (mb), using Teten formula.
 !

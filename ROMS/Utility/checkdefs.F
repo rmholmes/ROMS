@@ -518,6 +518,12 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' BULK_FLUXES,'
 #endif
+#ifdef BULK_FLUXES && defined RELATIVE_HUMIDITY
+      IF (Master) WRITE (stdout,20) 'RELATIVE_HUMIDITY',                &
+     &   'Hair input field assumed to be relative humidity fraction.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' RELATIVE_HUMIDITY,'
+#endif
 #ifdef SET_WINDSPEED
       IF (Master) WRITE (stdout,20) 'SET_WINDSPEED',                    &
      &   'Atmospheric boundary layer model.'
