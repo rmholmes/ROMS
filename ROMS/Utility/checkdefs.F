@@ -518,19 +518,19 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' BULK_FLUXES,'
 #endif
-#ifdef BULK_FLUXES && defined RELATIVE_HUMIDITY
+#if defined BULK_FLUXES && defined RELATIVE_HUMIDITY
       IF (Master) WRITE (stdout,20) 'RELATIVE_HUMIDITY',                &
      &   'Hair input field assumed to be relative humidity fraction.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' RELATIVE_HUMIDITY,'
 #endif
-#ifdef SET_WINDSPEED && defined BULK_FLUXES
+#if defined SET_WINDSPEED && defined BULK_FLUXES
       IF (Master) WRITE (stdout,20) 'SET_WINDSPEED',                    &
      &   'Wind speed magnitude is explicetely set as separate input.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' SET_WINDSPEED,'
 #endif
-#ifdef ABLM && defined BULK_FLUXES
+#if defined ABLM && defined BULK_FLUXES
       IF (Master) WRITE (stdout,20) 'ABLM',                             &
      &   'Atmospheric boundary layer model.'
       is=LEN_TRIM(Coptions)+1
@@ -554,7 +554,7 @@
 #  endif
 # endif
 #endif
-#ifdef STATS_ENSO && defined BULK_FLUXES
+#if defined STATS_ENSO && defined BULK_FLUXES
       IF (Master) WRITE (stdout,20) 'STATS_ENSO',                       &
      &   'Statistical ENSO forcing.'
       is=LEN_TRIM(Coptions)+1
@@ -2682,7 +2682,7 @@
      &          /,13x,'Use distributed-memory (MPI) in parallel runs.')
       END IF
 #endif
-#ifdef STATS_ENSO && defined BULK_FLUXES && !defined AVERAGES
+#if defined STATS_ENSO && defined BULK_FLUXES && !defined AVERAGES
 ! 
 !  Stop if trying to run STATS_ENSO without AVERAGES defined.
 !

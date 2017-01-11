@@ -225,7 +225,7 @@
 
       DO k=1,ntatm
 
-#ifdef ABLM_WATER && ABLM_RELHUM
+#if defined ABLM_WATER && defined ABLM_RELHUM
 !-----------------------------------------------------------------------
 !  Convert relative humidity to specific humidity (g/kg)
 !-----------------------------------------------------------------------
@@ -357,7 +357,7 @@
           END DO
         END DO
 
-#ifdef ABLM_WATER && ABLM_RELHUM
+#if defined ABLM_WATER && defined ABLM_RELHUM
 !-----------------------------------------------------------------------
 !  Convert specific humidity back to relative humidity
 !-----------------------------------------------------------------------
@@ -537,7 +537,7 @@
 !
            
 # include "set_bounds.h"
-#ifdef ABLM_WATER && ABLM_RELHUM
+#if defined ABLM_WATER && defined ABLM_RELHUM
 !-----------------------------------------------------------------------
 !  Convert relative humidity to specific humidity (g/kg)
 !-----------------------------------------------------------------------
@@ -613,7 +613,7 @@
         END DO
       END DO
 
-#ifdef ABLM_WATER && ABLM_RELHUM
+#if defined ABLM_WATER && defined ABLM_RELHUM
 !-----------------------------------------------------------------------
 !  Convert specific humidity back to relative humidity
 !-----------------------------------------------------------------------
