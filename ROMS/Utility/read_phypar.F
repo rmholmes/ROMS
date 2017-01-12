@@ -929,6 +929,8 @@
               Npts=load_r(Nval, Rval, Ngrids, M2nudg)
             CASE ('M3NUDG')
               Npts=load_r(Nval, Rval, Ngrids, M3nudg)
+            CASE ('TNUDGSSS')
+              Npts=load_r(Nval, Rval, Ngrids, TnudgSSS)
             CASE ('OBCFAC')
               Npts=load_r(Nval, Rval, Ngrids, obcfac)
             CASE ('R0')
@@ -4003,6 +4005,9 @@
      &          'Nudging/relaxation time scale (days)',                 &
      &          'for 3D momentum.'
 #endif
+          WRITE (out,210) TnudgSSS(ng), 'TnudgSSS',                     &
+     &          'Nudging/relaxation time scale (days)',                 &
+     &          'for SSS.'
           WRITE (out,210) obcfac(ng), 'obcfac',                         &
      &          'Factor between passive and active',                    &
      &          'open boundary conditions.'
@@ -5836,6 +5841,9 @@
             Tnudg(itrc,ng)=0.0_r8
           END IF
         END DO
+        IF (TnudgSSS(ng).gt.0.0_r8) THEN
+           TnudgSSS(ng)=1.0_r8/(TnudgSSS(ng)*86400.0_r8)
+        END IF
       END DO
 #endif
 

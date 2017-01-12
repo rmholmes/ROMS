@@ -1848,6 +1848,14 @@
       IF (exit_flag.ne.NoError) RETURN
 #endif
 
+      Vinfo( 1)='TnudgSSS'
+      Vinfo( 2)='SSS nudging/relaxation inverse time scale'
+      Vinfo( 3)='day-1'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
 #ifndef DEBUGGING
 !
 !  Open boundary nudging, inverse time scales.

@@ -305,10 +305,10 @@
         DO i=IstrR,IendR
 #   if defined SCORRECTION
           stflx(i,j,isalt)=stflx(i,j,isalt)*t(i,j,N(ng),nrhs,isalt)-    &
-     &                     Tnudg(isalt,ng)*Hz(i,j,N(ng))*               &
+     &                     TnudgSSS(ng)*Hz(i,j,N(ng))*                  &
      &                     (t(i,j,N(ng),nrhs,isalt)-sss(i,j))
 #   elif defined SRELAXATION
-          stflx(i,j,isalt)=-Tnudg(isalt,ng)*Hz(i,j,N(ng))*              &
+          stflx(i,j,isalt)=-TnudgSSS(ng)*Hz(i,j,N(ng))*                 &
      &                     (t(i,j,N(ng),nrhs,isalt)-sss(i,j))
 #   else
           stflx(i,j,isalt)=stflx(i,j,isalt)*t(i,j,N(ng),nrhs,isalt)

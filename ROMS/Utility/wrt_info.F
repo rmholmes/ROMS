@@ -727,6 +727,10 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 #endif
+      CALL netcdf_put_fvar (ng, model, ncname, 'TnudgSSS',              &
+     &                      TnudgSSS(ng)/sec2day, (/0/), (/0/),         &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
 
 #ifndef DEBUGGING
 !
