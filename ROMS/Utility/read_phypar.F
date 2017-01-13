@@ -3880,6 +3880,12 @@
      &          'Surface roughness (m).'
 # endif
 # ifdef BULK_FLUXES
+#  ifdef ABLM
+          blk_ZT(ng) = blk_ZW(ng)
+#   ifdef ABLM_WATER
+          blk_ZQ(ng) = blk_ZW(ng)
+#   endif
+#  endif
           WRITE (out,200) blk_ZQ(ng), 'blk_ZQ',                         &
      &          'Height (m) of surface air humidity measurement.'
           IF (blk_ZQ(ng).le.0.0_r8) THEN
