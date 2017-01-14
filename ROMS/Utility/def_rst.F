@@ -787,7 +787,6 @@
         Vinfo( 3)=Vname(3,idTair)
         Vinfo(14)=Vname(4,idTair)
         Vinfo(16)=Vname(1,idtime)
-        Vinfo(20)='mask_rho'
         Vinfo(22)='coordinates'
         Aval(5)=REAL(Iinfo(1,idTair,ng),r8)
         status=def_var(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idTair),     &
@@ -803,7 +802,6 @@
         Vinfo( 3)=Vname(3,idQair)
         Vinfo(14)=Vname(4,idQair)
         Vinfo(16)=Vname(1,idtime)
-        Vinfo(20)='mask_rho'
         Vinfo(22)='coordinates'
         Aval(5)=REAL(Iinfo(1,idQair,ng),r8)
         status=def_var(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idQair),     &
