@@ -196,6 +196,10 @@
 !  lrflxPG      Kinematic net longwave radiation (degC m/s), two-time  !
 !               snapshots.                                             !
 !  lrflxOG      Dummy location for background lrflxG input             !
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+!  sssPG        Sea Surface Salinity anomaly, two-time snapshots.      !
+!  sssOG        Dummy location for background sssPG input              !
+# endif
 #endif
 !                                                                      !
 !=======================================================================
@@ -422,6 +426,10 @@
           real(r8), pointer :: sss(:,:)
 #  ifndef ANA_SSS
           real(r8), pointer :: sssG(:,:,:)
+#   ifdef STATS_ENSO
+          real(r8), pointer :: sssPG(:,:,:)
+          real(r8), pointer :: sssOG(:,:,:)
+#   endif
 #  endif
 # endif
 
@@ -792,6 +800,10 @@
 
 #  ifndef ANA_SSS
       allocate ( FORCES(ng) % sssG(LBi:UBi,LBj:UBj,2) )
+#   ifdef STATS_ENSO
+      allocate ( FORCES(ng) % sssPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % sssOG(LBi:UBi,LBj:UBj,2) )
+#   endif
 #  endif
 # endif
 
@@ -1210,6 +1222,12 @@
 #  ifndef ANA_SSS
             FORCES(ng) % sssG(i,j,1) = IniVal
             FORCES(ng) % sssG(i,j,2) = IniVal
+#   ifdef STATS_ENSO
+            FORCES(ng) % sssPG(i,j,1) = IniVal
+            FORCES(ng) % sssPG(i,j,2) = IniVal
+            FORCES(ng) % sssOG(i,j,1) = IniVal
+            FORCES(ng) % sssOG(i,j,2) = IniVal
+#   endif
 #  endif
 # endif
             DO itrc=1,NT(ng)

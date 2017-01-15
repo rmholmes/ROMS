@@ -1788,6 +1788,15 @@
   'r2dvar'
   1.0d0
 
+'SSSP'                                             ! Input
+  'sea surface salinity climatology anomaly'
+  'nondimensional'                                 ! [PSU]
+  'SSS anomaly, scalar, series'
+  'prt_time'
+  'idSSSP'
+  'r2dvar'
+  1.0d0
+
 !
 !------------------------------------------------------------------------------
 !  Tidal forcing variables.

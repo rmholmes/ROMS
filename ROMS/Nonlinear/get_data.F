@@ -833,8 +833,35 @@
 #   ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #   endif
+#   ifdef STATS_ENSO
+     &                FORCES(ng) % sssOG)
+#   else
      &                FORCES(ng) % sssG)
+#   endif
       IF (exit_flag.ne.NoError) RETURN
+#   ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idSSSP, ncFRCid(idSSSP,ng),             &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#    ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#    endif
+     &                FORCES(ng) % sssPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%sssG(i,j,1)=FORCES(ng)%sssOG(i,j,1)+             &
+     &      stenIanom(ng)*stenRsss(ng)*FORCES(ng)%sssPG(i,j,1)
+            FORCES(ng)%sssG(i,j,2)=FORCES(ng)%sssOG(i,j,2)+             &
+     &      stenIanom(ng)*stenRsss(ng)*FORCES(ng)%sssPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#   endif
 #  endif
 
 #  ifndef ANA_BSFLUX

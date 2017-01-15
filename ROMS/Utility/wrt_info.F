@@ -516,6 +516,13 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRsss',              &
+     &                      stenRsss(ng), (/0/), (/0/),                 &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+
       CALL netcdf_put_ivar (ng, model, ncname, 'stenNdays',             &
      &                      stenNdays, (/0/), (/0/),                    &
      &                      ncid = ncid)

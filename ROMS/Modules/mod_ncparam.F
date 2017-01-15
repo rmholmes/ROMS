@@ -255,6 +255,7 @@
         integer  :: idSradP       ! net shortwave radiation flux anomaly
         integer  :: idSSHc        ! SSH climatology
         integer  :: idSSSc        ! SSS climatology
+        integer  :: idSSSP        ! SSS climatology anomaly
         integer  :: idSSTc        ! SST climatology
         integer  :: idShea        ! net sensible heat flux
         integer  :: idSWCW        ! SIN(omega(k)*t)*COS(omega(l)*t)
@@ -1270,6 +1271,8 @@
               idVclm=varid
             CASE ('idSSSc')
               idSSSc=varid
+            CASE ('idSSSP')
+              idSSSP=varid
             CASE ('idSSTc')
               idSSTc=varid
 #if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \

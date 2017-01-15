@@ -1550,6 +1550,16 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+      Vinfo( 1)='stenRsss'
+      Vinfo( 2)='Coupling coefficient of SSS pattern onto SST in'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+
       Vinfo( 1)='stenNdays'
       Vinfo( 2)='Number of days to average SST index over'
       Vinfo( 3)=''

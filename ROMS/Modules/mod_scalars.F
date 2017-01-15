@@ -389,6 +389,7 @@
 !    stenRpair      Coupling coefficient of Pair pattern onto SST index
 !    stenRsrad      Coupling coefficient of swrad pattern onto SST index
 !    stenRlrad      Coupling coefficient of lwrad_down pattern onto SST index
+!    stenRsss       Coupling coefficient of SSS pattern onto SST index
 !
 !    stenCount      Counter for current day of stenNdays
 !    stenIndex      the SST index over the last stenNdays
@@ -409,6 +410,9 @@
         real(r8), allocatable :: stenRpair(:)      ! degC^(-1)
         real(r8), allocatable :: stenRsrad(:)      ! degC^(-1)
         real(r8), allocatable :: stenRlrad(:)      ! degC^(-1)
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+        real(r8), allocatable :: stenRsss(:)       ! degC^(-1)
+# endif
         integer, allocatable  :: stenCount(:)
         real(r8), allocatable :: stenIndex(:,:)    ! degC
         real(r8), allocatable :: stenIanom(:)      ! degC
@@ -1874,6 +1878,9 @@
       allocate ( stenRpair(Ngrids) )
       allocate ( stenRsrad(Ngrids) )
       allocate ( stenRlrad(Ngrids) )
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+      allocate ( stenRsss(Ngrids) )
+# endif
       allocate ( stenCount(Ngrids) )
       allocate ( stenIndex(stenNdays,Ngrids) )
       allocate ( stenIanom(Ngrids) )

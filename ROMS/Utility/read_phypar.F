@@ -789,6 +789,10 @@
               Npts=load_r(Nval, Rval, Ngrids, stenRsrad)
             CASE ('stenRlrad')
               Npts=load_r(Nval, Rval, Ngrids, stenRlrad)
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            CASE ('stenRsss')
+              Npts=load_r(Nval, Rval, Ngrids, stenRsss)
+#  endif
 # endif
             CASE ('AKV_BAK')
               Npts=load_r(Nval, Rval, Ngrids, Akv_bak)
