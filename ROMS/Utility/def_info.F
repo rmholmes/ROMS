@@ -1444,14 +1444,6 @@
       IF (exit_flag.ne.NoError) RETURN
 #endif
 #ifdef STATS_ENSO
-      Vinfo( 1)='stenMean'
-      Vinfo( 2)='Climatological value of SST index'
-      Vinfo( 3)='degC'
-      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
-     &               1, (/0/), Aval, Vinfo, ncname,                     &
-     &               SetParAccess = .FALSE.)
-      IF (exit_flag.ne.NoError) RETURN
-
       Vinfo( 1)='stenRegnN'
       Vinfo( 2)='SST index region northern boundary'
       Vinfo( 3)='degrees'

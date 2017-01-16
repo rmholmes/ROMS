@@ -376,7 +376,6 @@
 !  Constants associated with statistical ENSO forcing
 !-----------------------------------------------------------------------
 !
-!    stenMean       Climatological value of SST index
 !    stenRegnN      SST index region northern boundary
 !    stenRegnE      SST index region eastern boundary
 !    stenRegnS      SST index region southern boundary
@@ -395,7 +394,6 @@
 !    stenIndex      the SST index over the last stenNdays
 !    stenIanom      Current averaged Index anomaly
 !    stenUpdte      Current Index has been updated
-        real(r8), allocatable :: stenMean(:)       ! degC
         real(r8), allocatable :: stenRegnN(:)       ! degrees
         real(r8), allocatable :: stenRegnE(:)       ! degrees
         real(r8), allocatable :: stenRegnS(:)       ! degrees
@@ -1863,7 +1861,6 @@
 #endif
 
 #ifdef STATS_ENSO
-      allocate ( stenMean(Ngrids) )
       allocate ( stenRegnN(Ngrids) )
       allocate ( stenRegnE(Ngrids) )
       allocate ( stenRegnS(Ngrids) )

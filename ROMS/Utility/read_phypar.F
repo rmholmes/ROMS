@@ -758,8 +758,6 @@
 #  endif
 # endif
 # ifdef STATS_ENSO
-            CASE ('stenMean')
-              Npts=load_r(Nval, Rval, Ngrids, stenMean)
             CASE ('stenRegnN')
               Npts=load_r(Nval, Rval, Ngrids, stenRegnN)
             CASE ('stenRegnE')
@@ -3758,8 +3756,6 @@
 #  endif
 # endif
 # ifdef STATS_ENSO
-          WRITE (out,140) stenMean(ng), 'stenMean',                     &
-     &          'Climatological value of SST index (degC).'
           WRITE (out,120) stenNdays, 'stenNdays',                       &
      &          'Number of days to average SST index over.'
           WRITE (out,150) stenRegnN(ng), 'stenRegnN',                   &

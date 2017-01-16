@@ -444,11 +444,6 @@
 #endif
 
 #ifdef STATS_ENSO
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenMean',              &
-     &                      stenMean(ng), (/0/), (/0/),                 &
-     &                      ncid = ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnN',             &
      &                      stenRegnN(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
