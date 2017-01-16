@@ -778,8 +778,7 @@
 !  Mean SST index values
 !-----------------------------------------------------------------------
 !
-          CALL set_ngfld (ng, iNLM, idSsti, 1, 1, 1,                    &
-     &                    1, 1, 1,                                      &
+          CALL set_svfld (ng, iNLM, idSsti,                             &
      &                    FORCES(ng) % SSTiClimG,                       &
      &                    FORCES(ng) % SSTiClim,                        &
      &                    update)
