@@ -83,7 +83,7 @@
 !  Imported variable declarations.
 !
       integer, intent(in) :: ng, model, ncid
-      integer, intent(in) :: DimIDs(32)
+      integer, intent(in) :: DimIDs(33)
       character (*), intent(in) :: ncname
 !
 !  Local variable declarations.
