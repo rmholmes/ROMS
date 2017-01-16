@@ -3792,6 +3792,11 @@
           WRITE (out,160) stenRlrad(ng), 'stenRlrad',                   &
      &          'Coupling coefficient of lwrad_down pattern onto',      &
      &          'SST index (1/degC).'
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+          WRITE (out,160) stenRlrad(ng), 'stenRsss',                    &
+     &          'Coupling coefficient of sea surface salinity pattern', &
+     &          'onto SST index (1/degC).'
+#  endif
 # endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
      &          'Background vertical mixing coefficient (m2/s)',        &
