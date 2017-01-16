@@ -1860,6 +1860,14 @@
       allocate ( tl_VolCons(4,Ngrids) )
 #endif
 
+#ifdef ABLM
+      allocate ( ablmK(Ngrids) )
+      allocate ( ntatm(Ngrids) )
+      allocate ( hABLM(Ngrids) )
+      allocate ( ABLM_maskwid(Ngrids) )
+      allocate ( ABLM_lrelax(Ngrids) )
+      allocate ( ABLM_cvthres(Ngrids) )
+#endif
 #ifdef STATS_ENSO
       allocate ( stenRegnN(Ngrids) )
       allocate ( stenRegnE(Ngrids) )

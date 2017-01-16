@@ -95,7 +95,9 @@
       integer :: IDmod, InpRec, gtype, i, ifield, itrc, lstr, lend
       integer :: Nrec, mySize, ncINPid, nvatts, nvdim, status, varid
       integer :: Vsize(4), start(4), total(4)
-
+#ifdef STATS_ENSO
+      logical :: foundsten
+#endif
       real(r8), parameter :: Fscl = 1.0_r8
 
       real(r8) :: Fmax, Fmin, INPtime, Tmax, scale, time_scale
@@ -421,10 +423,10 @@
 !
 ! Inquire variable:
       CALL netcdf_inq_var (ng, IDmod, ncname,                           &
-     &                     MyVarName = 'stenCount')
-
+     &                     MyVarName = 'stenCount',                     &
+     &                     SearchVar = foundsten)
 ! Read variables if present:
-      IF (exit_flag.eq.NoError) THEN
+      IF (foundsten) THEN
           CALL netcdf_get_fvar (ng, IDmod, ncname, 'stenIndex',         &
      &                          stenIndex(:,ng),                        &
      &                          ncid = ncINPid,                         &
@@ -452,9 +454,6 @@
         END DO
         stenIanom(ng)=stenIanom(ng)/stenNdays
         stenUpdte(ng)=.TRUE.
-      ELSE
-         exit_flag = NoError
-         ioerror = 0
       END IF
 # endif
 # if defined SEDIMENT && defined SED_MORPH
