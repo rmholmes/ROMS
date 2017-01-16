@@ -1676,6 +1676,15 @@
               Npts=load_l(Nval, Cval, Ngrids, Hout(idSair,:))
 # endif
 #endif
+#if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            CASE ('Hout(idSSSc)')
+              IF (idSSSc.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idSSSc'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idSSSc,:))
+#endif
             CASE ('Hout(idTsur)')
               IF (idTsur(itemp).eq.0) THEN
                 IF (Master) WRITE (out,280) 'idTsur'
@@ -1999,6 +2008,10 @@
               Npts=load_l(Nval, Cval, Ngrids, Qout(idSair,:))
 # endif
 #endif
+#if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            CASE ('Qout(idSSSc)')
+              Npts=load_l(Nval, Cval, Ngrids, Qout(idSSSc,:))
+#endif
             CASE ('Qout(idTsur)')
               Npts=load_l(Nval, Cval, NAT*Ngrids, Ltracer)
               DO ng=1,Ngrids
@@ -2146,6 +2159,10 @@
             CASE ('Aout(idSair)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSair,:))
 #  endif
+# endif
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            CASE ('Aout(idSSSc)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idSSSc,:))
 # endif
             CASE ('Aout(idTsur)')
               Npts=load_l(Nval, Cval, NAT*Ngrids, Ltracer)
@@ -4613,6 +4630,11 @@
      &         'Hout(idSrad)',                                          &
      &         'Write out shortwave radiation flux.'
 # endif
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            IF (Hout(idSSSc,ng)) WRITE (out,170) Hout(idSSSc,ng),       &
+     &         'Hout(idSSSc)',                                          &
+     &         'Write out sea surface salinity climatology.'
+# endif
 # ifdef BULK_FLUXES
             IF (Hout(idLrad,ng)) WRITE (out,170) Hout(idLrad,ng),       &
      &         'Hout(idLrad)',                                          &
@@ -4926,6 +4948,11 @@
      &         'Qout(idSrad)',                                          &
      &         'Write out shortwave radiation flux.'
 # endif
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            IF (Qout(idSSSc,ng)) WRITE (out,170) Qout(idSSSc,ng),       &
+     &         'Qout(idSSSc)',                                          &
+     &         'Write out sea surface salinity climatology.'
+# endif
 # ifdef BULK_FLUXES
             IF (Qout(idLrad,ng)) WRITE (out,170) Qout(idLrad,ng),       &
      &         'Qout(idLrad)',                                          &
@@ -5132,6 +5159,11 @@
             IF (Aout(idSrad,ng)) WRITE (out,170) Aout(idSrad,ng),       &
      &         'Aout(idSrad)',                                          &
      &         'Write out averaged shortwave radiation flux.'
+#  endif
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            IF (Aout(idSSSc,ng)) WRITE (out,170) Aout(idSSSc,ng),       &
+     &         'Aout(idSSSc)',                                          &
+     &         'Write out sea surface salinity climatology.'
 #  endif
 #  ifdef BULK_FLUXES
             IF (Aout(idLrad,ng)) WRITE (out,170) Aout(idLrad,ng),       &

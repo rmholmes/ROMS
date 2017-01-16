@@ -671,7 +671,24 @@
      &                        varid = STA(ng)%Vid(ifield))
         IF (exit_flag.ne.NoError) RETURN
       END IF
-
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+!
+!  Write out sea surface salinity climatology.
+!
+      IF (Sout(idSSSc,ng)) THEN
+        scale=1.0_r8
+        CALL extract_sta2d (ng, iNLM, Cgrid, idSSSc, r2dvar,            &
+     &                      LBi, UBi, LBj, UBj,                         &
+     &                      scale, FORCES(ng)%sss,                      &
+     &                      Nstation(ng), Xpos, Ypos, psta)
+        CALL netcdf_put_fvar (ng, iNLM, STA(ng)%name,                   &
+     &                        TRIM(Vname(1,idSSSc)), psta,              &
+     &                        (/1,STA(ng)%Rindex/), (/Nstation(ng),1/), &
+     &                        ncid = STA(ng)%ncid,                      &
+     &                        varid = STA(ng)%Vid(idSSSc))
+        IF (exit_flag.ne.NoError) RETURN
+      END IF
+#  endif
 #  ifdef BULK_FLUXES
 !
 !  Write out latent heat flux.

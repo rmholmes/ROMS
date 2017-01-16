@@ -723,6 +723,19 @@
           END DO
         END IF
 #  endif
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+        IF (Aout(idSSSc,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgsss(i,j)=FORCES(ng)%sss(i,j)
+#   ifdef WET_DRY
+              AVERAGE(ng)%avgsss(i,j)=AVERAGE(ng)%avgsss(i,j)*          &
+     &                                GRID(ng)%rmask_full(i,j)
+#   endif
+            END DO
+          END DO
+        END IF
+#  endif
 #  ifdef BULK_FLUXES
         IF (Aout(idLhea,ng)) THEN
           DO j=JstrR,JendR
@@ -1771,6 +1784,19 @@
      &                                GRID(ng)%rmask_full(i,j)*         &
 #   endif
      &                                FORCES(ng)%srflx(i,j)
+            END DO
+          END DO
+        END IF
+#  endif
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+        IF (Aout(idSSSc,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgsss(i,j)=AVERAGE(ng)%avgsss(i,j)+          &
+#   ifdef WET_DRY
+     &                                GRID(ng)%rmask_full(i,j)*         &
+#   endif
+     &                                FORCES(ng)%sss(i,j)
             END DO
           END DO
         END IF
@@ -3198,6 +3224,28 @@
         END IF
 #  endif
 
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+        IF (Aout(idSSSc,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgsss(i,j)=rfac(i,j)*                        &
+     &                                AVERAGE(ng)%avgsss(i,j)
+            END DO
+          END DO
+          IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+            CALL exchange_v2d_tile (ng, tile,                           &
+     &                              LBi, UBi, LBj, UBj,                 &
+     &                              AVERAGE(ng)%avgsss)
+#   ifdef DISTRIBUTE
+            CALL mp_exchange2d (ng, tile, iNLM, 1,                      &
+     &                          LBi, UBi, LBj, UBj,                     &
+     &                          NghostPoints,                           &
+     &                          EWperiodic(ng), NSperiodic(ng),         &
+     &                          AVERAGE(ng)%avgsss)
+#   endif
+          END IF
+        END IF
+#  endif
 #  ifdef BULK_FLUXES
         IF (Aout(idLhea,ng)) THEN
           DO j=JstrR,JendR

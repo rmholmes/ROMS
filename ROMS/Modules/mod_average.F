@@ -66,6 +66,9 @@
 !  avgsvs     Surface v-momentum stress (N/m2).                        !
 !  avgbus     Bottom u-momentum stress (N/m2).                         !
 !  avgbvs     Bottom v-momentum stress (N/m2).                         !
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+!  avgsss     Sea surface salinity climatology                         !
+#  endif
 
 # ifdef SOLVE3D
 !  avgstf     Surface net heat flux (W/m2).                            !
@@ -207,6 +210,9 @@
 
           real(r8), pointer :: avgbus(:,:)
           real(r8), pointer :: avgbvs(:,:)
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+          real(r8), pointer :: avgsss(:,:)
+# endif
 
 # ifdef SOLVE3D
 #  if defined BULK_FLUXES || defined ECOSIM || defined ATM_PRESS
@@ -437,6 +443,11 @@
       IF (Aout(idVbms,ng)) THEN
         allocate ( AVERAGE(ng) % avgbvs(LBi:UBi,LBj:UBj) )
       END IF
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+      IF (Aout(idSSSc,ng)) THEN
+        allocate ( AVERAGE(ng) % avgsss(LBi:UBi,LBj:UBj) )
+      END IF
+# endif
 
 # ifdef SOLVE3D
 #  if defined BULK_FLUXES || defined ECOSIM || defined ATM_PRESS
@@ -932,7 +943,15 @@
           END DO
         END DO
       END IF
-
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+      IF (Aout(idSSSc,ng)) THEN
+        DO j=Jmin,Jmax
+          DO i=Imin,Imax
+            AVERAGE(ng) % avgsss(i,j) = IniVal
+          END DO
+        END DO
+      END IF
+# endif
 # ifdef SOLVE3D
 #  if defined BULK_FLUXES || defined ECOSIM || defined ATM_PRESS
       IF (Aout(idPair,ng)) THEN

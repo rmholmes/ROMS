@@ -190,6 +190,10 @@
             CASE ('Sout(idSair)')
               Npts=load_l(Nval, Cval, Ngrids, Sout(idSair,:))
 #  endif
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            CASE ('Sout(idSSSc)')
+              Npts=load_l(Nval, Cval, Ngrids, Sout(idSSSc,:))
+#  endif
             CASE ('Sout(idTsur)')
               Npts=load_l(Nval, Cval, NAT*Ngrids, Lsta)
               DO ng=1,Ngrids
@@ -634,6 +638,11 @@
             IF (Sout(idSrad,ng)) WRITE (out,90) Sout(idSrad,ng),        &
      &          'Sout(idSrad)',                                         &
      &          'Write out shortwave radiation flux.'
+#  endif
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+            IF (Sout(idSSSc,ng)) WRITE (out,90) Sout(idSSSc,ng),        &
+     &          'Sout(idSSSc)',                                         &
+     &          'Write out sea surface salinity climatology.'
 #  endif
 #  ifdef BULK_FLUXES
             IF (Sout(idLrad,ng)) WRITE (out,90) Sout(idLrad,ng),        &

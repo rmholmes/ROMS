@@ -680,6 +680,23 @@
      &                   SetParAccess = .FALSE.)
           IF (exit_flag.ne.NoError) RETURN
         END IF
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+!
+!  Define sea surface salinity climatology.
+!
+        IF (Sout(idSSSc,ng)) THEN
+          Vinfo( 1)=Vname(1,idSSSc)
+          Vinfo( 2)=Vname(2,idSSSc)
+          Vinfo( 3)=Vname(3,idSSSc)
+          Vinfo(14)=Vname(4,idSSSc)
+          Vinfo(16)=Vname(1,idtime)
+          status=def_var(ng, iNLM, STA(ng)%ncid, STA(ng)%Vid(idSSSc),   &
+     &                   NF_FOUT, 2, pgrd, Aval, Vinfo, ncname,         &
+     &                   SetFillVal = .TRUE.,                           &
+     &                   SetParAccess = .FALSE.)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+#  endif
 #  ifdef BULK_FLUXES
 !
 !  Define latent heat flux.
@@ -1640,6 +1657,11 @@
      &             TRIM(Vname(1,idTsur(isalt)))) THEN
             got_var(idTsur(isalt))=.TRUE.
             STA(ng)%Vid(idTsur(isalt))=var_id(i)
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSSSc))) THEN
+            got_var(idSSSc)=.TRUE.
+            STA(ng)%Vid(idSSSc)=var_id(i)
+#  endif
 #  ifdef BULK_FLUXES
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idLhea))) THEN
             got_var(idLhea)=.TRUE.
@@ -2017,6 +2039,14 @@
           exit_flag=3
           RETURN
         END IF
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+        IF (.not.got_var(idSSSc).and.Sout(idSSSc,ng)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idSSSc)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+#  endif
 #  ifdef BULK_FLUXES
         IF (.not.got_var(idLhea).and.Sout(idLhea,ng)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idLhea)),          &

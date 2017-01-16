@@ -1644,6 +1644,30 @@
           RETURN
         END IF
       END IF
+#  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+!
+!  Write out sea surface salinity
+!
+      IF (Aout(idSSSc,ng)) THEN
+        scale=1.0_r8
+        gtype=gfactor*r2dvar
+        status=nf_fwrite2d(ng, iNLM, AVG(ng)%ncid, AVG(ng)%Vid(idSSSc), &
+     &                     AVG(ng)%Rindex, gtype,                       &
+     &                     LBi, UBi, LBj, UBj, scale,                   &
+#   ifdef MASKING
+     &                     GRID(ng) % rmask,                            &
+#   endif
+     &                     AVERAGE(ng) % avgsss)
+        IF (status.ne.nf90_noerr) THEN
+          IF (Master) THEN
+            WRITE (stdout,10) TRIM(Vname(1,idSSSc)), AVG(ng)%Rindex
+          END IF
+          exit_flag=3
+          ioerror=status
+          RETURN
+        END IF
+      END IF
+#  endif
 #  ifdef BULK_FLUXES
 !
 !  Write out latent heat flux.
