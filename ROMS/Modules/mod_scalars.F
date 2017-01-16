@@ -357,18 +357,18 @@
 !    ablm_lrelax   Time-scale for relaxation over land and near boundaries
 !    ablm_orelax   Time-scale for relaxation over ocean (normally zero)
 !
-        integer  :: ntatm                  !
-        real(r8) :: zWind = 10.0_r8        ! m
-        real(r8) :: ablmK                  ! m2s-1
-        logical  :: ABfirst = .TRUE.       ! Overwritten after first step
-        real(r8) :: ABeps = 0.01_r8        ! 
-        real(r8) :: hABLM                  ! m
-        real(r8) :: ABLM_rhoa = 1.3_r8     ! kgm-3
-        real(r8) :: ABLM_lapse = 0.0098_r8 ! degC/m
-        integer  :: ABLM_maskwid           ! grid units
-        real(r8) :: ABLM_lrelax            ! days
-        real(r8) :: ABLM_orelax = 0.0_r8   ! days
-        real(r8) :: ABLM_cvthres           ! degC
+        integer, allocatable :: ntatm(:)         !
+        real(r8) :: zWind = 10.0_r8              ! m
+        real(r8), allocatable :: ablmK(:)        ! m2s-1
+        logical  :: ABfirst = .TRUE.             ! Overwritten after first step
+        real(r8) :: ABeps = 0.01_r8              ! 
+        real(r8), allocatable :: hABLM(:)        ! m
+        real(r8) :: ABLM_rhoa = 1.3_r8           ! kgm-3
+        real(r8) :: ABLM_lapse = 0.0098_r8       ! degC/m
+        integer, allocatable  :: ABLM_maskwid(:) ! grid units
+        real(r8), allocatable :: ABLM_lrelax(:)  ! days
+        real(r8) :: ABLM_orelax = 0.0_r8         ! days
+        real(r8), allocatable :: ABLM_cvthres(:) ! degC
 #endif
 #ifdef STATS_ENSO
 !
@@ -2392,14 +2392,6 @@
 #endif
       Co=1.0_r8/(2.0_r8+SQRT(2.0_r8))
       gorho0=g/rho0
-#ifdef ABLM
-        ablmK = 1.0E04_r8
-        ntatm = 5
-        ABLM_maskwid = 1
-        ABLM_lrelax = 0.1_r8
-        hABLM = 1000.0_r8
-        ABLM_cvthres = 28.0_r8
-#endif
       DO ng=1,Ngrids
         EWperiodic(ng)=.FALSE.
         NSperiodic(ng)=.FALSE.
@@ -2459,6 +2451,14 @@
         END DO
         stenIanom(ng)=0.0_r8
         stenUpdte(ng)=.FALSE.
+#endif
+#ifdef ABLM
+        ablmK(ng) = 1.0E04_r8
+        ntatm(ng) = 5
+        ABLM_maskwid(ng) = 1
+        ABLM_lrelax(ng) = 0.1_r8
+        hABLM(ng) = 1000.0_r8
+        ABLM_cvthres(ng) = 28.0_r8
 #endif
         ad_Akv_fac(ng)=1.0_r8
         tl_Akv_fac(ng)=1.0_r8

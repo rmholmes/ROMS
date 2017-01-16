@@ -3741,17 +3741,17 @@
      &            'for tracer ', itrc, TRIM(Vname(1,idTvar(itrc)))
           END DO
 # ifdef ABLM
-            WRITE (out,200) ablmK, 'ABLM_KAPPA','ABLM diffusivity.'
-            WRITE (out,120) ntatm, 'ABLM_NTATM',                        &
+            WRITE (out,200) ablmK(ng), 'ABLM_KAPPA','ABLM diffusivity.'
+            WRITE (out,120) ntatm(ng), 'ABLM_NTATM',                    &
      &            'ABLM number of atmospheric time steps.'
-            WRITE (out,120) ABLM_maskwid, 'ABLM_MASKWIDTH',             &
+            WRITE (out,120) ABLM_maskwid(ng), 'ABLM_MASKWIDTH',         &
      &            'ABLM boundary nudging region width (grid points).'
-            WRITE (out,200) ABLM_lrelax, 'ABLM_LANDRELAX',              &
+            WRITE (out,200) ABLM_lrelax(ng), 'ABLM_LANDRELAX',          &
      &            'ABLM nudging time scale over land/boundaries (days).'
-            WRITE (out,150) hABLM, 'ABLM_H',                            &
+            WRITE (out,150) hABLM(ng), 'ABLM_H',                        &
      &            'ABLM height of boundary layer (m).'
 #  ifdef ABLM_CONVTHR
-            WRITE (out,200) ABLM_cvthres, 'ABLM_CVTHRES',               &
+            WRITE (out,200) ABLM_cvthres(ng), 'ABLM_CVTHRES',           &
      &            'ABLM convection threshold on Tair (degC).'
 #  endif
 # endif
@@ -3793,7 +3793,7 @@
      &          'Coupling coefficient of lwrad_down pattern onto',      &
      &          'SST index (1/degC).'
 #  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
-          WRITE (out,160) stenRlrad(ng), 'stenRsss',                    &
+          WRITE (out,160) stenRsss(ng), 'stenRsss',                     &
      &          'Coupling coefficient of sea surface salinity pattern', &
      &          'onto SST index (1/degC).'
 #  endif

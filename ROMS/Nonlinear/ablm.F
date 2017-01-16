@@ -221,9 +221,9 @@
       END DO
 
 ! Start atmospheric time loop
-      dtatm = dt(ng)/REAL(ntatm)
+      dtatm = dt(ng)/REAL(ntatm(ng))
 
-      DO k=1,ntatm
+      DO k=1,ntatm(ng)
 
 #if defined ABLM_WATER && defined ABLM_RELHUM
 !-----------------------------------------------------------------------
@@ -280,10 +280,10 @@
 ! Compute zonal diffusive flux
       DO j=JstrV-2,Jendp2
         DO i=IstrU-1,Iendp2
-          fZon(i,j) = fZon(i,j) - ablmK*pmon_u(i,j)                     &
+          fZon(i,j) = fZon(i,j) - ablmK(ng)*pmon_u(i,j)                 &
      &                            *(Tair(i,j)-Tair(i-1,j))
 #ifdef ABLM_WATER
-          fZonQ(i,j) = fZonQ(i,j) - ablmK*pmon_u(i,j)                   &
+          fZonQ(i,j) = fZonQ(i,j) - ablmK(ng)*pmon_u(i,j)               &
      &                            *(Qair(i,j)-Qair(i-1,j))
 #endif
         END DO
@@ -292,10 +292,10 @@
 ! Compute meridional diffusive flux
       DO j=JstrV-1,Jendp2
         DO i=IstrU-2,Iendp2
-          fMer(i,j) = fMer(i,j) - ablmK*pnom_v(i,j)                     &
+          fMer(i,j) = fMer(i,j) - ablmK(ng)*pnom_v(i,j)                 &
      &                            *(Tair(i,j)-Tair(i,j-1))
 #ifdef ABLM_WATER
-          fMerQ(i,j) = fMerQ(i,j) - ablmK*pnom_v(i,j)                   &
+          fMerQ(i,j) = fMerQ(i,j) - ablmK(ng)*pnom_v(i,j)               &
      &                            *(Qair(i,j)-Qair(i,j-1))
 #endif
         END DO
@@ -572,7 +572,7 @@
           TseaC = t(i,j,N(ng),nrhs,itemp)
           TseaK = TseaC+273.16_r8
           TairK = Tair(i,j)+273.16_r8
-          Ttop = TairK - ABLM_lapse * ( hABLM - zWind )
+          Ttop = TairK - ABLM_lapse * ( hABLM(ng) - zWind )
 
           LWup = 0.5_r8*StefBo*(0.5_r8*TairK+0.5_r8*Ttop)**4
           LWdn = 0.5_r8*StefBo*TairK**4
@@ -581,7 +581,7 @@
           NETup = LWup/HscaleA
           NETdn = (OCup-LWdn-shflx(i,j))/HscaleA
 
-          TairTen = (NETdn - NETup) / hABLM
+          TairTen = (NETdn - NETup) / hABLM(ng)
 #ifdef MASKING
           TairTen = TairTen*rmask(i,j)
 #endif
@@ -603,7 +603,7 @@
           evap = -lhflx(i,j) / HscaleW / lhvap
           entrain = 0.25*(evap/(Qsea - Qair(i,j)/1000.0_r8))*Q100(i,j)
 
-          QairTen = (evap - entrain) / hABLM / ABLM_rhoa
+          QairTen = (evap - entrain) / hABLM(ng) / ABLM_rhoa
 #ifdef MASKING
           QairTen = QairTen*rmask(i,j)
 #endif
@@ -648,7 +648,7 @@
 !  Apply a convective threshold limit to Tair
 !-----------------------------------------------------------------------
 ! 
-          Tair(i,j) = MIN(ABLM_cvthres,Tair(i,j))
+          Tair(i,j) = MIN(ABLM_cvthres(ng),Tair(i,j))
 #endif
         END DO
       END DO
@@ -741,7 +741,7 @@
 !-----------------------------------------------------------------------
 !  Set up nudging towards data time-scale coefficients (1/s).
 !-----------------------------------------------------------------------
-      mw = ABLM_maskwid
+      mw = ABLM_maskwid(ng)
       rmw = (REAL(mw,r8)-1.0_r8)
       IF (mw.ne.1) THEN
         rmw = 1.0_r8 / rmw
@@ -791,7 +791,7 @@
           IF (wrk(i,j).eq.0.0_r8) THEN
             wrk(i,j) = ABLM_orelax
           ELSE
-            wrk(i,j) = ABLM_lrelax / wrk(i,j)
+            wrk(i,j) = ABLM_lrelax(ng) / wrk(i,j)
           END IF
         END DO
       END DO
