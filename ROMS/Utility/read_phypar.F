@@ -792,6 +792,16 @@
               Npts=load_r(Nval, Rval, Ngrids, stenRsss)
 #  endif
 # endif
+# ifdef ADD_WWB
+            CASE ('WWBxC')
+              Npts=load_r(Nval, Rval, Ngrids, WWBxC)
+            CASE ('WWByC')
+              Npts=load_r(Nval, Rval, Ngrids, WWByC)
+            CASE ('WWBxW')
+              Npts=load_r(Nval, Rval, Ngrids, WWBxW)
+            CASE ('WWByW')
+              Npts=load_r(Nval, Rval, Ngrids, WWByW)
+# endif
             CASE ('AKV_BAK')
               Npts=load_r(Nval, Rval, Ngrids, Akv_bak)
             CASE ('ad_AKV_fac')
@@ -3797,6 +3807,16 @@
      &          'Coupling coefficient of sea surface salinity pattern', &
      &          'onto SST index (1/degC).'
 #  endif
+# endif
+# ifdef ADD_WWB
+          WRITE (out,150) WWBxC(ng), 'WWBxC',                           &
+     &          'Central longitude of WWB.'
+          WRITE (out,150) WWByC(ng), 'WWByC',                           &
+     &          'Central latitude of WWB.'
+          WRITE (out,150) WWBxW(ng), 'WWBxW',                           &
+     &          'Longitudinal width of WWB.'
+          WRITE (out,150) WWByW(ng), 'WWByW',                           &
+     &          'Latitudinal width of WWB.'
 # endif
           WRITE (out,210) Akv_bak(ng), 'Akv_bak',                       &
      &          'Background vertical mixing coefficient (m2/s)',        &

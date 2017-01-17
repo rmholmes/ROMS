@@ -416,6 +416,22 @@
         real(r8), allocatable :: stenIanom(:)      ! degC
         logical, allocatable  :: stenUpdte(:)
 #endif
+#ifdef ADD_WWB
+!
+!-----------------------------------------------------------------------
+!  Constants associated with WWB forcing
+!-----------------------------------------------------------------------
+!
+!    WWBxC       Central longitude of WWB
+!    WWByC       Central latitude of WWB
+!    WWBxW       Longitudinal width of WWB
+!    WWByW       Latitudinal width of WWB
+!
+        real(r8), allocatable :: WWBxC(:)        ! deg
+        real(r8), allocatable :: WWByC(:)        ! deg
+        real(r8), allocatable :: WWBxW(:)        ! deg
+        real(r8), allocatable :: WWByW(:)        ! deg
+#endif
 !-----------------------------------------------------------------------
 !  Various model parameters.  Some of these parameters are overwritten
 !  with the values provided from model standard input script.
@@ -1891,6 +1907,12 @@
       allocate ( stenIanom(Ngrids) )
       allocate ( stenUpdte(Ngrids) )
 #endif
+#ifdef ADD_WWB
+      allocate ( WWBxC(Ngrids) )
+      allocate ( WWByC(Ngrids) )
+      allocate ( WWBxW(Ngrids) )
+      allocate ( WWByW(Ngrids) )
+#endif
       allocate ( Lsponge(Ngrids) )
       allocate ( LuvSponge(Ngrids) )
       allocate ( LtracerSponge(MT,Ngrids) )
@@ -2467,6 +2489,12 @@
         ABLM_lrelax(ng) = 0.1_r8
         hABLM(ng) = 1000.0_r8
         ABLM_cvthres(ng) = 28.0_r8
+#endif
+#ifdef ADD_WWB
+        WWBxC = -200.0_r8
+        WWByC = 0.0_r8
+        WWBxW = 20.0_r8
+        WWByW = 6.0_r8
 #endif
         ad_Akv_fac(ng)=1.0_r8
         tl_Akv_fac(ng)=1.0_r8

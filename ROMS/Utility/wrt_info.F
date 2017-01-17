@@ -533,7 +533,24 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 #endif
-
+#ifdef ADD_WWB
+      CALL netcdf_put_fvar (ng, model, ncname, 'WWBxC',                 &
+     &                      WWBxC(ng), (/0/), (/0/),                    &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+      CALL netcdf_put_fvar (ng, model, ncname, 'WWByC',                 &
+     &                      WWByC(ng), (/0/), (/0/),                    &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+      CALL netcdf_put_fvar (ng, model, ncname, 'WWBxW',                 &
+     &                      WWBxW(ng), (/0/), (/0/),                    &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+      CALL netcdf_put_fvar (ng, model, ncname, 'WWByW',                 &
+     &                      WWByW(ng), (/0/), (/0/),                    &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
 #ifdef SOLVE3D
 !
 !  Background vertical mixing coefficients.

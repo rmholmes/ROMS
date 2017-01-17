@@ -807,8 +807,8 @@
 # endif
 # ifdef ADD_WWB
           Taux(i,j)=Taux(i,j) + WWBamp *                                &
-     &                     EXP(-((lonr(i,j)-WWBxC)/WWBxW)**2 -          &
-     &                          ((latr(i,j)-WWByC)/WWByW)**2)
+     &                     EXP(-((lonr(i,j)-WWBxC(ng))/WWBxW(ng))**2 -  &
+     &                          ((latr(i,j)-WWByC(ng))/WWByW(ng))**2)
 # endif
 # ifdef MASKING
           Taux(i,j)=Taux(i,j)*rmask(i,j)

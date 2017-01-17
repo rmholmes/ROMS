@@ -1576,6 +1576,39 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 #endif
+#ifdef ADD_WWB
+      Vinfo( 1)='WWBxC'
+      Vinfo( 2)='Central longitude of WWB'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='WWByC'
+      Vinfo( 2)='Central latitude of WWB'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='WWBxW'
+      Vinfo( 2)='Longitudinal width of WWB'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='WWByW'
+      Vinfo( 2)='Latitudinal width of WWB'
+      Vinfo( 3)='degrees'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+#endif
 #ifdef SOLVE3D
 !
 !  Background vertical mixing coefficients.
