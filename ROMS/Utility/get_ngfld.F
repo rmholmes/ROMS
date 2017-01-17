@@ -68,7 +68,7 @@
       logical :: Linquire, Liocycle, Lmulti, Lonerec
 
       integer :: Nrec, Tid, Tindex, Trec, Vid, Vtype
-      integer :: i, ic, j, job, lend, lstr, npts, status
+      integer :: i, ic, j, job, lend, lstr, status
 
       real(r8) :: Aval, Clength, Fmax, Fmin, Tdelta, Tend
       real(r8) :: Tmax, Tmin, Tmono, Tscale, Tstr
@@ -170,27 +170,31 @@
             Vtime(Tindex,ifield,ng)=Tval
           END IF
 !
-!  Read in non-grided data. The conditional statement on Jrec is to
-!  differentiate between reading a 3D and 2D array.
-!
+!  Read in non-grided data. The conditional statements are to
+!  differentiate between reading, 1D, 2D or 3D arrays.
+! 
           IF (Vid.ge.0) THEN
             Fmin=0.0_r8
             Fmax=0.0_r8
             IF ((Jrec.gt.1).or.                                         &
      &          ((Jrec.eq.1).and.(Iinfo(7,ifield,ng).gt.0))) THEN
-              npts=(Iend-Istr+1)*Jrec
               CALL netcdf_get_fvar (ng, model, ncfile, Vname(1,ifield), &
      &                              A,                                  &
      &                              ncid = ncid,                        &
      &                              start = (/1,1,Trec/),               &
      &                              total = (/Iend-Istr+1,Jrec,1/))
-            ELSE
-              npts=Iend-Istr+1
+            ELSE IF (Iinfo(6,ifield,ng).gt.0) THEN
               CALL netcdf_get_fvar (ng, model, ncfile, Vname(1,ifield), &
      &                              A,                                  &
      &                              ncid = ncid,                        &
      &                              start = (/1,Trec/),                 &
      &                              total = (/Iend-Istr+1,1/))
+            ELSE
+              CALL netcdf_get_fvar (ng, model, ncfile, Vname(1,ifield), &
+     &                              A,                                  &
+     &                              ncid = ncid,                        &
+     &                              start = (/Trec/),                   &
+     &                              total = (/1/))
             END IF
             IF (exit_flag.ne.NoError) THEN
               IF (Master) WRITE (stdout,50) TRIM(Vname(1,ifield)), Trec

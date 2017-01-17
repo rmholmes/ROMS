@@ -448,7 +448,6 @@
           Vinfo( 3)=Vname(3,idWwb)
           Vinfo(14)=Vname(4,idWwb)
           Vinfo(16)=Vname(1,idtime)
-          Vinfo(22)='coordinates'
           status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idWwb),   &
        &                 NF_TYPE, 1, (/recdim/), Aval, Vinfo, ncname,   &
        &                 SetParAccess = .FALSE.)
