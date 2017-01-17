@@ -98,6 +98,7 @@
 # ifdef ADD_WWB
      &                     GRID(ng) % lonr,                             &
      &                     GRID(ng) % latr,                             &
+     &                     FORCES(ng) % WWBamp,                         &
 # endif
      &                     MIXING(ng) % alpha,                          &
      &                     MIXING(ng) % beta,                           &
@@ -158,7 +159,7 @@
      &                           rmask_wet, umask_wet, vmask_wet,       &
 # endif
 # ifdef ADD_WWB
-     &                           lonr, latr,                            &
+     &                           lonr, latr, WWBamp,                    &
 # endif
      &                           alpha, beta, rho, t,                   &
 # ifdef ABLM_WATER
@@ -203,6 +204,9 @@
       integer, intent(in) :: LBi, UBi, LBj, UBj
       integer, intent(in) :: IminS, ImaxS, JminS, JmaxS
       integer, intent(in) :: nrhs
+# ifdef ADD_WWB
+      real(r8), intent(in) :: WWBamp
+# endif
 !
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING

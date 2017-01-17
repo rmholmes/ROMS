@@ -95,6 +95,18 @@
         IF (exit_flag.ne.NoError) RETURN
 
 #endif
+#ifdef ADD_WWB
+!
+!-----------------------------------------------------------------------
+!  WWB amplitude
+!-----------------------------------------------------------------------
+!
+        CALL get_ngfld (ng, iNLM, idWwb, ncFRCid(idWwb,ng),             &
+     &                  nFfiles(ng), FRC(1,ng), update(1),              &
+     &                  1, 1, 1, 2, 1, 1, 1,                            &
+     &                  FORCES(ng) % WWBampG )
+        IF (exit_flag.ne.NoError) RETURN
+#endif
 #ifndef ANA_PSOURCE
 !
 !-----------------------------------------------------------------------

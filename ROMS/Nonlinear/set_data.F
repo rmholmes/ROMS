@@ -784,6 +784,18 @@
      &                    update)
           IF (exit_flag.ne.NoError) RETURN
 # endif
+# ifdef ADD_WWB
+!
+!-----------------------------------------------------------------------
+!  WWB amplitude
+!-----------------------------------------------------------------------
+!
+          CALL set_svfld (ng, iNLM, idWwb,                              &
+     &                    FORCES(ng) % WWBampG,                         &
+     &                    FORCES(ng) % WWBamp,                          &
+     &                    update)
+          IF (exit_flag.ne.NoError) RETURN
+# endif
 !
 !-----------------------------------------------------------------------
 !  Set point Sources/Sinks (river runoff).

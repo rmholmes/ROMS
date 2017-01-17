@@ -201,6 +201,10 @@
 !  sssOG        Dummy location for background sssPG input              !
 # endif
 #endif
+#ifdef ADD_WWB
+!  WWBampG      WWB amplitude, two-time snapshots                      !
+!  WWBamp       WWB amplitude                                          !
+#endif
 !                                                                      !
 !=======================================================================
 !
@@ -215,6 +219,10 @@
 # ifdef STATS_ENSO
           real(r8), pointer :: SSTiClimG(:)
           real(r8), pointer :: SSTiClim
+# endif
+# ifdef ADD_WWB
+          real(r8), pointer :: WWBampG(:)
+          real(r8), pointer :: WWBamp
 # endif
           real(r8), pointer :: sustr(:,:)
           real(r8), pointer :: svstr(:,:)
@@ -572,6 +580,10 @@
 # ifdef STATS_ENSO
       allocate ( FORCES(ng) % SSTiClimG(2) )
       allocate ( FORCES(ng) % SSTiClim )
+# endif
+# ifdef ADD_WWB
+      allocate ( FORCES(ng) % WWBampG(2) )
+      allocate ( FORCES(ng) % WWBamp )
 # endif
       allocate ( FORCES(ng) % sustr(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % svstr(LBi:UBi,LBj:UBj) )
@@ -992,6 +1004,11 @@
         FORCES(ng) % SSTiClimG(1) = IniVal
         FORCES(ng) % SSTiClimG(2) = IniVal
         FORCES(ng) % SSTiClim = IniVal
+#endif
+#ifdef ADD_WWB
+        FORCES(ng) % WWBampG(1) = IniVal
+        FORCES(ng) % WWBampG(2) = IniVal
+        FORCES(ng) % WWBamp = IniVal
 #endif
         DO j=Jmin,Jmax
           DO i=Imin,Imax
