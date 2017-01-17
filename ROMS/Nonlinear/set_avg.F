@@ -580,6 +580,14 @@
           END DO
         END IF
 # endif
+# ifdef ADD_WWB
+!
+!  Initialize WWB amplitude.
+!
+        IF (Aout(idWwb,ng)) THEN
+          AVERAGE(ng)%avgWWBamp = FORCES(ng)%WWBamp
+        END IF
+# endif
 # ifdef STATS_ENSO
 !
 !  Initialize SST index climatology.
@@ -1642,6 +1650,15 @@
           END DO
         END IF
 # endif
+# ifdef ADD_WWB
+!
+!  Accumulate WWB amplitude
+!
+        IF (Aout(idWwb,ng)) THEN
+          AVERAGE(ng)%avgWWBamp = AVERAGE(ng)%avgWWBamp+                &
+     &                         FORCES(ng)%WWBamp
+        END IF
+# endif
 # ifdef STATS_ENSO
 !
 !  Accumulate SST index climatology.
@@ -2669,6 +2686,14 @@
             END IF
           END IF
         END DO
+#ifdef ADD_WWB
+!
+!  Calculate WWB amplitude
+!
+        IF (Aout(idWwb,ng)) THEN
+          AVERAGE(ng)%avgWWBamp = fac*AVERAGE(ng)%avgWWBamp
+        END IF
+#endif
 #ifdef STATS_ENSO
 !
 !  Calculate time-averaged SST index climatology

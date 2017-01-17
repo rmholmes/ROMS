@@ -2168,6 +2168,10 @@
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSair,:))
 #  endif
 # endif
+#ifdef ADD_WWB
+            CASE ('Aout(idWwb)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idWwb,:))
+#endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
             CASE ('Aout(idSSSc)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSSSc,:))
@@ -5180,6 +5184,11 @@
             IF (Aout(idSrad,ng)) WRITE (out,170) Aout(idSrad,ng),       &
      &         'Aout(idSrad)',                                          &
      &         'Write out averaged shortwave radiation flux.'
+#  endif
+#  ifdef ADD_WWB
+            IF (Aout(idWwb,ng)) WRITE (out,170) Aout(idWwb,ng),         &
+     &         'Aout(idWwb)',                                           &
+     &         'Write out WWB amplitude.'
 #  endif
 #  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
             IF (Aout(idSSSc,ng)) WRITE (out,170) Aout(idSSSc,ng),       &

@@ -56,6 +56,9 @@
 !  avgDV_avg1 time-averaged v-flux for 3D momentum coupling.           !
 !  avgDV_avg2 time-averaged v-flux for 3D momentum coupling.           !
 # endif
+# ifdef ADD_WWB
+!  avgWWBamp time-averaged WWB amplitude                               !
+# endif
 # ifdef STATS_ENSO
 !  avgSSTiClim time-averaged SST index climatology                     !
 # endif
@@ -195,6 +198,12 @@
 
           real(r8), pointer :: avgDV_avg1(:,:)
           real(r8), pointer :: avgDV_avg2(:,:)
+# endif
+# ifdef ADD_WWB
+!
+!  Time-averaged WWB amplitude.
+!
+          real(r8), pointer :: avgWWBamp
 # endif
 # ifdef STATS_ENSO
 !
@@ -419,6 +428,14 @@
       END IF
       IF (Aout(idVfx2,ng)) THEN
         allocate ( AVERAGE(ng) % avgDV_avg2(LBi:UBi,LBj:UBj) )
+      END IF
+# endif
+# ifdef ADD_WWB
+!
+!  Time-averaged WWB amplitude
+!
+      IF (Aout(idWwb,ng)) THEN
+        allocate ( AVERAGE(ng) % avgWWBamp )
       END IF
 # endif
 # ifdef STATS_ENSO
@@ -903,6 +920,14 @@
             AVERAGE(ng) % avgDV_avg2(i,j) = IniVal
           END DO
         END DO
+      END IF
+# endif
+# ifdef ADD_WWB
+!
+!  Time-averaged WWB amplitude.
+!
+      IF (Aout(idWwb,ng)) THEN
+        AVERAGE(ng) % avgWWBamp = IniVal
       END IF
 # endif
 # ifdef STATS_ENSO

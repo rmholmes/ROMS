@@ -438,6 +438,24 @@
      &                 SetParAccess = .FALSE.)
 
         IF (exit_flag.ne.NoError) RETURN
+# ifdef ADD_WWB
+!
+!  Define WWB amplitude time series.
+!
+        IF (Aout(idWwb,ng)) THEN
+          Vinfo( 1)=Vname(1,idWwb)
+          WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idWwb))
+          Vinfo( 3)=Vname(3,idWwb)
+          Vinfo(14)=Vname(4,idWwb)
+          Vinfo(16)=Vname(1,idtime)
+          Vinfo(22)='coordinates'
+          status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idWwb),   &
+       &                 NF_TYPE, 1, (/recdim/), Aval, Vinfo, ncname,   &
+       &                 SetParAccess = .FALSE.)
+
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+# endif
 !
 !  Define free-surface.
 !
@@ -2060,6 +2078,11 @@
           IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idtime))) THEN
             got_var(idtime)=.TRUE.
             AVG(ng)%Vid(idtime)=var_id(i)
+# ifdef ADD_WWB
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idWwb))) THEN
+            got_var(idWwb)=.TRUE.
+            AVG(ng)%Vid(idWwb)=var_id(i)
+# endif
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idFsur))) THEN
             got_var(idFsur)=.TRUE.
             AVG(ng)%Vid(idFsur)=var_id(i)
@@ -2378,6 +2401,14 @@
           exit_flag=3
           RETURN
         END IF
+# ifdef ADD_WWB
+        IF (.not.got_var(idWwb)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idWwb)),           &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+# endif
         IF (.not.got_var(idFsur).and.Aout(idFsur,ng)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idFsur)),          &
      &                                  TRIM(ncname)

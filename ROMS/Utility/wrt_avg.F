@@ -95,6 +95,18 @@
      &                      ncid = AVG(ng)%ncid,                        &
      &                      varid = AVG(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
+#ifdef ADD_WWB
+!
+!  Write out averaged WWB amplitude.
+!
+      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
+     &                      TRIM(Vname(idWwb,ng)),                      &
+     &                      AVERAGE(ng) % avgWWBamp,                    &
+     &                      (/AVG(ng)%Rindex/), (/1/),                  &
+     &                      ncid = AVG(ng)%ncid,                        &
+     &                      varid = AVG(ng)%Vid(idWwb))
+      IF (exit_flag.ne.NoError) RETURN
+#endif
 #ifdef STATS_ENSO
 !
 !  Write out SST index and current count.
