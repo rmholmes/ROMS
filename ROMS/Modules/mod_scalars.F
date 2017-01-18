@@ -2475,6 +2475,23 @@
           tnu4(itrc,ng)=IniVal
         END DO
 #ifdef STATS_ENSO
+        stenRegnN(ng)=5.0_r8
+        stenRegnE(ng)=-90.0_r8
+        stenRegnS(ng)=-5.0_r8
+        stenRegnW(ng)=-150.0_r8
+        stenRuwnd(ng)=0.0_r8
+        stenRvwnd(ng)=0.0_r8
+#ifdef SET_WINDSPEED
+        stenRwmag(ng)=0.0_r8
+#endif
+        stenRqair(ng)=0.0_r8
+        stenRtair(ng)=0.0_r8
+        stenRpair(ng)=0.0_r8
+        stenRsrad(ng)=0.0_r8
+        stenRlrad(ng)=0.0_r8
+#if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+        stenRsss(ng)=0.0_r8
+#endif
         stenCount(ng)=0
         DO i=1,stenNdays
           stenIndex(i,ng) = 0.0_r8
