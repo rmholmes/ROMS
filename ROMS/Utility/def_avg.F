@@ -455,6 +455,23 @@
           IF (exit_flag.ne.NoError) RETURN
         END IF
 # endif
+# ifdef STATS_ENSO
+!
+!  Define STATS_ENSO SST index anomaly time series.
+!
+        IF (Aout(idIanm,ng)) THEN
+          Vinfo( 1)=Vname(1,idIanm)
+          WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idIanm))
+          Vinfo( 3)=Vname(3,idIanm)
+          Vinfo(14)=Vname(4,idIanm)
+          Vinfo(16)=Vname(1,idtime)
+          status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idIanm),  &
+       &                 NF_TYPE, 1, (/recdim/), Aval, Vinfo, ncname,   &
+       &                 SetParAccess = .FALSE.)
+
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+# endif
 !
 !  Define free-surface.
 !
@@ -2082,6 +2099,11 @@
             got_var(idWwb)=.TRUE.
             AVG(ng)%Vid(idWwb)=var_id(i)
 # endif
+# ifdef STATS_ENSO
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idIanm))) THEN
+            got_var(idIanm)=.TRUE.
+            AVG(ng)%Vid(idIanm)=var_id(i)
+# endif
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idFsur))) THEN
             got_var(idFsur)=.TRUE.
             AVG(ng)%Vid(idFsur)=var_id(i)
@@ -2403,6 +2425,14 @@
 # ifdef ADD_WWB
         IF (.not.got_var(idWwb)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idWwb)),           &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+# endif
+# ifdef STATS_ENSO
+        IF (.not.got_var(idIanm)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idIanm)),          &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN

@@ -2172,6 +2172,10 @@
             CASE ('Aout(idWwb)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idWwb,:))
 #endif
+#ifdef STATS_ENSO
+            CASE ('Aout(idIanm)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idIanm,:))
+#endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
             CASE ('Aout(idSSSc)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSSSc,:))
@@ -5189,6 +5193,11 @@
             IF (Aout(idWwb,ng)) WRITE (out,170) Aout(idWwb,ng),         &
      &         'Aout(idWwb)',                                           &
      &         'Write out WWB amplitude.'
+#  endif
+#  ifdef STATS_ENSO
+            IF (Aout(idIanm,ng)) WRITE (out,170) Aout(idIanm,ng),       &
+     &         'Aout(idIanm)',                                          &
+     &         'Write out STATS_ENSO SST index anomaly.'
 #  endif
 #  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
             IF (Aout(idSSSc,ng)) WRITE (out,170) Aout(idSSSc,ng),       &

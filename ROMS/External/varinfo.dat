@@ -1731,6 +1731,15 @@
   'nulvar'
   1.0d0
 
+'SSTiAnom'                                         ! Input
+  'SST index anomaly'
+  'Celsius'                                        ! [degC]
+  'SST index anomaly, scalar, series'
+  'ocean_time'
+  'idIanm'
+  'nulvar'
+  1.0d0
+
 'UwindP'                                            ! Input
   'surface u-wind anomaly'
   'meter second-1'                                 ! [m/s]

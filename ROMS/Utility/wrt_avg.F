@@ -109,6 +109,16 @@
 #endif
 #ifdef STATS_ENSO
 !
+!  Write out STATS_ENSO SST index anomaly time series.
+!
+      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
+     &                      TRIM(Vname(idIanm,ng)),                     &
+     &                      stenIndex(stenCount(ng),ng),                &
+     &                      (/AVG(ng)%Rindex/), (/1/),                  &
+     &                      ncid = AVG(ng)%ncid,                        &
+     &                      varid = AVG(ng)%Vid(idIanm))
+      IF (exit_flag.ne.NoError) RETURN
+!
 !  Write out SST index and current count.
 !
       CALL netcdf_put_ivar (ng, iNLM, AVG(ng)%name, 'stenCount',        &
