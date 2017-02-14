@@ -3,7 +3,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2016 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2017 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -2609,6 +2609,7 @@
         LdefIRP(ng)=.FALSE.
         LdefITL(ng)=.FALSE.
         LdefMOD(ng)=.FALSE.
+        LdefQCK(ng)=.FALSE.
         LdefRST(ng)=.TRUE.
         LdefSTA(ng)=.TRUE.
         LdefTLM(ng)=.FALSE.
@@ -2620,6 +2621,7 @@
         LwrtDIA(ng)=.FALSE.
         LwrtHIS(ng)=.FALSE.
         LwrtPER(ng)=.FALSE.
+        LwrtQCK(ng)=.FALSE.
         LwrtRST(ng)=.FALSE.
         LwrtTLM(ng)=.FALSE.
         LwrtInfo(ng)=.TRUE.
