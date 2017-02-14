@@ -302,6 +302,7 @@
         integer  :: idUfx2        ! time averaged U-flux for 3D
         integer  :: idUice        ! ice U-velocity
         integer  :: idUsms        ! surface U-momentum stress
+        integer  :: idUsmsP       ! surface U-momentum stress anomaly
         integer  :: idUsuE        ! model surface eastward velocity
         integer  :: idUsur        ! surface U-velocity
         integer  :: idUtlf        ! 3D U-velocity impulse forcing
@@ -339,6 +340,7 @@
         integer  :: idVmKK        ! Kinetic energy vertical mixing
         integer  :: idVmKP        ! Length scale vertical mixing
         integer  :: idVsms        ! surface V-momentum stress
+        integer  :: idVsmsP       ! surface V-momentum stress anomaly
         integer  :: idVsuN        ! model surface northward velocity
         integer  :: idVsur        ! surface V-velocity
         integer  :: idVtlf        ! 3D V-velocity impulse forcing
@@ -999,8 +1001,12 @@
               idTvar(isalt)=varid
             CASE ('idUsms')
               idUsms=varid
+            CASE ('idUsmsP')
+              idUsmsP=varid
             CASE ('idVsms')
               idVsms=varid
+            CASE ('idVsmsP')
+              idVsmsP=varid
             CASE ('idUbms')
               idUbms=varid
             CASE ('idVbms')

@@ -274,8 +274,34 @@
 #  ifdef MASKING
      &                GRID(ng) % umask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % sustrOG)
+#  else
      &                FORCES(ng) % sustrG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idUsmsP, ncFRCid(idUsmsP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % umask,                                 &
+#   endif
+     &                FORCES(ng) % sustrPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%sustrG(i,j,1)=FORCES(ng)%sustrOG(i,j,1)+         &
+     &      stenIanom(ng)*stenRustr(ng)*FORCES(ng)%sustrPG(i,j,1)
+            FORCES(ng)%sustrG(i,j,2)=FORCES(ng)%sustrOG(i,j,2)+         &
+     &      stenIanom(ng)*stenRustr(ng)*FORCES(ng)%sustrPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#  endif
 
       CALL get_2dfld (ng, iNLM, idVsms, ncFRCid(idVsms,ng),             &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
@@ -283,9 +309,35 @@
 #  ifdef MASKING
      &                GRID(ng) % vmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % svstrOG)
+#  else
      &                FORCES(ng) % svstrG)
+#  endif
       IF (exit_flag.ne.NoError) RETURN
 # endif
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idVsmsP, ncFRCid(idVsmsP,ng),           &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % vmask,                                 &
+#   endif
+     &                FORCES(ng) % svstrPG)
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%svstrG(i,j,1)=FORCES(ng)%svstrOG(i,j,1)+         &
+     &      stenIanom(ng)*stenRvstr(ng)*FORCES(ng)%svstrPG(i,j,1)
+            FORCES(ng)%svstrG(i,j,2)=FORCES(ng)%svstrOG(i,j,2)+         &
+     &      stenIanom(ng)*stenRvstr(ng)*FORCES(ng)%svstrPG(i,j,2)
+          END DO
+        END DO
+      END IF
+#  endif
 
 # if defined FOUR_DVAR && defined BULK_FLUXES && defined NL_BULK_FLUXES
 !

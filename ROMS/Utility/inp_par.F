@@ -931,7 +931,9 @@
 !
         cff=1.0_r8/rho0
         Fscale(idUsms,ng)=cff*Fscale(idUsms,ng)
+        Fscale(idUsmsP,ng)=cff*Fscale(idUsmsP,ng)
         Fscale(idVsms,ng)=cff*Fscale(idVsms,ng)
+        Fscale(idVsmsP,ng)=cff*Fscale(idVsmsP,ng)
         Fscale(idUbms,ng)=cff*Fscale(idUbms,ng)
         Fscale(idVbms,ng)=cff*Fscale(idVbms,ng)
         Fscale(idUbrs,ng)=cff*Fscale(idUbrs,ng)

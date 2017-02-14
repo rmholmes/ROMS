@@ -773,6 +773,10 @@
               Npts=load_r(Nval, Rval, Ngrids, stenRuwnd)
             CASE ('stenRvwnd')
               Npts=load_r(Nval, Rval, Ngrids, stenRvwnd)
+            CASE ('stenRustr')
+              Npts=load_r(Nval, Rval, Ngrids, stenRustr)
+            CASE ('stenRvstr')
+              Npts=load_r(Nval, Rval, Ngrids, stenRvstr)
 #ifdef SET_WINDSPEED
             CASE ('stenRwmag')
               Npts=load_r(Nval, Rval, Ngrids, stenRwmag)
@@ -3789,6 +3793,12 @@
      &          'SST index (1/degC).'
           WRITE (out,160) stenRvwnd(ng), 'stenRvwnd',                   &
      &          'Coupling coefficient of Vwind pattern onto',           &
+     &          'SST index (1/degC).'
+          WRITE (out,160) stenRustr(ng), 'stenRustr',                   &
+     &          'Coupling coefficient of sustr pattern onto',           &
+     &          'SST index (1/degC).'
+          WRITE (out,160) stenRvstr(ng), 'stenRvstr',                   &
+     &          'Coupling coefficient of svstr pattern onto',           &
      &          'SST index (1/degC).'
 # ifdef SET_WINDSPEED
           WRITE (out,160) stenRwmag(ng), 'stenRwmag',                   &

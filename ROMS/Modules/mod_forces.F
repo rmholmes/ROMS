@@ -185,6 +185,14 @@
 !               RHO-points, two-time snapshots.                        !
 !  wMagOG      Dummy location for background wMagG input               !
 #endif
+#ifdef BULK_STRESS
+!  sustrPG     Kinematic surface momentum flux anomaly in              !
+!                 the XI-direction (m2/s2) at horizontal U-points.     !
+!  sustrOG     Dummy location for background sustrG input              !
+!  svstrPG     Kinematic surface momentum flux anomaly in              !
+!                 the ETA-direction (m2/s2) at horizontal U-points.    !
+!  svstrOG     Dummy location for background sustrG input              !
+#endif
 !  PairPG       Surface air pressure anomaly (mb), two-time snapshots. !
 !  PairOG       Dummy location for background PairG input              !
 !  TairPG       Surface air temperature anomaly (Celsius), two-time    !
@@ -234,6 +242,12 @@
      defined NL_BULK_FLUXES) || defined BULK_STRESS
           real(r8), pointer :: sustrG(:,:,:)
           real(r8), pointer :: svstrG(:,:,:)
+# ifdef STATS_ENSO
+          real(r8), pointer :: sustrPG(:,:,:)
+          real(r8), pointer :: svstrPG(:,:,:)
+          real(r8), pointer :: sustrOG(:,:,:)
+          real(r8), pointer :: svstrOG(:,:,:)
+# endif
 #endif
 # ifdef BULK_STRESS
           real(r8), pointer :: sustrI(:,:)
@@ -600,6 +614,12 @@
      defined NL_BULK_FLUXES) || defined BULK_STRESS
       allocate ( FORCES(ng) % sustrG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % svstrG(LBi:UBi,LBj:UBj,2) )
+# ifdef STATS_ENSO
+      allocate ( FORCES(ng) % sustrPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % svstrPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % sustrOG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % svstrOG(LBi:UBi,LBj:UBj,2) )
+# endif
 #endif
 #ifdef BULK_STRESS
       allocate ( FORCES(ng) % sustrI(LBi:UBi,LBj:UBj) )
@@ -1040,6 +1060,16 @@
             FORCES(ng) % sustrG(i,j,2) = IniVal
             FORCES(ng) % svstrG(i,j,1) = IniVal
             FORCES(ng) % svstrG(i,j,2) = IniVal
+# ifdef STATS_ENSO
+            FORCES(ng) % sustrPG(i,j,1) = IniVal
+            FORCES(ng) % sustrPG(i,j,2) = IniVal
+            FORCES(ng) % svstrPG(i,j,1) = IniVal
+            FORCES(ng) % svstrPG(i,j,2) = IniVal
+            FORCES(ng) % sustrOG(i,j,1) = IniVal
+            FORCES(ng) % sustrOG(i,j,2) = IniVal
+            FORCES(ng) % svstrOG(i,j,1) = IniVal
+            FORCES(ng) % svstrOG(i,j,2) = IniVal
+# endif
 #endif
 #ifdef BULK_STRESS
             FORCES(ng) % sustrI(i,j) = IniVal
