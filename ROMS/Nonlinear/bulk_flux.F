@@ -115,6 +115,10 @@
 # ifdef SET_WINDSPEED
      &                     FORCES(ng) % wMag,                           &
 # endif
+# ifdef BULK_STRESS
+     &                     FORCES(ng) % sustrI,                         &
+     &                     FORCES(ng) % svstrI,                         &
+# endif
 # ifdef CLOUDS
      &                     FORCES(ng) % cloud,                          &
 # endif
@@ -168,6 +172,9 @@
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
 # ifdef SET_WINDSPEED
      &                           extWmag,                               &
+# endif
+# ifdef BULK_STRESS
+     &                           sustrI,svstrI,                         &
 # endif
 # ifdef CLOUDS
      &                           cloud,                                 &
@@ -238,6 +245,10 @@
 #  ifdef SET_WINDSPEED
       real(r8), intent(in) :: extWmag(LBi:,LBj:)
 #  endif
+#  ifdef BULK_STRESS
+      real(r8), intent(in) :: sustrI(LBi:,LBj:)
+      real(r8), intent(in) :: svstrI(LBi:,LBj:)
+#  endif
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:,LBj:)
 #  endif
@@ -294,6 +305,10 @@
       real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
 #  ifdef SET_WINDSPEED
       real(r8), intent(in) :: extWmag(LBi:UBi,LBj:UBj)
+#  endif
+#  ifdef BULK_STRESS
+      real(r8), intent(in) :: sustrI(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: svstrI(LBi:UBi,LBj:UBj)
 #  endif
 #  ifdef CLOUDS
       real(r8), intent(in) :: cloud(LBi:UBi,LBj:UBj)
@@ -804,10 +819,12 @@
 !  Compute wind stress components (N/m2), Tau.
 !
           cff=rhoAir(i)*Cd*Wspeed
-# if defined SET_WINDSPEED && defined SET_WINDQUAD
+# ifndef BULK_STRESS
+#  if defined SET_WINDSPEED && defined SET_WINDQUAD
           Taux(i,j)=(cff/Wspeed*Uwind(i,j)+Taur*SIGN(1.0_r8,Uwind(i,j)))
-# else
+#  else
           Taux(i,j)=(cff*Uwind(i,j)+Taur*SIGN(1.0_r8,Uwind(i,j)))
+#  endif
 # endif
 # ifdef ADD_WWB
           Taux(i,j)=Taux(i,j) + WWBamp *                                &
@@ -820,10 +837,12 @@
 # ifdef WET_DRY
           Taux(i,j)=Taux(i,j)*rmask_wet(i,j)
 # endif
-# if defined SET_WINDSPEED && defined SET_WINDQUAD
+# ifndef BULK_STRESS
+#  if defined SET_WINDSPEED && defined SET_WINDQUAD
           Tauy(i,j)=(cff/Wspeed*Vwind(i,j)+Taur*SIGN(1.0_r8,Vwind(i,j)))
-# else
+#  else
           Tauy(i,j)=(cff*Vwind(i,j)+Taur*SIGN(1.0_r8,Vwind(i,j)))
+#  endif
 # endif
 # ifdef MASKING
           Tauy(i,j)=Tauy(i,j)*rmask(i,j)
@@ -906,6 +925,9 @@
       DO j=JstrR,JendR
         DO i=Istr,IendR
           sustr(i,j)=cff*(Taux(i-1,j)+Taux(i,j))
+# ifdef BULK_STRESS
+          sustr(i,j)=sustr(i,j)+sustrI(i,j)
+# endif
 # ifdef MASKING
           sustr(i,j)=sustr(i,j)*umask(i,j)
 # endif
@@ -917,6 +939,9 @@
       DO j=Jstr,JendR
         DO i=IstrR,IendR
           svstr(i,j)=cff*(Tauy(i,j-1)+Tauy(i,j))
+# ifdef BULK_STRESS
+          svstr(i,j)=svstr(i,j)+svstrI(i,j)
+# endif
 # ifdef MASKING
           svstr(i,j)=svstr(i,j)*vmask(i,j)
 # endif

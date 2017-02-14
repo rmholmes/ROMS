@@ -261,7 +261,8 @@
 #endif
 
 #ifndef AIR_OCEAN
-# if !defined ANA_SMFLUX && !defined BULK_FLUXES
+# if (!defined ANA_SMFLUX && !defined BULK_FLUXES) || \
+       defined BULK_STRESS
 !
 !-----------------------------------------------------------------------
 !  Surface wind stress components.

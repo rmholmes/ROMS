@@ -530,7 +530,7 @@
 # endif
 
 # ifndef AIR_OCEAN
-#  ifndef BULK_FLUXES
+#  if !defined BULK_FLUXES || defined BULK_STRESS
 !
 !-----------------------------------------------------------------------
 !  Set kinematic surface momentum flux (m2/s2).
@@ -542,14 +542,22 @@
       CALL set_2dfld_tile (ng, tile, iNLM, idUsms,                      &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     FORCES(ng)%sustrG,                           &
+#   ifdef BULK_STRESS
+     &                     FORCES(ng)%sustrI,                           &
+#   else
      &                     FORCES(ng)%sustr,                            &
+#   endif
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 
       CALL set_2dfld_tile (ng, tile, iNLM, idVsms,                      &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     FORCES(ng)%svstrG,                           &
+#   ifdef BULK_STRESS
+     &                     FORCES(ng)%svstrI,                           &
+#   else
      &                     FORCES(ng)%svstr,                            &
+#   endif
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 
@@ -563,22 +571,39 @@
      &    (Iinfo(6,idUsms,ng).ne.Mm(ng)+2)) THEN
         DO j=JstrR,JendR
           DO i=IstrR,IendR
+#     ifdef BULK_STRESS
+            cff1=FORCES(ng)%sustrI(i,j)*GRID(ng)%CosAngler(i,j)+        &
+     &           FORCES(ng)%svstrI(i,j)*GRID(ng)%SinAngler(i,j)
+            cff2=FORCES(ng)%svstrI(i,j)*GRID(ng)%CosAngler(i,j)-        &
+     &           FORCES(ng)%sustrI(i,j)*GRID(ng)%SinAngler(i,j)
+            FORCES(ng)%sustrI(i,j)=cff1
+            FORCES(ng)%svstrI(i,j)=cff2
+#     else
             cff1=FORCES(ng)%sustr(i,j)*GRID(ng)%CosAngler(i,j)+         &
      &           FORCES(ng)%svstr(i,j)*GRID(ng)%SinAngler(i,j)
             cff2=FORCES(ng)%svstr(i,j)*GRID(ng)%CosAngler(i,j)-         &
      &           FORCES(ng)%sustr(i,j)*GRID(ng)%SinAngler(i,j)
             FORCES(ng)%sustr(i,j)=cff1
             FORCES(ng)%svstr(i,j)=cff2
+#     endif
           END DO
         END DO
 
         IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
           CALL exchange_u2d_tile (ng, tile,                             &
      &                            LBi, UBi, LBj, UBj,                   &
+#     ifdef BULK_STRESS
+     &                            FORCES(ng)%sustrI)
+#     else
      &                            FORCES(ng)%sustr)
+#     endif
           CALL exchange_v2d_tile (ng, tile,                             &
      &                            LBi, UBi, LBj, UBj,                   &
+#     ifdef BULK_STRESS
+     &                            FORCES(ng)%svstrI)
+#     else
      &                            FORCES(ng)%svstr)
+#     endif
         END IF
 
 #     ifdef DISTRIBUTE
@@ -586,8 +611,13 @@
      &                      LBi, UBi, LBj, UBj,                         &
      &                      NghostPoints,                               &
      &                      EWperiodic(ng), NSperiodic(ng),             &
+#      ifdef BULK_STRESS
+     &                      FORCES(ng)%sustrI,                          &
+     &                      FORCES(ng)%svstrI)
+#      else
      &                      FORCES(ng)%sustr,                           &
      &                      FORCES(ng)%svstr)
+#      endif
 #     endif
       END IF
 #    endif

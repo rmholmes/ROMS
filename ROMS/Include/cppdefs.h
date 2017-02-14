@@ -172,6 +172,8 @@
 **                     Vwind*wMag quadratic terms (used to get correct       **
 **                     mean wind stress when using time-average Uwind        **
 **                     and Vwind fields).                                    **
+** BULK_STRESS         use if setting wind stress explicitely from           **
+**                     file but using BULK_FLUXES for heat fluxes.           **
 ** ADD_WWB             use if adding tau_x gaussian wind bursts              **
 ** NL_BULK_FLUXES      use bulk fluxes computed by nonlinear model           **
 ** COOL_SKIN           use if cool skin correction                           **

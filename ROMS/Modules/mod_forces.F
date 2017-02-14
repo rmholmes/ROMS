@@ -18,6 +18,10 @@
 !                 the ETA-direction (m2/s2) at horizontal V-points.    !
 !  svstrG       Latest two-time snapshots of input "svstr" grided      !
 !                 data used for interpolation.                         !
+# ifdef BULK_STRESS
+!  sustrI       Input surface zonal stress from file (m2/s2)           !
+!  svstrI       Input surface meridional stress from file (m2/s2)      !
+# endif
 !                                                                      !
 !  Bottom momentum stresses.                                           !
 !                                                                      !
@@ -226,11 +230,15 @@
 # endif
           real(r8), pointer :: sustr(:,:)
           real(r8), pointer :: svstr(:,:)
-#if !defined ANA_SMFLUX     && !defined BULK_FLUXES || \
-     defined NL_BULK_FLUXES
+#if (!defined ANA_SMFLUX     && !defined BULK_FLUXES || \
+     defined NL_BULK_FLUXES) || defined BULK_STRESS
           real(r8), pointer :: sustrG(:,:,:)
           real(r8), pointer :: svstrG(:,:,:)
 #endif
+# ifdef BULK_STRESS
+          real(r8), pointer :: sustrI(:,:)
+          real(r8), pointer :: svstrI(:,:)
+# endif
 #ifdef ADJUST_WSTRESS
           real(r8), pointer :: ustr(:,:,:,:)
           real(r8), pointer :: vstr(:,:,:,:)
@@ -588,10 +596,14 @@
       allocate ( FORCES(ng) % sustr(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % svstr(LBi:UBi,LBj:UBj) )
 
-#if !defined ANA_SMFLUX     && !defined BULK_FLUXES || \
-     defined NL_BULK_FLUXES
+#if (!defined ANA_SMFLUX     && !defined BULK_FLUXES || \
+     defined NL_BULK_FLUXES) || defined BULK_STRESS
       allocate ( FORCES(ng) % sustrG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % svstrG(LBi:UBi,LBj:UBj,2) )
+#endif
+#ifdef BULK_STRESS
+      allocate ( FORCES(ng) % sustrI(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % svstrI(LBi:UBi,LBj:UBj) )
 #endif
 #ifdef ADJUST_WSTRESS
       allocate ( FORCES(ng) % ustr(LBi:UBi,LBj:UBj,Nfrec(ng),2) )
@@ -1022,12 +1034,16 @@
 #endif
             FORCES(ng) % sustr(i,j) = IniVal
             FORCES(ng) % svstr(i,j) = IniVal
-#if !defined ANA_SMFLUX     && !defined BULK_FLUXES || \
-     defined NL_BULK_FLUXES
+#if (!defined ANA_SMFLUX     && !defined BULK_FLUXES || \
+     defined NL_BULK_FLUXES) || defined BULK_STRESS
             FORCES(ng) % sustrG(i,j,1) = IniVal
             FORCES(ng) % sustrG(i,j,2) = IniVal
             FORCES(ng) % svstrG(i,j,1) = IniVal
             FORCES(ng) % svstrG(i,j,2) = IniVal
+#endif
+#ifdef BULK_STRESS
+            FORCES(ng) % sustrI(i,j) = IniVal
+            FORCES(ng) % svstrI(i,j) = IniVal
 #endif
             FORCES(ng) % bustr(i,j) = IniVal
             FORCES(ng) % bvstr(i,j) = IniVal
