@@ -631,6 +631,12 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' STATS_ENSO,'
 #endif
+#if defined BULK_FLUXES && defined BULK_STRESS
+      IF (Master) WRITE (stdout,20) 'BULK_STRESS',                      &
+     &   'Using bulk fluxes for heat fluxes but set wind stresses.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' BULK_STRESS,'
+#endif
 #ifdef BVF_MIXING
 !
       IF (Master) WRITE (stdout,20) 'BVF_MIXING',                       &
