@@ -1481,8 +1481,8 @@
         real(r8) :: lmd_nu0c = 0.01_r8        ! m2/s
 !!      real(r8) :: lmd_nu0c = 0.1_r8         ! m2/s
 !!      real(r8) :: lmd_nu0c = 0.05_r8        ! m2/s
-        real(r8) :: lmd_nu0m = 10.0E-4_r8     ! m2/s
-        real(r8) :: lmd_nu0s = 10.0E-4_r8     ! m2/s
+        real(r8) :: lmd_nu0m = 20.0E-4_r8     ! m2/s
+        real(r8) :: lmd_nu0s = 20.0E-4_r8     ! m2/s
 !!      real(r8) :: lmd_nu0m = 50.0E-4_r8     ! m2/s
 !!      real(r8) :: lmd_nu0s = 50.0E-4_r8     ! m2/s
         real(r8) :: lmd_nuf = 10.0E-4_r8      ! m2/s
