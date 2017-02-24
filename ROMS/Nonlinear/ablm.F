@@ -212,7 +212,8 @@
 !  Calculate RHS of Tair advection/diffusion equation
 !-----------------------------------------------------------------------
 !
-! Calculate vertical velocity from continuity, assuming w(0) = 0
+! Calculate vertical velocity at 2*zWind from continuity, assuming w(0) = 0.
+! Note: 0.5*2
       DO j=JstrV-1,Jend
         DO i=IstrU-1,Iend
           wVel(i,j) =  -(pm(i,j)*(Uwind(i+1,j)-Uwind(i-1,j))            &
@@ -574,7 +575,8 @@
           TairK = Tair(i,j)+273.16_r8
           Ttop = TairK - ABLM_lapse * ( hABLM(ng) - zWind )
 
-          LWup = 0.5_r8*StefBo*(0.5_r8*TairK+0.5_r8*Ttop)**4
+          LWup = 0.5_r8*StefBo*Ttop**4
+!          LWup = 0.5_r8*StefBo*(0.5_r8*TairK+0.5_r8*Ttop)**4    ! Option to reduce height at which long-wave radiated
           LWdn = 0.5_r8*StefBo*TairK**4
           OCup = emmiss*StefBo*TseaK**4
 
@@ -601,7 +603,8 @@
 
           lhvap = (2.501_r8-0.00237_r8*TseaC)*1.0E+6_r8
           evap = -lhflx(i,j) / HscaleW / lhvap
-          entrain = 0.25*(evap/(Qsea - Qair(i,j)/1000.0_r8))*Q100(i,j)
+!          entrain = 0.25*(evap/(Qsea - Qair(i,j)/1000.0_r8))*Q100(i,j)    ! This line is consistent with cheapAML. The following line is consistent with Deremble paper.
+          entrain = 0.25*evap/((Qsea / (Qair(i,j)/1000.0_r8))-1.0_r8)      
 
           QairTen = (evap - entrain) / hABLM(ng) / ABLM_rhoa
 #ifdef MASKING
