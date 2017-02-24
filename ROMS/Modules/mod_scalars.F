@@ -350,6 +350,9 @@
 !    ABeps         Adams-Bashforth small number
 !    hABLM         Thickness of atmospheric boundary layer
 !    ABLM_rhoa     Density of air
+!    muABLM        Proportionality constant in top of BL humidity
+!                  entrainment
+!    hlwABLM       Height of upwards long-wave radiation. 0 = 10m, 1 = hABLM.
 !
 !    ABLM_cvthres  Convection threshold on Tair
 !
@@ -363,6 +366,8 @@
         logical  :: ABfirst = .TRUE.             ! Overwritten after first step
         real(r8) :: ABeps = 0.01_r8              ! 
         real(r8), allocatable :: hABLM(:)        ! m
+        real(r8), allocatable :: muABLM(:)       ! default 0.25
+        real(r8), allocatable :: hlwABLM(:)      ! 0 < * < 1
         real(r8) :: ABLM_rhoa = 1.3_r8           ! kgm-3
         real(r8) :: ABLM_lapse = 0.0098_r8       ! degC/m
         integer, allocatable  :: ABLM_maskwid(:) ! grid units
@@ -1888,6 +1893,8 @@
       allocate ( ablmK(Ngrids) )
       allocate ( ntatm(Ngrids) )
       allocate ( hABLM(Ngrids) )
+      allocate ( muABLM(Ngrids) )
+      allocate ( hlwABLM(Ngrids) )
       allocate ( ABLM_maskwid(Ngrids) )
       allocate ( ABLM_lrelax(Ngrids) )
       allocate ( ABLM_cvthres(Ngrids) )
@@ -2523,6 +2530,8 @@
         ABLM_maskwid(ng) = 1
         ABLM_lrelax(ng) = 0.1_r8
         hABLM(ng) = 1000.0_r8
+        muABLM(ng) = 0.25_r8
+        hlwABLM(ng) = 1.0_r8
         ABLM_cvthres(ng) = 28.0_r8
 #endif
 #ifdef ADD_WWB
