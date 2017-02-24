@@ -795,6 +795,10 @@
             CASE ('stenRsss')
               Npts=load_r(Nval, Rval, Ngrids, stenRsss)
 #  endif
+#  if defined ABLM && defined ABLM_BLHVAR
+            CASE ('stenRblh')
+              Npts=load_r(Nval, Rval, Ngrids, stenRblh)
+#  endif
 # endif
 # ifdef ADD_WWB
             CASE ('WWBxC')
@@ -3841,6 +3845,11 @@
           WRITE (out,160) stenRsss(ng), 'stenRsss',                     &
      &          'Coupling coefficient of sea surface salinity pattern', &
      &          'onto SST index (1/degC).'
+#  endif
+#  if defined ABLM && defined ABLM_BLHVAR
+          WRITE (out,160) stenRblh(ng), 'stenRblh',                     &
+     &          'Coupling coefficient of boundary layer height',        &
+     &          'pattern onto SST index (1/degC).'
 #  endif
 # endif
 # ifdef ADD_WWB

@@ -528,6 +528,13 @@
       IF (exit_flag.ne.NoError) RETURN
 # endif
 
+# if defined ABLM && defined ABLM_BLHVAR
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRblh',              &
+     &                      stenRblh(ng), (/0/), (/0/),                 &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+
       CALL netcdf_put_ivar (ng, model, ncname, 'stenNdays',             &
      &                      stenNdays, (/0/), (/0/),                    &
      &                      ncid = ncid)

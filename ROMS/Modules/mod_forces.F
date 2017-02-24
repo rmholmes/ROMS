@@ -201,6 +201,11 @@
 !                 the ETA-direction (m2/s2) at horizontal U-points.    !
 !  svstrOG     Dummy location for background sustrG input              !
 #endif
+# if defined ABLM && defined ABLM_BLHVAR
+!  blhPG        Atmospheric boundary layer height anomaly at           !
+!               horizontal RHO-points, two-time snapshots.             !
+!  blhOG        Dummy location for background blhG input               !
+# endif
 !  PairPG       Surface air pressure anomaly (mb), two-time snapshots. !
 !  PairOG       Dummy location for background PairG input              !
 !  TairPG       Surface air temperature anomaly (Celsius), two-time    !
@@ -427,6 +432,10 @@
 #  if defined ABLM && defined ABLM_BLHVAR
           real(r8), pointer :: blh(:,:)
           real(r8), pointer :: blhG(:,:,:)
+#   ifdef STATS_ENSO
+          real(r8), pointer :: blhPG(:,:,:)
+          real(r8), pointer :: blhOG(:,:,:)
+#   endif
 #  endif
 # endif
 
@@ -813,6 +822,10 @@
 #  if defined ABLM && defined ABLM_BLHVAR
       allocate ( FORCES(ng) % blh(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % blhG(LBi:UBi,LBj:UBj,2) )
+#   ifdef STATS_ENSO
+      allocate ( FORCES(ng) % blhPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % blhOG(LBi:UBi,LBj:UBj,2) )
+#   endif
 #  endif
 # endif
 
@@ -1261,6 +1274,12 @@
 #  if defined ABLM && defined ABLM_BLHVAR
             FORCES(ng) % blhG(i,j,1) = IniVal
             FORCES(ng) % blhG(i,j,2) = IniVal
+#   ifdef STATS_ENSO
+            FORCES(ng) % blhPG(i,j,1) = IniVal
+            FORCES(ng) % blhPG(i,j,2) = IniVal
+            FORCES(ng) % blhOG(i,j,1) = IniVal
+            FORCES(ng) % blhOG(i,j,2) = IniVal
+#   endif
 #  endif
 #  ifndef ANA_WINDS
             FORCES(ng) % UwindG(i,j,1) = IniVal

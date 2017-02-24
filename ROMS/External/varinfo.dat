@@ -1794,6 +1794,15 @@
   'r2dvar'
   1.0d0
 
+'blhP'                                             ! Input
+  'atmospheric boundary layer height anomaly'
+  'meter'                                          ! [m]
+  'blh anomaly, scalar, series'
+  'blh_time'
+  'idHblyP'
+  'r2dvar'
+  1.0d0
+
 'PairP'                                            ! Input
   'surface air pressure anomaly'
   'millibar'                                       ! [millibar]

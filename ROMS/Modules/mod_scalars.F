@@ -391,6 +391,7 @@
 !    stenRsrad      Coupling coefficient of swrad pattern onto SST index
 !    stenRlrad      Coupling coefficient of lwrad_down pattern onto SST index
 !    stenRsss       Coupling coefficient of SSS pattern onto SST index
+!    stenRblh       Coupling coefficient of blh pattern onto SST index
 !
 !    stenCount      Counter for current day of stenNdays
 !    stenIndex      the SST index over the last stenNdays
@@ -415,6 +416,9 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         real(r8), allocatable :: stenRsss(:)       ! degC^(-1)
 # endif
+#if defined ABLM && defined ABLM_BLHVAR
+        real(r8), allocatable :: stenRblh(:)       ! degC^(-1)
+#endif
         integer, allocatable  :: stenCount(:)
         real(r8), allocatable :: stenIndex(:,:)    ! degC
         real(r8), allocatable :: stenIanom(:)      ! degC
@@ -1908,6 +1912,9 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
       allocate ( stenRsss(Ngrids) )
 # endif
+#if defined ABLM && defined ABLM_BLHVAR
+      allocate ( stenRblh(Ngrids) )
+#endif
       allocate ( stenCount(Ngrids) )
       allocate ( stenIndex(stenNdays,Ngrids) )
       allocate ( stenIanom(Ngrids) )
@@ -2499,6 +2506,9 @@
         stenRlrad(ng)=0.0_r8
 #if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         stenRsss(ng)=0.0_r8
+#endif
+#if defined ABLM && defined ABLM_BLHVAR
+        stenRblh(ng)=0.0_r8
 #endif
         stenCount(ng)=0
         DO i=1,stenNdays

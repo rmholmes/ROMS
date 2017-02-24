@@ -269,12 +269,39 @@
       CALL get_2dfld (ng, iNLM, idHbly, ncFRCid(idHbly,ng),             &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
      &                LBi, UBi, LBj, UBj, 2, 1,                         &
+# ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+# endif
+# ifdef STATS_ENSO
+     &                FORCES(ng) % blhOG)
+# else
+     &                FORCES(ng) % blhG)
+# endif
+
+      IF (exit_flag.ne.NoError) RETURN
+# ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng , iNLM, idHblyP, ncFRCid(idHblyP,ng),          &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
-     &                FORCES(ng) % blhG)
-
+     &                FORCES(ng) % blhPG)
       IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%blhG(i,j,1)=FORCES(ng)%blhOG(i,j,1)+             &
+     &      stenIanom(ng)*stenRblh(ng)*FORCES(ng)%blhPG(i,j,1)
+            FORCES(ng)%blhG(i,j,2)=FORCES(ng)%blhOG(i,j,2)+             &
+     &      stenIanom(ng)*stenRblh(ng)*FORCES(ng)%blhPG(i,j,2)
+          END DO
+        END DO
+      END IF
+# endif
 #endif
 
 #ifndef AIR_OCEAN
