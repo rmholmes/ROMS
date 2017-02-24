@@ -260,6 +260,23 @@
 # endif
 #endif
 
+#if defined ABLM && defined ABLM_BLHVAR
+!
+!-----------------------------------------------------------------------
+!  Atmospheric boundary layer depth.
+!-----------------------------------------------------------------------
+!
+      CALL get_2dfld (ng, iNLM, idHbly, ncFRCid(idHbly,ng),             &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#  ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#  endif
+     &                FORCES(ng) % blhG)
+
+      IF (exit_flag.ne.NoError) RETURN
+#endif
+
 #ifndef AIR_OCEAN
 # if (!defined ANA_SMFLUX && !defined BULK_FLUXES) || \
        defined BULK_STRESS

@@ -125,6 +125,14 @@
 !  wMagG        Latest two-time snapshots of input "wMag" grided       !
 !                 data used for interpolation.                         !
 #endif
+# if defined ABLM && defined ABLM_BLHVAR
+!                                                                      !
+!  Atmospheric boundary layer height                                   !
+!                                                                      !
+!  blh          Atmospheric boundary layer height at RHO-points.       !
+!  blhG         Latest two-time snapshots of input "blh" grided        !
+!               data used for interpolation.                           !
+# endif
 !                                                                      !
 !  Rain fall rate.                                                     !
 !                                                                      !
@@ -415,6 +423,10 @@
           real(r8), pointer :: wMagOG(:,:,:)
 #   endif
 #   endif
+#  endif
+#  if defined ABLM && defined ABLM_BLHVAR
+          real(r8), pointer :: blh(:,:)
+          real(r8), pointer :: blhG(:,:,:)
 #  endif
 # endif
 
@@ -797,6 +809,10 @@
       allocate ( FORCES(ng) % wMagOG(LBi:UBi,LBj:UBj,2) )
 #    endif
 #   endif
+#  endif
+#  if defined ABLM && defined ABLM_BLHVAR
+      allocate ( FORCES(ng) % blh(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % blhG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
 
@@ -1198,6 +1214,9 @@
 #  ifdef SET_WINDSPEED
             FORCES(ng) % wMag(i,j) = IniVal
 #  endif
+#  if defined ABLM && defined ABLM_BLHVAR
+            FORCES(ng) % blh(i,j) = IniVal
+#  endif
 # endif
 # ifdef BULK_FLUXES
             FORCES(ng) % rain(i,j) = IniVal
@@ -1238,6 +1257,10 @@
             FORCES(ng) % TairOG(i,j,1) = IniVal
             FORCES(ng) % TairOG(i,j,2) = IniVal
 #   endif
+#  endif
+#  if defined ABLM && defined ABLM_BLHVAR
+            FORCES(ng) % blhG(i,j,1) = IniVal
+            FORCES(ng) % blhG(i,j,2) = IniVal
 #  endif
 #  ifndef ANA_WINDS
             FORCES(ng) % UwindG(i,j,1) = IniVal

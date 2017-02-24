@@ -231,6 +231,9 @@
           real(r8), pointer :: avgUwind(:,:)
           real(r8), pointer :: avgVwind(:,:)
           real(r8), pointer :: avgwMag(:,:)
+#   if defined ABLM && defined ABLM_BLHVAR
+          real(r8), pointer :: avgblh(:,:)
+#   endif
 #  endif
           real(r8), pointer :: avgstf(:,:)
           real(r8), pointer :: avgswf(:,:)
@@ -482,6 +485,11 @@
       IF (Aout(idSair,ng)) THEN
         allocate ( AVERAGE(ng) % avgwMag(LBi:UBi,LBj:UBj) )
       END IF
+#   if defined ABLM && defined ABLM_BLHVAR
+      IF (Aout(idHbly,ng)) THEN
+        allocate ( AVERAGE(ng) % avgblh(LBi:UBi,LBj:UBj) )
+      END IF
+#   endif
 #  endif
       IF (Aout(idTsur(itemp),ng)) THEN
         allocate ( AVERAGE(ng) % avgstf(LBi:UBi,LBj:UBj) )
@@ -1009,6 +1017,15 @@
           END DO
         END DO
       END IF
+#   if defined ABLM && defined ABLM_BLHVAR
+      IF (Aout(idHbly,ng)) THEN
+        DO j=Jmin,Jmax
+          DO i=Imin,Imax
+            AVERAGE(ng) % avgblh(i,j) = IniVal
+          END DO
+        END DO
+      END IF
+#   endif
 #  endif
       IF (Aout(idTsur(itemp),ng)) THEN
         DO j=Jmin,Jmax

@@ -1686,6 +1686,15 @@
                 RETURN
               END IF
               Npts=load_l(Nval, Cval, Ngrids, Hout(idSair,:))
+#  if defined ABLM && defined ABLM_BLHVAR
+            CASE ('Hout(idHbly)')
+              IF (idHbly.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idHbly'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idHbly,:))
+#  endif
 # endif
 #endif
 #if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
@@ -2018,6 +2027,10 @@
               Npts=load_l(Nval, Cval, Ngrids, Qout(idVair,:))
             CASE ('Qout(idSair)')
               Npts=load_l(Nval, Cval, Ngrids, Qout(idSair,:))
+#  if defined ABLM && defined ABLM_BLHVAR
+            CASE ('Qout(idHbly)')
+              Npts=load_l(Nval, Cval, Ngrids, Qout(idHbly,:))
+#  endif
 # endif
 #endif
 #if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
@@ -2170,6 +2183,10 @@
               Npts=load_l(Nval, Cval, Ngrids, Aout(idVair,:))
             CASE ('Aout(idSair)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idSair,:))
+#   if defined ABLM && defined ABLM_BLHVAR
+            CASE ('Aout(idHbly)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idHbly,:))
+#   endif
 #  endif
 # endif
 #ifdef ADD_WWB
@@ -4657,6 +4674,11 @@
             IF (Hout(idSair,ng)) WRITE (out,170) Hout(idSair,ng),       &
      &         'Hout(idSair)',                                          &
      &         'Write out surface wind speed magnitude.'
+#  if defined ABLM && defined ABLM_BLHVAR
+            IF (Hout(idHbly,ng)) WRITE (out,170) Hout(idHbly,ng),       &
+     &         'Hout(idHbly)',                                          &
+     &         'Write out atmospheric boundary layer height.'
+#  endif
 # endif
             IF (Hout(idTsur(itemp),ng)) WRITE (out,170)                 &
      &          Hout(idTsur(itemp),ng), 'Hout(idTsur)',                 &
@@ -4975,6 +4997,11 @@
             IF (Qout(idSair,ng)) WRITE (out,170) Qout(idSair,ng),       &
      &         'Qout(idSair)',                                          &
      &         'Write out surface wind speed magnitude.'
+#  if defined ABLM && defined ABLM_BLHVAR
+            IF (Qout(idHbly,ng)) WRITE (out,170) Qout(idHbly,ng),       &
+     &         'Qout(idHbly)',                                          &
+     &         'Write out atmospheric boundary layer height.'
+#  endif
 # endif
             IF (Qout(idTsur(itemp),ng)) WRITE (out,170)                 &
      &          Qout(idTsur(itemp),ng), 'Qout(idTsur)',                 &
@@ -5187,6 +5214,11 @@
             IF (Aout(idSair,ng)) WRITE (out,170) Aout(idSair,ng),       &
      &         'Aout(idSair)',                                          &
      &         'Write out averaged surface wind speed magnitude.'
+#   if defined ABLM && defined ABLM_BLHVAR
+            IF (Aout(idHbly,ng)) WRITE (out,170) Aout(idHbly,ng),       &
+     &         'Aout(idHbly)',                                          &
+     &         'Write out atmospheric boundary layer height.'
+#   endif
 #  endif
             IF (Aout(idTsur(itemp),ng)) WRITE (out,170)                 &
      &          Aout(idTsur(itemp),ng), 'Aout(idTsur)',                 &

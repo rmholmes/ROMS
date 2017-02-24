@@ -643,6 +643,21 @@
      &                   SetParAccess = .FALSE.)
           IF (exit_flag.ne.NoError) RETURN
         END IF
+
+#   if defined ABLM && defined ABLM_BLHVAR
+        IF (Sout(idHbly,ng)) THEN
+          Vinfo( 1)=Vname(1,idHbly)
+          Vinfo( 2)=Vname(2,idHbly)
+          Vinfo( 3)=Vname(3,idHbly)
+          Vinfo(14)=Vname(4,idHbly)
+          Vinfo(16)=Vname(1,idtime)
+          status=def_var(ng, iNLM, STA(ng)%ncid, STA(ng)%Vid(idHbly),   &
+     &                   NF_FOUT, 2, pgrd, Aval, Vinfo, ncname,         &
+     &                   SetFillVal = .TRUE.,                           &
+     &                   SetParAccess = .FALSE.)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+#   endif
 #  endif
 !
 !  Define surface net heat flux.
@@ -1648,6 +1663,11 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSair))) THEN
             got_var(idSair)=.TRUE.
             STA(ng)%Vid(idSair)=var_id(i)
+#   if defined ABLM && defined ABLM_BLHVAR
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idHbly))) THEN
+            got_var(idHbly)=.TRUE.
+            STA(ng)%Vid(idHbly)=var_id(i)
+#   endif
 #  endif
           ELSE IF (TRIM(var_name(i)).eq.                                &
      &             TRIM(Vname(1,idTsur(itemp)))) THEN
@@ -2026,6 +2046,14 @@
           exit_flag=3
           RETURN
         END IF
+#   if defined ABLM && defined ABLM_BLHVAR
+        IF (.not.got_var(idHbly).and.Sout(idHbly,ng)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idHbly)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+#   endif
 #  endif
         IF (.not.got_var(idTsur(itemp)).and.Sout(idTsur(itemp),ng)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idTsur(itemp))),   &

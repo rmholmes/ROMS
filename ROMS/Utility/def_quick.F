@@ -1140,6 +1140,27 @@
      &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
         END IF
+
+#  if defined ABLM && defined ABLM_BLHVAR
+!
+!  Defined atmospheric boundary layer height
+!
+        IF (Qout(idHbly,ng)) THEN
+          Vinfo( 1)=Vname(1,idHbly)
+          Vinfo( 2)=Vname(2,idHbly)
+          Vinfo( 3)=Vname(3,idHbly)
+          Vinfo(14)=Vname(4,idHbly)
+          Vinfo(16)=Vname(1,idtime)
+#   if defined WRITE_WATER && defined MASKING
+          Vinfo(20)='mask_rho'
+#   endif
+          Vinfo(22)='coordinates'
+          Aval(5)=REAL(Iinfo(1,idHbly,ng),r8)
+          status=def_var(ng, iNLM, QCK(ng)%ncid, QCK(ng)%Vid(idHbly),   &
+     &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+#  endif
 # endif
 !
 !  Define surface active tracer fluxes.
@@ -2378,6 +2399,11 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSair))) THEN
             got_var(idSair)=.TRUE.
             QCK(ng)%Vid(idSair)=var_id(i)
+#  if defined ABLM && defined ABLM_BLHVAR
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idHbly))) THEN
+            got_var(idHbly)=.TRUE.
+            QCK(ng)%Vid(idHbly)=var_id(i)
+#  endif
 # endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSSSc))) THEN
@@ -2900,6 +2926,14 @@
           exit_flag=3
           RETURN
         END IF
+#  if defined ABLM && defined ABLM_BLHVAR
+        IF (.not.got_var(idHbly).and.Qout(idHbly,ng)) THEN
+          IF (Master) WRITE (stdout,70) TRIM(Vname(1,idHbly)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+#  endif
 # endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         IF (.not.got_var(idSSSc).and.Qout(idSSSc,ng)) THEN

@@ -694,6 +694,19 @@
           END DO
         END IF
 #endif
+#   if defined ABLM && defined ABLM_BLHVAR
+        IF (Aout(idHbly,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgblh(i,j)=FORCES(ng)%blh(i,j)
+#    ifdef WET_DRY
+              AVERAGE(ng)%avgblh(i,j)=AVERAGE(ng)%avgblh(i,j)*          &
+     &                                  GRID(ng)%rmask_full(i,j)
+#    endif
+            END DO
+          END DO
+        END IF
+#   endif
 #  endif
 
         IF (Aout(idTsur(itemp),ng)) THEN
@@ -1768,6 +1781,19 @@
           END DO
         END IF
 #endif
+#   if defined ABLM && defined ABLM_BLHVAR
+        IF (Aout(idHbly,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgblh(i,j)=AVERAGE(ng)%avgblh(i,j)+          &
+#    ifdef WET_DRY
+     &                                  GRID(ng)%rmask_full(i,j)*       &
+#    endif
+     &                                  FORCES(ng)%blh(i,j)
+            END DO
+          END DO
+        END IF
+#   endif
 #  endif
 
         IF (Aout(idTsur(itemp),ng)) THEN
@@ -3182,6 +3208,28 @@
           END IF
         END IF
 #endif
+#   if defined ABLM && defined ABLM_BLHVAR
+        IF (Aout(idHbly,ng)) THEN
+          DO j=JstrR,JendR
+            DO i=IstrR,IendR
+              AVERAGE(ng)%avgblh(i,j)=rfac(i,j)*                        &
+     &                                  AVERAGE(ng)%avgblh(i,j)
+            END DO
+          END DO
+          IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+            CALL exchange_r2d_tile (ng, tile,                           &
+     &                              LBi, UBi, LBj, UBj,                 &
+     &                              AVERAGE(ng)%avgblh)
+#    ifdef DISTRIBUTE
+            CALL mp_exchange2d (ng, tile, iNLM, 1,                      &
+     &                          LBi, UBi, LBj, UBj,                     &
+     &                          NghostPoints,                           &
+     &                          EWperiodic(ng), NSperiodic(ng),         &
+     &                          AVERAGE(ng)%avgblh)
+#    endif
+          END IF
+        END IF
+#   endif
 #  endif
 
         IF (Aout(idTsur(itemp),ng)) THEN

@@ -1485,6 +1485,15 @@
   'r2dvar'
   1.0d0
 
+'blh'                                              ! Input
+  'atmospheric boundary layer height'
+  'meter'                                          ! [m]
+  'blh, scalar, series'
+  'blh_time'
+  'idHbly'
+  'r2dvar'
+  1.0d0
+
 'Dwave'                                            ! Input
   'wind-induced wave direction'
   'degrees'                                        ! [radians]

@@ -612,6 +612,12 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' ABLM_CONVTHR,'
 # endif
+# ifdef ABLM_BLHVAR
+      IF (Master) WRITE (stdout,20) 'ABLM_BLHVAR',                      &
+     &   'Use variable atmospheric boundary layer height in ABLM.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ABLM_BLHVAR,'
+# endif
 # ifdef ABLM_WATER
       IF (Master) WRITE (stdout,20) 'ABLM_WATER',                       &
      &   'Atmospheric boundary layer model Qair.'

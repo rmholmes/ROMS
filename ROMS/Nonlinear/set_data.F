@@ -335,6 +335,20 @@
 #   endif
 #  endif
 
+#  if defined ABLM && defined ABLM_BLHVAR
+!
+!-----------------------------------------------------------------------
+!  Set atmospheric boundary layer height (m).
+!-----------------------------------------------------------------------
+!
+      CALL set_2dfld_tile (ng, tile, iNLM, idHbly,                      &
+     &                     LBi, UBi, LBj, UBj,                          &
+     &                     FORCES(ng)%blhG,                             &
+     &                     FORCES(ng)%blh,                              &
+     &                     update)
+      IF (exit_flag.ne.NoError) RETURN
+#  endif
+
 #  ifndef BULK_FLUXES
 !
 !-----------------------------------------------------------------------

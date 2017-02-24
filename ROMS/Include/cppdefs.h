@@ -165,6 +165,8 @@
 ** ABLM_RELHUM         use if input Hair is relative humidity fraction (Not  **
 **                     recommended, use specific humidity in g/kg)           **
 ** ABLM_CONVTHR        use if convective threshold on Tair in ABLM           **
+** ABLM_BLHVAR         use if using a spatially variable atmospheric         **
+**                     boundary layer height read from file                  **
 ** SET_WINDSPEED       use if set wind speed magnitude explicitely           **
 ** SET_WINDQUAD        if this option (and SET_WINDSPEED) is selected,       **
 **                     then the Uwind and Vwind input fields are             **

@@ -446,6 +446,9 @@
 #endif
      &                     FORCES(ng) % lhflx,                          &
      &                     FORCES(ng) % shflx,                          &
+# ifdef ABLM_BLHVAR
+     &                     FORCES(ng) % blh,                            &
+# endif
      &                     CLIMA(ng) % ABLMnudgcof,                     &
      &                     OCEAN(ng) % t)
 # ifdef PROFILE
@@ -468,6 +471,9 @@
      &                           Qair, QairB, Pair, Q100,               &
 # endif
      &                           lhflx, shflx,                          &
+# ifdef ABLM_BLHVAR
+     &                           blh,                                   &
+# endif
      &                           ABLMnudgcof, t)
 !***********************************************************************
 !
@@ -500,6 +506,9 @@
 # endif
       real(r8), intent(in) :: lhflx(LBi:,LBj:)
       real(r8), intent(in) :: shflx(LBi:,LBj:)
+#  ifdef ABLM_BLHVAR
+      real(r8), intent(in) :: blh(LBi:,LBj:)
+#  endif
       real(r8), intent(in) :: ABLMnudgcof(LBi:,LBj:)
       real(r8), intent(in) :: t(LBi:,LBj:,:,:,:)
 # else
@@ -516,6 +525,9 @@
 #  endif
       real(r8), intent(in) :: lhflx(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: shflx(LBi:UBi,LBj:UBj)
+#  ifdef ABLM_BLHVAR
+      real(r8), intent(in) :: blh(LBi:UBi,LBj:UBj)
+#  endif
       real(r8), intent(in) :: ABLMnudgcof(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: t(LBi:UBi,LBj:UBj,N(ng),3,NT(ng))
 # endif
@@ -523,7 +535,7 @@
 !  Local variable declarations.
 !
       integer :: i, j, k
-      real(r8) :: cff, HscaleA, TairK, TseaC, TseaK
+      real(r8) :: cff, HscaleA, TairK, TseaC, TseaK, hBL
 
       real(r8) :: Ttop ! temperature for outgoing longwave calculation
       real(r8) :: TairTen ! temperature for outgoing longwave calculation
@@ -563,8 +575,14 @@
 # ifdef ABLM_WATER
       HscaleW=1.0_r8/(rho0*Cp)
 # endif
+# ifndef ABLM_BLHVAR
+      hBL=hABLM(ng)
+# endif
       DO j=Jstr-1,JendR
         DO i=Istr-1,IendR
+# ifdef ABLM_BLHVAR
+          hBL = blh(i,j)
+# endif
 !
 !-----------------------------------------------------------------------
 !  Air temperature diabatic changes
@@ -573,7 +591,7 @@
           TseaC = t(i,j,N(ng),nrhs,itemp)
           TseaK = TseaC+273.16_r8
           TairK = Tair(i,j)+273.16_r8
-          Ttop = TairK - ABLM_lapse * ( hABLM(ng) - zWind )
+          Ttop = TairK - ABLM_lapse * ( hBL - zWind )
 
           LWup = 0.5_r8*StefBo*Ttop**4
 !          LWup = 0.5_r8*StefBo*(0.5_r8*TairK+0.5_r8*Ttop)**4    ! Option to reduce height at which long-wave radiated
@@ -583,7 +601,7 @@
           NETup = LWup/HscaleA
           NETdn = (OCup-LWdn-shflx(i,j))/HscaleA
 
-          TairTen = (NETdn - NETup) / hABLM(ng)
+          TairTen = (NETdn - NETup) / hBL
 #ifdef MASKING
           TairTen = TairTen*rmask(i,j)
 #endif
@@ -606,7 +624,7 @@
 !          entrain = 0.25*(evap/(Qsea - Qair(i,j)/1000.0_r8))*Q100(i,j)    ! This line is consistent with cheapAML. The following line is consistent with Deremble paper.
           entrain = 0.25*evap/((Qsea / (Qair(i,j)/1000.0_r8))-1.0_r8)      
 
-          QairTen = (evap - entrain) / hABLM(ng) / ABLM_rhoa
+          QairTen = (evap - entrain) / hBL / ABLM_rhoa
 #ifdef MASKING
           QairTen = QairTen*rmask(i,j)
 #endif
