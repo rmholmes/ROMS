@@ -216,12 +216,12 @@
         END DO
       END IF
 # endif
+# ifdef SET_WINDSPEED
 !
 !-----------------------------------------------------------------------
 !  Surface wind speed magnitude.
 !-----------------------------------------------------------------------
 !
-# ifdef SET_WINDSPEED
       CALL get_2dfld (ng, iNLM, idSair, ncFRCid(idSair,ng),             &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
      &                LBi, UBi, LBj, UBj, 2, 1,                         &

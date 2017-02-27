@@ -267,14 +267,14 @@
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 
-#   ifdef SET_WINDSPEED
+#    ifdef SET_WINDSPEED
       CALL set_2dfld_tile (ng, tile, iNLM, idSair,                      &
      &                     LBi, UBi, LBj, UBj,                          &
      &                     FORCES(ng)%wMagG,                            &
      &                     FORCES(ng)%wMag,                             &
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
-#   endif
+#    endif
 
 #    ifdef CURVGRID
 !

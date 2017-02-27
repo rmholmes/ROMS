@@ -18,10 +18,10 @@
 !                 the ETA-direction (m2/s2) at horizontal V-points.    !
 !  svstrG       Latest two-time snapshots of input "svstr" grided      !
 !                 data used for interpolation.                         !
-# ifdef BULK_STRESS
+#ifdef BULK_STRESS
 !  sustrI       Input surface zonal stress from file (m2/s2)           !
 !  svstrI       Input surface meridional stress from file (m2/s2)      !
-# endif
+#endif
 !                                                                      !
 !  Bottom momentum stresses.                                           !
 !                                                                      !
@@ -125,14 +125,14 @@
 !  wMagG        Latest two-time snapshots of input "wMag" grided       !
 !                 data used for interpolation.                         !
 #endif
-# if defined ABLM && defined ABLM_BLHVAR
+#if defined ABLM && defined ABLM_BLHVAR
 !                                                                      !
 !  Atmospheric boundary layer height                                   !
 !                                                                      !
 !  blh          Atmospheric boundary layer height at RHO-points.       !
 !  blhG         Latest two-time snapshots of input "blh" grided        !
 !               data used for interpolation.                           !
-# endif
+#endif
 !                                                                      !
 !  Rain fall rate.                                                     !
 !                                                                      !
@@ -188,19 +188,19 @@
 !  VwindPG      Surface wind anomaly in the ETA-direction (m/s)        !
 !               at horizontal RHO-points, two-time snapshots.          !
 !  VwindOG      Dummy location for background VwindG input             !
-#ifdef SET_WINDSPEED
+# ifdef SET_WINDSPEED
 !  wMagPG       Surface wind magnitude anomaly (m/s) at horizontal     ! 
 !               RHO-points, two-time snapshots.                        !
 !  wMagOG      Dummy location for background wMagG input               !
-#endif
-#ifdef BULK_STRESS
+# endif
+# ifdef BULK_STRESS
 !  sustrPG     Kinematic surface momentum flux anomaly in              !
 !                 the XI-direction (m2/s2) at horizontal U-points.     !
 !  sustrOG     Dummy location for background sustrG input              !
 !  svstrPG     Kinematic surface momentum flux anomaly in              !
 !                 the ETA-direction (m2/s2) at horizontal U-points.    !
 !  svstrOG     Dummy location for background sustrG input              !
-#endif
+# endif
 # if defined ABLM && defined ABLM_BLHVAR
 !  blhPG        Atmospheric boundary layer height anomaly at           !
 !               horizontal RHO-points, two-time snapshots.             !
@@ -241,14 +241,14 @@
 !
 !  Nonlinear model state.
 !
-# ifdef STATS_ENSO
+#ifdef STATS_ENSO
           real(r8), pointer :: SSTiClimG(:)
           real(r8), pointer :: SSTiClim
-# endif
-# ifdef ADD_WWB
+#endif
+#ifdef ADD_WWB
           real(r8), pointer :: WWBampG(:)
           real(r8), pointer :: WWBamp
-# endif
+#endif
           real(r8), pointer :: sustr(:,:)
           real(r8), pointer :: svstr(:,:)
 #if (!defined ANA_SMFLUX     && !defined BULK_FLUXES || \
@@ -262,10 +262,10 @@
           real(r8), pointer :: svstrOG(:,:,:)
 # endif
 #endif
-# ifdef BULK_STRESS
+#ifdef BULK_STRESS
           real(r8), pointer :: sustrI(:,:)
           real(r8), pointer :: svstrI(:,:)
-# endif
+#endif
 #ifdef ADJUST_WSTRESS
           real(r8), pointer :: ustr(:,:,:,:)
           real(r8), pointer :: vstr(:,:,:,:)

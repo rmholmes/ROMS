@@ -681,19 +681,19 @@
             END DO
           END DO
         END IF
-#ifdef SET_WINDSPEED
+#   ifdef SET_WINDSPEED
         IF (Aout(idSair,ng)) THEN
           DO j=JstrR,JendR
             DO i=IstrR,IendR
               AVERAGE(ng)%avgwMag(i,j)=FORCES(ng)%wMag(i,j)
-#   ifdef WET_DRY
+#    ifdef WET_DRY
               AVERAGE(ng)%avgwMag(i,j)=AVERAGE(ng)%avgwMag(i,j)*        &
      &                                  GRID(ng)%rmask_full(i,j)
-#   endif
+#    endif
             END DO
           END DO
         END IF
-#endif
+#   endif
 #   if defined ABLM && defined ABLM_BLHVAR
         IF (Aout(idHbly,ng)) THEN
           DO j=JstrR,JendR
@@ -1768,19 +1768,19 @@
           END DO
         END IF
 
-#ifdef SET_WINDSPEED
+#   ifdef SET_WINDSPEED
         IF (Aout(idSair,ng)) THEN
           DO j=JstrR,JendR
             DO i=IstrR,IendR
               AVERAGE(ng)%avgwMag(i,j)=AVERAGE(ng)%avgwMag(i,j)+        &
-#   ifdef WET_DRY
+#    ifdef WET_DRY
      &                                  GRID(ng)%rmask_full(i,j)*       &
-#   endif
+#    endif
      &                                  FORCES(ng)%wMag(i,j)
             END DO
           END DO
         END IF
-#endif
+#   endif
 #   if defined ABLM && defined ABLM_BLHVAR
         IF (Aout(idHbly,ng)) THEN
           DO j=JstrR,JendR
@@ -3186,7 +3186,7 @@
           END IF
         END IF
 
-#ifdef SET_WINDSPEED
+#   ifdef SET_WINDSPEED
         IF (Aout(idSair,ng)) THEN
           DO j=JstrR,JendR
             DO i=IstrR,IendR
@@ -3198,16 +3198,16 @@
             CALL exchange_r2d_tile (ng, tile,                           &
      &                              LBi, UBi, LBj, UBj,                 &
      &                              AVERAGE(ng)%avgwMag)
-#   ifdef DISTRIBUTE
+#    ifdef DISTRIBUTE
             CALL mp_exchange2d (ng, tile, iNLM, 1,                      &
      &                          LBi, UBi, LBj, UBj,                     &
      &                          NghostPoints,                           &
      &                          EWperiodic(ng), NSperiodic(ng),         &
      &                          AVERAGE(ng)%avgwMag)
-#   endif
+#    endif
           END IF
         END IF
-#endif
+#   endif
 #   if defined ABLM && defined ABLM_BLHVAR
         IF (Aout(idHbly,ng)) THEN
           DO j=JstrR,JendR

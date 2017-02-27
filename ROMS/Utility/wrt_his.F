@@ -1353,16 +1353,16 @@
         END IF
       END IF
 
-#ifdef SET_WINDSPEED
+#  ifdef SET_WINDSPEED
       IF (Hout(idSair,ng)) THEN
         scale=1.0_r8
         gtype=gfactor*r2dvar
         status=nf_fwrite2d(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idSair), &
      &                     HIS(ng)%Rindex, gtype,                       &
      &                     LBi, UBi, LBj, UBj, scale,                   &
-#  ifdef MASKING
+#   ifdef MASKING
      &                     GRID(ng) % rmask,                            &
-#  endif
+#   endif
      &                     FORCES(ng) % wMag)
         IF (status.ne.nf90_noerr) THEN
           IF (Master) THEN
@@ -1373,7 +1373,7 @@
           RETURN
         END IF
       END IF
-#endif
+#  endif
 #  if defined ABLM && defined ABLM_BLHVAR
 !
 !  Write out atmospheric boundary layer depth.
