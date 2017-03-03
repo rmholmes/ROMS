@@ -1771,7 +1771,7 @@
   'surface u-momentum stress anomaly'
   'newton meter-2'                                 ! Input:  [N/m2]
   'u-stress anomaly, scalar, series'               ! [m2/s2]
-  'sms_time'                                       ! Output: [N/m2]
+  'prt_time'                                       ! Output: [N/m2]
   'idUsmsP'
   'u2dvar'
   1.0d0
@@ -1780,7 +1780,7 @@
   'surface v-momentum stress anomaly'
   'newton meter-2'                                 ! Input:  [N/m2]
   'v-stress anomaly, scalar, series'               ! [m2/s2]
-  'sms_time'                                       ! Output: [N/m2]
+  'prt_time'                                       ! Output: [N/m2]
   'idVsmsP'
   'v2dvar'
   1.0d0
@@ -1798,7 +1798,7 @@
   'atmospheric boundary layer height anomaly'
   'meter'                                          ! [m]
   'blh anomaly, scalar, series'
-  'blh_time'
+  'prt_time'
   'idHblyP'
   'r2dvar'
   1.0d0
