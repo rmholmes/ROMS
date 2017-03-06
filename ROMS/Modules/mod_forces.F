@@ -180,6 +180,10 @@
 !  avcos        Cosine of average zenith angle of downwelling          !
 !                 spectral photons.                                    !
 #ifdef STATS_ENSO
+!  stflxPG      Kinematic surface flux anomaly                         !
+!                 (temperature: degC m/s; salinity: PSU m/s) at        !
+!                 horizontal RHO-points.                               !
+!  stflxOG      Dummy location for background stflxG input             !
 !  SSTiClimG    SST index climatology, two-time snapshots              !
 !  SSTiClim     SST index climatology                                  !
 !  UwindPG      Surface wind anomaly in the XI-direction (m/s)         !
@@ -454,6 +458,10 @@
 # if !defined ANA_STFLUX || !defined ANA_SSFLUX || \
      !defined ANA_SPFLUX
           real(r8), pointer :: stflxG(:,:,:,:)
+#  if defined STATS_ENSO && !defined BULK_FLUXES
+          real(r8), pointer :: stflxPG(:,:,:,:)
+          real(r8), pointer :: stflxOG(:,:,:,:)
+#  endif
 # endif
 # ifdef ADJUST_STFLUX
           real(r8), pointer :: tflux(:,:,:,:,:)
@@ -846,6 +854,10 @@
 # if !defined ANA_STFLUX || !defined ANA_SSFLUX || \
      !defined ANA_SPFLUX
       allocate ( FORCES(ng) % stflxG(LBi:UBi,LBj:UBj,2,NT(ng)) )
+#  if defined STATS_ENSO && !defined BULK_FLUXES
+      allocate ( FORCES(ng) % stflxPG(LBi:UBi,LBj:UBj,2,NT(ng)) )
+      allocate ( FORCES(ng) % stflxOG(LBi:UBi,LBj:UBj,2,NT(ng)) )
+#  endif
 # endif
 # ifdef ADJUST_STFLUX
       allocate ( FORCES(ng) % tflux(LBi:UBi,LBj:UBj,nfrec(ng),          &
@@ -1348,6 +1360,12 @@
      !defined ANA_SPFLUX
               FORCES(ng) % stflxG(i,j,1,itrc) = IniVal
               FORCES(ng) % stflxG(i,j,2,itrc) = IniVal
+#  if defined STATS_ENSO && !defined BULK_FLUXES
+              FORCES(ng) % stflxPG(i,j,1,itrc) = IniVal
+              FORCES(ng) % stflxPG(i,j,2,itrc) = IniVal
+              FORCES(ng) % stflxOG(i,j,1,itrc) = IniVal
+              FORCES(ng) % stflxOG(i,j,2,itrc) = IniVal
+#  endif
 # endif
 # if !defined ANA_BTFLUX || !defined ANA_BSFLUX || \
      !defined ANA_BPFLUX

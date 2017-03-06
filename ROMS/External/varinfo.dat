@@ -1785,6 +1785,15 @@
   'v2dvar'
   1.0d0
 
+'shfluxP'                                          ! Input/Output
+  'surface net heat flux anomaly'
+  'watt meter-2'                                   ! Input:  [Watt/m2]
+  'surface heat flux anomaly, scalar, series'      ! [Celsius m/s]
+  'prt_time'                                       ! Output: [Watt/m2]
+  'idTsurP(itemp)'
+  'r2dvar'
+  1.0d0
+
 'wMagP'                                            ! Input
   'wind speed magnitude anomaly'
   'meter second-1'                                 ! [m/s]

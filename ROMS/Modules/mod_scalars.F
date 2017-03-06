@@ -389,6 +389,7 @@
 !    stenRvwnd      Coupling coefficient of Vwind pattern onto SST index
 !    stenRustr      Coupling coefficient of sustr pattern onto SST index
 !    stenRvstr      Coupling coefficient of svstr pattern onto SST index
+!    stenRhflx      Coupling coefficient of shflux pattern onto SST index
 !    stenRwmag      Coupling coefficient of wMag pattern onto SST index
 !    stenRqair      Coupling coefficient of Qair pattern onto SST index
 !    stenRtair      Coupling coefficient of Tair pattern onto SST index
@@ -410,6 +411,7 @@
         real(r8), allocatable :: stenRvwnd(:)      ! degC^(-1)
         real(r8), allocatable :: stenRustr(:)      ! degC^(-1)
         real(r8), allocatable :: stenRvstr(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRhflx(:)      ! degC^(-1)
 #ifdef SET_WINDSPEED
         real(r8), allocatable :: stenRwmag(:)      ! degC^(-1)
 #endif
@@ -1908,6 +1910,7 @@
       allocate ( stenRvwnd(Ngrids) )
       allocate ( stenRustr(Ngrids) )
       allocate ( stenRvstr(Ngrids) )
+      allocate ( stenRhflx(Ngrids) )
 #ifdef SET_WINDSPEED
       allocate ( stenRwmag(Ngrids) )
 #endif
@@ -2503,6 +2506,7 @@
         stenRvwnd(ng)=0.0_r8
         stenRustr(ng)=0.0_r8
         stenRvstr(ng)=0.0_r8
+        stenRhflx(ng)=0.0_r8
 #ifdef SET_WINDSPEED
         stenRwmag(ng)=0.0_r8
 #endif

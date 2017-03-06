@@ -804,8 +804,38 @@
 #  ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #  endif
+#  ifdef STATS_ENSO
+     &                FORCES(ng) % stflxOG(:,:,:,itemp))
+#  else
      &                FORCES(ng) % stflxG(:,:,:,itemp))
+#  endif
       IF (exit_flag.ne.NoError) RETURN
+#  ifdef STATS_ENSO
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      CALL get_2dfld (ng, iNLM, idTsurP(itemp),                         &
+     &                ncFRCid(idTsurP(itemp),ng),                       &
+     &                nFfiles(ng), FRC(1,ng), update(1),                &
+     &                LBi, UBi, LBj, UBj, 2, 1,                         &
+#   ifdef MASKING
+     &                GRID(ng) % rmask,                                 &
+#   endif
+     &                FORCES(ng) % stfluxPG(:,:,:,itemp))
+      IF (exit_flag.ne.NoError) RETURN
+      IF (update(1)) stenUpdte(ng) = .TRUE.
+      
+      IF (stenUpdte(ng)) THEN
+        DO j=LBj,UBj
+          DO i=LBi,UBi
+            FORCES(ng)%stflxG(i,j,1,itemp)=                             &
+     &          FORCES(ng)%stflxOG(i,j,1,itemp) + stenIanom(ng)*        &
+     &          stenRhflx(ng)*FORCES(ng)%stflxPG(i,j,1,itemp)
+            FORCES(ng)%stflxG(i,j,2,itemp)=                             &
+     &          FORCES(ng)%stflxOG(i,j,2,itemp) + stenIanom(ng)*        &
+     &          stenRhflx(ng)*FORCES(ng)%stflxPG(i,j,2,itemp)
+          END DO
+        END DO
+      END IF
+#  endif
 # endif
 
 # if !defined ANA_STFLUX  && defined FOUR_DVAR      && \

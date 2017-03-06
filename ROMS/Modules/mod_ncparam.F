@@ -394,6 +394,7 @@
         integer, allocatable :: idTclm(:)    ! tracers climatology
         integer, allocatable :: idTnud(:)    ! tracers nudge coefficient
         integer, allocatable :: idTsur(:)    ! surface flux for tracers
+        integer, allocatable :: idTsurP(:)   ! surface flux for tracers anomaly
         integer, allocatable :: idTtlf(:)    ! tracers impulse forcing
 !
 !  Boundary conditions identification indices.
@@ -598,6 +599,7 @@
       allocate ( idTclm(MT) )
       allocate ( idTnud(MT) )
       allocate ( idTsur(MT) )
+      allocate ( idTsurP(MT) )
       allocate ( idTtlf(MT) )
 
       allocate ( iHUTav(MT) )
@@ -1023,12 +1025,16 @@
               idVbcs=varid
             CASE ('idTsur(itemp)')
               idTsur(itemp)=varid
+            CASE ('idTsurP(itemp)')
+              idTsurP(itemp)=varid
             CASE ('iddQdT')
               iddQdT=varid
             CASE ('idsfwf')
               idsfwf=varid
             CASE ('idTsur(isalt)')
               idTsur(isalt)=varid
+            CASE ('idTsurP(isalt)')
+              idTsurP(isalt)=varid
             CASE ('idTbot(itemp)')
               idTbot(itemp)=varid
             CASE ('idTbot(isalt)')
@@ -2277,6 +2283,7 @@
           STOP
         END IF
         idTsur(i)=varid
+        idTsurP(i)=varid
         DO ng=1,Ngrids
           Fscale(varid,ng)=1.0_r8
           Iinfo(1,varid,ng)=r2dvar
