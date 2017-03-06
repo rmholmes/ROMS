@@ -407,25 +407,33 @@
         real(r8), allocatable :: stenRegnE(:)       ! degrees
         real(r8), allocatable :: stenRegnS(:)       ! degrees
         real(r8), allocatable :: stenRegnW(:)       ! degrees
+# ifdef BULK_FLUXES
         real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
         real(r8), allocatable :: stenRvwnd(:)      ! degC^(-1)
-        real(r8), allocatable :: stenRustr(:)      ! degC^(-1)
-        real(r8), allocatable :: stenRvstr(:)      ! degC^(-1)
-        real(r8), allocatable :: stenRhflx(:)      ! degC^(-1)
-#ifdef SET_WINDSPEED
+#  ifdef SET_WINDSPEED
         real(r8), allocatable :: stenRwmag(:)      ! degC^(-1)
-#endif
+#  endif
         real(r8), allocatable :: stenRqair(:)      ! degC^(-1)
         real(r8), allocatable :: stenRtair(:)      ! degC^(-1)
         real(r8), allocatable :: stenRpair(:)      ! degC^(-1)
-        real(r8), allocatable :: stenRsrad(:)      ! degC^(-1)
         real(r8), allocatable :: stenRlrad(:)      ! degC^(-1)
+#  if defined ABLM && defined ABLM_BLHVAR
+        real(r8), allocatable :: stenRblh(:)       ! degC^(-1)
+#  endif
+# else
+        real(r8), allocatable :: stenRhflx(:)      ! degC^(-1)
+# endif
+
+# if !defined BULK_FLUXES || defined BULK_STRESS
+        real(r8), allocatable :: stenRustr(:)      ! degC^(-1)
+        real(r8), allocatable :: stenRvstr(:)      ! degC^(-1)
+# endif
+# if defined SHORTWAVE
+        real(r8), allocatable :: stenRsrad(:)      ! degC^(-1)
+# endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         real(r8), allocatable :: stenRsss(:)       ! degC^(-1)
 # endif
-#if defined ABLM && defined ABLM_BLHVAR
-        real(r8), allocatable :: stenRblh(:)       ! degC^(-1)
-#endif
         integer, allocatable  :: stenCount(:)
         real(r8), allocatable :: stenIndex(:,:)    ! degC
         real(r8), allocatable :: stenIanom(:)      ! degC
@@ -1906,25 +1914,32 @@
       allocate ( stenRegnE(Ngrids) )
       allocate ( stenRegnS(Ngrids) )
       allocate ( stenRegnW(Ngrids) )
+# ifdef BULK_FLUXES
       allocate ( stenRuwnd(Ngrids) )
       allocate ( stenRvwnd(Ngrids) )
-      allocate ( stenRustr(Ngrids) )
-      allocate ( stenRvstr(Ngrids) )
-      allocate ( stenRhflx(Ngrids) )
-#ifdef SET_WINDSPEED
+#  ifdef SET_WINDSPEED
       allocate ( stenRwmag(Ngrids) )
-#endif
+#  endif
       allocate ( stenRqair(Ngrids) )
       allocate ( stenRtair(Ngrids) )
       allocate ( stenRpair(Ngrids) )
-      allocate ( stenRsrad(Ngrids) )
       allocate ( stenRlrad(Ngrids) )
+#  if defined ABLM && defined ABLM_BLHVAR
+      allocate ( stenRblh(Ngrids) )
+#  endif
+# else
+      allocate ( stenRhflx(Ngrids) )
+# endif
+# if !defined BULK_FLUXES || defined BULK_STRESS
+      allocate ( stenRustr(Ngrids) )
+      allocate ( stenRvstr(Ngrids) )
+# endif
+# if defined SHORTWAVE
+      allocate ( stenRsrad(Ngrids) )
+# endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
       allocate ( stenRsss(Ngrids) )
 # endif
-#if defined ABLM && defined ABLM_BLHVAR
-      allocate ( stenRblh(Ngrids) )
-#endif
       allocate ( stenCount(Ngrids) )
       allocate ( stenIndex(stenNdays,Ngrids) )
       allocate ( stenIanom(Ngrids) )
@@ -2502,25 +2517,32 @@
         stenRegnE(ng)=-90.0_r8
         stenRegnS(ng)=-5.0_r8
         stenRegnW(ng)=-150.0_r8
+# ifdef BULK_FLUXES
         stenRuwnd(ng)=0.0_r8
         stenRvwnd(ng)=0.0_r8
-        stenRustr(ng)=0.0_r8
-        stenRvstr(ng)=0.0_r8
-        stenRhflx(ng)=0.0_r8
-#ifdef SET_WINDSPEED
+#  ifdef SET_WINDSPEED
         stenRwmag(ng)=0.0_r8
-#endif
+#  endif
         stenRqair(ng)=0.0_r8
         stenRtair(ng)=0.0_r8
         stenRpair(ng)=0.0_r8
-        stenRsrad(ng)=0.0_r8
         stenRlrad(ng)=0.0_r8
-#if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
-        stenRsss(ng)=0.0_r8
-#endif
-#if defined ABLM && defined ABLM_BLHVAR
+#  if defined ABLM && defined ABLM_BLHVAR
         stenRblh(ng)=0.0_r8
-#endif
+#  endif
+# else
+        stenRhflx(ng)=0.0_r8
+# endif
+# if !defined BULK_FLUXES || defined BULK_STRESS
+        stenRustr(ng)=0.0_r8
+        stenRvstr(ng)=0.0_r8
+# endif
+# if defined SHORTWAVE
+        stenRsrad(ng)=0.0_r8
+# endif
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+        stenRsss(ng)=0.0_r8
+# endif
         stenCount(ng)=0
         DO i=1,stenNdays
           stenIndex(i,ng) = 0.0_r8

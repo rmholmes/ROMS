@@ -469,6 +469,7 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
+# ifdef BULK_FLUXES
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRuwnd',             &
      &                      stenRuwnd(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
@@ -479,27 +480,12 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRustr',             &
-     &                      stenRustr(ng), (/0/), (/0/),                &
-     &                      ncid = ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRvstr',             &
-     &                      stenRvstr(ng), (/0/), (/0/),                &
-     &                      ncid = ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRhflx',             &
-     &                      stenRhflx(ng), (/0/), (/0/),                &
-     &                      ncid = ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
-#ifdef SET_WINDSPEED
+#  ifdef SET_WINDSPEED
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRwmag',             &
      &                      stenRwmag(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
-#endif
+#  endif
 
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRqair',             &
      &                      stenRqair(ng), (/0/), (/0/),                &
@@ -516,26 +502,47 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRsrad',             &
-     &                      stenRsrad(ng), (/0/), (/0/),                &
-     &                      ncid = ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRlrad',             &
      &                      stenRlrad(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
-# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRsss',              &
-     &                      stenRsss(ng), (/0/), (/0/),                 &
+#  if defined ABLM && defined ABLM_BLHVAR
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRblh',              &
+     &                      stenRblh(ng), (/0/), (/0/),                 &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+#  endif
+# else
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRhflx',             &
+     &                      stenRhflx(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+# if !defined BULK_FLUXES || defined BULK_STRESS
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRustr',             &
+     &                      stenRustr(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRvstr',             &
+     &                      stenRvstr(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 # endif
 
-# if defined ABLM && defined ABLM_BLHVAR
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRblh',              &
-     &                      stenRblh(ng), (/0/), (/0/),                 &
+# if defined SHORTWAVE
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRsrad',             &
+     &                      stenRsrad(ng), (/0/), (/0/),                &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+
+# if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
+      CALL netcdf_put_fvar (ng, model, ncname, 'stenRsss',              &
+     &                      stenRsss(ng), (/0/), (/0/),                 &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 # endif

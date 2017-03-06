@@ -1476,6 +1476,8 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
+# ifdef BULK_FLUXES
+
       Vinfo( 1)='stenRuwnd'
       Vinfo( 2)='Coupling coefficient of Uwind pattern onto SST index'
       Vinfo( 3)='1/degC'
@@ -1492,31 +1494,7 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
-      Vinfo( 1)='stenRustr'
-      Vinfo( 2)='Coupling coefficient of sustr pattern onto SST index'
-      Vinfo( 3)='1/degC'
-      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
-     &               1, (/0/), Aval, Vinfo, ncname,                     &
-     &               SetParAccess = .FALSE.)
-      IF (exit_flag.ne.NoError) RETURN
-
-      Vinfo( 1)='stenRvstr'
-      Vinfo( 2)='Coupling coefficient of svstr pattern onto SST index'
-      Vinfo( 3)='1/degC'
-      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
-     &               1, (/0/), Aval, Vinfo, ncname,                     &
-     &               SetParAccess = .FALSE.)
-      IF (exit_flag.ne.NoError) RETURN
-
-      Vinfo( 1)='stenRhflx'
-      Vinfo( 2)='Coupling coefficient of shflux pattern onto SST index'
-      Vinfo( 3)='1/degC'
-      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
-     &               1, (/0/), Aval, Vinfo, ncname,                     &
-     &               SetParAccess = .FALSE.)
-      IF (exit_flag.ne.NoError) RETURN
-
-#ifdef SET_WINDSPEED
+#  ifdef SET_WINDSPEED
       Vinfo( 1)='stenRwmag'
       Vinfo( 2)='Coupling coefficient of wMag pattern onto SST index'
       Vinfo( 3)='1/degC'
@@ -1524,7 +1502,7 @@
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
-#endif
+#  endif
 
       Vinfo( 1)='stenRqair'
       Vinfo( 2)='Coupling coefficient of Qair pattern onto SST index'
@@ -1550,14 +1528,6 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
-      Vinfo( 1)='stenRsrad'
-      Vinfo( 2)='Coupling coefficient of swrad pattern onto SST index'
-      Vinfo( 3)='1/degC'
-      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
-     &               1, (/0/), Aval, Vinfo, ncname,                     &
-     &               SetParAccess = .FALSE.)
-      IF (exit_flag.ne.NoError) RETURN
-
       Vinfo( 1)='stenRlrad'
       Vinfo( 2)='Coupling coefficient of lwrad_down pattern onto SST in'
       Vinfo( 3)='1/degC'
@@ -1566,6 +1536,52 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
+#  if defined ABLM && defined ABLM_BLHVAR
+      Vinfo( 1)='stenRblh'
+      Vinfo( 2)='Coupling coefficient of blh pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+#  endif
+# else
+      Vinfo( 1)='stenRhflx'
+      Vinfo( 2)='Coupling coefficient of shflux pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+
+# if !defined BULK_FLUXES || defined BULK_STRESS
+      Vinfo( 1)='stenRustr'
+      Vinfo( 2)='Coupling coefficient of sustr pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+
+      Vinfo( 1)='stenRvstr'
+      Vinfo( 2)='Coupling coefficient of svstr pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
+
+# if defined SHORTWAVE
+      Vinfo( 1)='stenRsrad'
+      Vinfo( 2)='Coupling coefficient of swrad pattern onto SST index'
+      Vinfo( 3)='1/degC'
+      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+# endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
       Vinfo( 1)='stenRsss'
       Vinfo( 2)='Coupling coefficient of SSS pattern onto SST index'
@@ -1576,15 +1592,6 @@
       IF (exit_flag.ne.NoError) RETURN
 # endif
 
-# if defined ABLM && defined ABLM_BLHVAR
-      Vinfo( 1)='stenRblh'
-      Vinfo( 2)='Coupling coefficient of blh pattern onto SST index'
-      Vinfo( 3)='1/degC'
-      status=def_var(ng, model, ncid, varid, NF_TYPE,                   &
-     &               1, (/0/), Aval, Vinfo, ncname,                     &
-     &               SetParAccess = .FALSE.)
-      IF (exit_flag.ne.NoError) RETURN
-# endif
       Vinfo( 1)='stenNdays'
       Vinfo( 2)='Number of days to average SST index over'
       Vinfo( 3)=''

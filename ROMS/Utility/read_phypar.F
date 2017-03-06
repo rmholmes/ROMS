@@ -773,37 +773,44 @@
             CASE ('stenNdays')
               Npts=load_i(Nval, Rval, 1, Ivalue)
               stenNdays=Ivalue(1)
+#  ifdef BULK_FLUXES
             CASE ('stenRuwnd')
               Npts=load_r(Nval, Rval, Ngrids, stenRuwnd)
             CASE ('stenRvwnd')
               Npts=load_r(Nval, Rval, Ngrids, stenRvwnd)
-            CASE ('stenRustr')
-              Npts=load_r(Nval, Rval, Ngrids, stenRustr)
-            CASE ('stenRvstr')
-              Npts=load_r(Nval, Rval, Ngrids, stenRvstr)
-            CASE ('stenRhflx')
-              Npts=load_r(Nval, Rval, Ngrids, stenRhflx)
-#  ifdef SET_WINDSPEED
+#   ifdef SET_WINDSPEED
             CASE ('stenRwmag')
               Npts=load_r(Nval, Rval, Ngrids, stenRwmag)
-#  endif
+#   endif
             CASE ('stenRqair')
               Npts=load_r(Nval, Rval, Ngrids, stenRqair)
             CASE ('stenRtair')
               Npts=load_r(Nval, Rval, Ngrids, stenRtair)
             CASE ('stenRpair')
               Npts=load_r(Nval, Rval, Ngrids, stenRpair)
-            CASE ('stenRsrad')
-              Npts=load_r(Nval, Rval, Ngrids, stenRsrad)
             CASE ('stenRlrad')
               Npts=load_r(Nval, Rval, Ngrids, stenRlrad)
+#   if defined ABLM && defined ABLM_BLHVAR
+            CASE ('stenRblh')
+              Npts=load_r(Nval, Rval, Ngrids, stenRblh)
+#   endif
+#  else
+            CASE ('stenRhflx')
+              Npts=load_r(Nval, Rval, Ngrids, stenRhflx)
+#  endif
+#  if !defined BULK_FLUXES || defined BULK_STRESS
+            CASE ('stenRustr')
+              Npts=load_r(Nval, Rval, Ngrids, stenRustr)
+            CASE ('stenRvstr')
+              Npts=load_r(Nval, Rval, Ngrids, stenRvstr)
+#  endif
+#  if defined SHORTWAVE
+            CASE ('stenRsrad')
+              Npts=load_r(Nval, Rval, Ngrids, stenRsrad)
+#  endif
 #  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
             CASE ('stenRsss')
               Npts=load_r(Nval, Rval, Ngrids, stenRsss)
-#  endif
-#  if defined ABLM && defined ABLM_BLHVAR
-            CASE ('stenRblh')
-              Npts=load_r(Nval, Rval, Ngrids, stenRblh)
 #  endif
 # endif
 # ifdef ADD_WWB
@@ -3819,26 +3826,18 @@
      &          'SST index region southern boundary.'
           WRITE (out,150) stenRegnW(ng), 'stenRegnW',                   &
      &          'SST index region western boundary.'
+#  ifdef BULK_FLUXES
           WRITE (out,160) stenRuwnd(ng), 'stenRuwnd',                   &
      &          'Coupling coefficient of Uwind pattern onto',           &
      &          'SST index (1/degC).'
           WRITE (out,160) stenRvwnd(ng), 'stenRvwnd',                   &
      &          'Coupling coefficient of Vwind pattern onto',           &
      &          'SST index (1/degC).'
-          WRITE (out,160) stenRustr(ng), 'stenRustr',                   &
-     &          'Coupling coefficient of sustr pattern onto',           &
-     &          'SST index (1/degC).'
-          WRITE (out,160) stenRvstr(ng), 'stenRvstr',                   &
-     &          'Coupling coefficient of svstr pattern onto',           &
-     &          'SST index (1/degC).'
-          WRITE (out,160) stenRhflx(ng), 'stenRhflx',                   &
-     &          'Coupling coefficient of shflux pattern onto',          &
-     &          'SST index (1/degC).'
-#  ifdef SET_WINDSPEED
+#   ifdef SET_WINDSPEED
           WRITE (out,160) stenRwmag(ng), 'stenRwmag',                   &
      &          'Coupling coefficient of wmag pattern onto',            &
      &          'SST index (1/degC).'
-#  endif
+#   endif
           WRITE (out,160) stenRqair(ng), 'stenRqair',                   &
      &          'Coupling coefficient of Qair pattern onto',            &
      &          'SST index (1/degC).'
@@ -3848,21 +3847,36 @@
           WRITE (out,160) stenRtair(ng), 'stenRtair',                   &
      &          'Coupling coefficient of Tair pattern onto',            &
      &          'SST index (1/degC).'
-          WRITE (out,160) stenRsrad(ng), 'stenRsrad',                   &
-     &          'Coupling coefficient of swrad pattern onto',           &
-     &          'SST index (1/degC).'
           WRITE (out,160) stenRlrad(ng), 'stenRlrad',                   &
      &          'Coupling coefficient of lwrad_down pattern onto',      &
      &          'SST index (1/degC).'
+#   if defined ABLM && defined ABLM_BLHVAR
+          WRITE (out,160) stenRblh(ng), 'stenRblh',                     &
+     &          'Coupling coefficient of boundary layer height',        &
+     &          'pattern onto SST index (1/degC).'
+#   endif
+#  else
+          WRITE (out,160) stenRhflx(ng), 'stenRhflx',                   &
+     &          'Coupling coefficient of shflux pattern onto',          &
+     &          'SST index (1/degC).'
+#  endif
+#  if !defined BULK_FLUXES || defined BULK_STRESS
+          WRITE (out,160) stenRustr(ng), 'stenRustr',                   &
+     &          'Coupling coefficient of sustr pattern onto',           &
+     &          'SST index (1/degC).'
+          WRITE (out,160) stenRvstr(ng), 'stenRvstr',                   &
+     &          'Coupling coefficient of svstr pattern onto',           &
+     &          'SST index (1/degC).'
+#  endif
+#  if defined SHORTWAVE
+          WRITE (out,160) stenRsrad(ng), 'stenRsrad',                   &
+     &          'Coupling coefficient of swrad pattern onto',           &
+     &          'SST index (1/degC).'
+#  endif
 #  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
           WRITE (out,160) stenRsss(ng), 'stenRsss',                     &
      &          'Coupling coefficient of sea surface salinity pattern', &
      &          'onto SST index (1/degC).'
-#  endif
-#  if defined ABLM && defined ABLM_BLHVAR
-          WRITE (out,160) stenRblh(ng), 'stenRblh',                     &
-     &          'Coupling coefficient of boundary layer height',        &
-     &          'pattern onto SST index (1/degC).'
 #  endif
 # endif
 # ifdef ADD_WWB

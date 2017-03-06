@@ -631,7 +631,7 @@
 #  endif
 # endif
 #endif
-#if defined STATS_ENSO && defined BULK_FLUXES
+#if defined STATS_ENSO
       IF (Master) WRITE (stdout,20) 'STATS_ENSO',                       &
      &   'Statistical ENSO forcing.'
       is=LEN_TRIM(Coptions)+1
@@ -3050,7 +3050,7 @@
      &          /,13x,'Use distributed-memory (MPI) in parallel runs.')
       END IF
 #endif
-#if defined STATS_ENSO && defined BULK_FLUXES && !defined AVERAGES
+#if defined STATS_ENSO && !defined AVERAGES
 ! 
 !  Stop if trying to run STATS_ENSO without AVERAGES defined.
 !

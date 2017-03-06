@@ -180,36 +180,20 @@
 !  avcos        Cosine of average zenith angle of downwelling          !
 !                 spectral photons.                                    !
 #ifdef STATS_ENSO
-!  stflxPG      Kinematic surface flux anomaly                         !
-!                 (temperature: degC m/s; salinity: PSU m/s) at        !
-!                 horizontal RHO-points.                               !
-!  stflxOG      Dummy location for background stflxG input             !
 !  SSTiClimG    SST index climatology, two-time snapshots              !
 !  SSTiClim     SST index climatology                                  !
+# ifdef BULK_FLUXES
 !  UwindPG      Surface wind anomaly in the XI-direction (m/s)         !
 !               at horizontal RHO-points, two-time snapshots.          !
 !  UwindOG      Dummy location for background UwindG input             !
 !  VwindPG      Surface wind anomaly in the ETA-direction (m/s)        !
 !               at horizontal RHO-points, two-time snapshots.          !
 !  VwindOG      Dummy location for background VwindG input             !
-# ifdef SET_WINDSPEED
+#  ifdef SET_WINDSPEED
 !  wMagPG       Surface wind magnitude anomaly (m/s) at horizontal     ! 
 !               RHO-points, two-time snapshots.                        !
 !  wMagOG      Dummy location for background wMagG input               !
-# endif
-# ifdef BULK_STRESS
-!  sustrPG     Kinematic surface momentum flux anomaly in              !
-!                 the XI-direction (m2/s2) at horizontal U-points.     !
-!  sustrOG     Dummy location for background sustrG input              !
-!  svstrPG     Kinematic surface momentum flux anomaly in              !
-!                 the ETA-direction (m2/s2) at horizontal U-points.    !
-!  svstrOG     Dummy location for background sustrG input              !
-# endif
-# if defined ABLM && defined ABLM_BLHVAR
-!  blhPG        Atmospheric boundary layer height anomaly at           !
-!               horizontal RHO-points, two-time snapshots.             !
-!  blhOG        Dummy location for background blhG input               !
-# endif
+#  endif
 !  PairPG       Surface air pressure anomaly (mb), two-time snapshots. !
 !  PairOG       Dummy location for background PairG input              !
 !  TairPG       Surface air temperature anomaly (Celsius), two-time    !
@@ -218,13 +202,34 @@
 !  HairPG       Surface air specific (g/kg) or relative humidity       !
 !               (percentage) anomaly, two-time snapshots               !
 !  HairOG       Dummy location for background HairG input              !
+!  lrflxPG      Kinematic net longwave radiation (degC m/s), two-time  !
+!               snapshots.                                             !
+!  lrflxOG      Dummy location for background lrflxG input             !
+#  if defined ABLM && defined ABLM_BLHVAR
+!  blhPG        Atmospheric boundary layer height anomaly at           !
+!               horizontal RHO-points, two-time snapshots.             !
+!  blhOG        Dummy location for background blhG input               !
+#  endif
+# else
+!  stflxPG      Kinematic surface flux anomaly                         !
+!                 (temperature: degC m/s; salinity: PSU m/s) at        !
+!                 horizontal RHO-points.                               !
+!  stflxOG      Dummy location for background stflxG input             !
+# endif
+# if !defined BULK_FLUXES || defined BULK_STRESS
+!  sustrPG     Kinematic surface momentum flux anomaly in              !
+!                 the XI-direction (m2/s2) at horizontal U-points.     !
+!  sustrOG     Dummy location for background sustrG input              !
+!  svstrPG     Kinematic surface momentum flux anomaly in              !
+!                 the ETA-direction (m2/s2) at horizontal U-points.    !
+!  svstrOG     Dummy location for background sustrG input              !
+# endif
+# if defined SHORTWAVE
 !  srflxPG      Kinematic surface shortwave solar radiation flux       !
 !               (Celsius m/s) anomaly at horizontal RHO-points,        !
 !               two-time snapshots.                                    !
 !  srflxOG      Dummy location for background srflxG input             !
-!  lrflxPG      Kinematic net longwave radiation (degC m/s), two-time  !
-!               snapshots.                                             !
-!  lrflxOG      Dummy location for background lrflxG input             !
+# endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
 !  sssPG        Sea Surface Salinity anomaly, two-time snapshots.      !
 !  sssOG        Dummy location for background sssPG input              !
