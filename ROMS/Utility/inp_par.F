@@ -944,6 +944,7 @@
         Fscale(idVbcs,ng)=cff*Fscale(idVbcs,ng)
         cff=1.0_r8/(rho0*Cp)
         Fscale(idTsur(itemp),ng)=cff*Fscale(idTsur(itemp),ng)
+        Fscale(idTsurP(itemp),ng)=cff*Fscale(idTsurP(itemp),ng)
         Fscale(idTbot(itemp),ng)=cff*Fscale(idTbot(itemp),ng)
         Fscale(idSrad,ng)=cff*Fscale(idSrad,ng)
         Fscale(idLdwn,ng)=cff*Fscale(idLdwn,ng)
