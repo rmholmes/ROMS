@@ -819,7 +819,7 @@
 #   ifdef MASKING
      &                GRID(ng) % rmask,                                 &
 #   endif
-     &                FORCES(ng) % stfluxPG(:,:,:,itemp))
+     &                FORCES(ng) % stflxPG(:,:,:,itemp))
       IF (exit_flag.ne.NoError) RETURN
       IF (update(1)) stenUpdte(ng) = .TRUE.
       
