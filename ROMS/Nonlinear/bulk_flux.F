@@ -95,11 +95,6 @@
      &                     GRID(ng) % umask_wet,                        &
      &                     GRID(ng) % vmask_wet,                        &
 # endif
-# ifdef ADD_WWB
-     &                     GRID(ng) % lonr,                             &
-     &                     GRID(ng) % latr,                             &
-     &                     FORCES(ng) % WWBamp,                         &
-# endif
      &                     MIXING(ng) % alpha,                          &
      &                     MIXING(ng) % beta,                           &
      &                     OCEAN(ng) % rho,                             &
@@ -162,9 +157,6 @@
 # ifdef WET_DRY
      &                           rmask_wet, umask_wet, vmask_wet,       &
 # endif
-# ifdef ADD_WWB
-     &                           lonr, latr, WWBamp,                    &
-# endif
      &                           alpha, beta, rho, t,                   &
 # ifdef ABLM_WATER
      &                           Q100,                                  &
@@ -211,9 +203,6 @@
       integer, intent(in) :: LBi, UBi, LBj, UBj
       integer, intent(in) :: IminS, ImaxS, JminS, JmaxS
       integer, intent(in) :: nrhs
-# ifdef ADD_WWB
-      real(r8), intent(in) :: WWBamp
-# endif
 !
 # ifdef ASSUMED_SHAPE
 #  ifdef MASKING
@@ -225,10 +214,6 @@
       real(r8), intent(in) :: rmask_wet(LBi:,LBj:)
       real(r8), intent(in) :: umask_wet(LBi:,LBj:)
       real(r8), intent(in) :: vmask_wet(LBi:,LBj:)
-#  endif
-#  ifdef ADD_WWB
-      real(r8), intent(in) :: lonr(LBi:,LBj:)
-      real(r8), intent(in) :: latr(LBi:,LBj:)
 #  endif
       real(r8), intent(in) :: alpha(LBi:,LBj:)
       real(r8), intent(in) :: beta(LBi:,LBj:)
@@ -286,10 +271,6 @@
       real(r8), intent(in) :: rmask_wet(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: umask_wet(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: vmask_wet(LBi:UBi,LBj:UBj)
-#  endif
-#  ifdef ADD_WWB
-      real(r8), intent(in) :: lonr(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: latr(LBi:UBi,LBj:UBj)
 #  endif
       real(r8), intent(in) :: alpha(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: beta(LBi:UBi,LBj:UBj)
@@ -825,11 +806,6 @@
 #  else
           Taux(i,j)=(cff*Uwind(i,j)+Taur*SIGN(1.0_r8,Uwind(i,j)))
 #  endif
-# endif
-# ifdef ADD_WWB
-          Taux(i,j)=Taux(i,j) + WWBamp *                                &
-     &                     EXP(-((lonr(i,j)-WWBxC(ng))/WWBxW(ng))**2 -  &
-     &                          ((latr(i,j)-WWByC(ng))/WWByW(ng))**2)
 # endif
 # ifdef MASKING
           Taux(i,j)=Taux(i,j)*rmask(i,j)

@@ -63,6 +63,11 @@
 #  if defined ICESHELF
      &                   GRID(ng) % zice,                               &
 #  endif
+#  ifdef ADD_WWB
+     &                   GRID(ng) % lonu,                               &
+     &                   GRID(ng) % latu,                               &
+     &                   FORCES(ng) % WWBamp,                           &
+#  endif
      &                   OCEAN(ng) % t,                                 &
 #  if !defined BBL_MODEL || defined ICESHELF
      &                   OCEAN(ng) % u,                                 &
@@ -75,10 +80,10 @@
 #  if defined SCORRECTION || defined SRELAXATION
      &                   FORCES(ng) % sss,                              &
 #  endif
-#  if defined ICESHELF
-#   ifdef SHORTWAVE
+#  if defined ICESHELF && defined SHORTWAVE
      &                   FORCES(ng) % srflx,                            &
-#   endif
+#  endif
+#  if defined ICESHELF || defined ADD_WWB
      &                   FORCES(ng) % sustr,                            &
      &                   FORCES(ng) % svstr,                            &
 #  endif
@@ -114,6 +119,9 @@
 #  if defined ICESHELF
      &                         zice,                                    &
 #  endif
+#  ifdef ADD_WWB
+     &                         lonu, latu, WWBamp,                      &
+# endif
      &                         t,                                       &
 #  if !defined BBL_MODEL || defined ICESHELF
      &                         u, v,                                    &
@@ -124,10 +132,10 @@
 #  if defined SCORRECTION || defined SRELAXATION
      &                         sss,                                     &
 #  endif
-#  if defined ICESHELF
-#   ifdef SHORTWAVE
+#  if defined ICESHELF && defined SHORTWAVE
      &                         srflx,                                   &
-#   endif
+#  endif
+#  if defined ICESHELF || defined ADD_WWB
      &                         sustr, svstr,                            &
 #  endif
 #  ifndef BBL_MODEL
@@ -140,6 +148,9 @@
       USE mod_scalars
 !
       USE bc_2d_mod
+# ifdef ADD_WWB
+      USE exchange_2d_mod
+# endif
 # ifdef DISTRIBUTE
       USE mp_exchange_mod, ONLY : mp_exchange2d
 # endif
@@ -150,6 +161,9 @@
       integer, intent(in) :: LBi, UBi, LBj, UBj
       integer, intent(in) :: IminS, ImaxS, JminS, JmaxS
       integer, intent(in) :: nrhs
+# ifdef ADD_WWB
+      real(r8), intent(in) :: WWBamp
+# endif
 !
 #  ifdef ASSUMED_SHAPE
       real(r8), intent(in) :: Hz(LBi:,LBj:,:)
@@ -167,6 +181,10 @@
 #   if defined ICESHELF
       real(r8), intent(in) :: zice(LBi:,LBj:)
 #   endif
+#   ifdef ADD_WWB
+      real(r8), intent(in) :: lonu(LBi:,LBj:)
+      real(r8), intent(in) :: latu(LBi:,LBj:)
+#   endif
       real(r8), intent(in) :: t(LBi:,LBj:,:,:,:)
 #   if !defined BBL_MODEL || defined ICESHELF
       real(r8), intent(in) :: u(LBi:,LBj:,:,:)
@@ -179,10 +197,10 @@
 #   if defined SCORRECTION || defined SRELAXATION
       real(r8), intent(in) :: sss(LBi:,LBj:)
 #   endif
-#   if defined ICESHELF
-#    ifdef SHORTWAVE
+#   if defined ICESHELF && defined SHORTWAVE
       real(r8), intent(inout) :: srflx(LBi:,LBj:)
-#    endif
+#   endif
+#   if defined ICESHELF || defined ADD_WWB
       real(r8), intent(inout) :: sustr(LBi:,LBj:)
       real(r8), intent(inout) :: svstr(LBi:,LBj:)
 #   endif
@@ -208,6 +226,10 @@
 #   if defined ICESHELF
       real(r8), intent(in) :: zice(LBi:UBi,LBj:UBj)
 #   endif
+#   ifdef ADD_WWB
+      real(r8), intent(in) :: lonu(LBi:UBi,LBj:UBj)
+      real(r8), intent(in) :: latu(LBi:UBi,LBj:UBj)
+#   endif
       real(r8), intent(in) :: t(LBi:UBi,LBj:UBj,N(ng),3,NT(ng))
 #   if !defined BBL_MODEL || defined ICESHELF
       real(r8), intent(in) :: u(LBi:UBi,LBj:UBj,N(ng),2)
@@ -220,10 +242,10 @@
 #   if defined SCORRECTION || defined SRELAXATION
       real(r8), intent(in) :: sss(LBi:UBi,LBj:UBj)
 #   endif
-#   if defined ICESHELF
-#    ifdef SHORTWAVE
+#   if defined ICESHELF && defined SHORTWAVE
       real(r8), intent(inout) :: srflx(LBi:UBi,LBj:UBj)
-#    endif
+#   endif
+#   if defined ICESHELF || defined ADD_WWB
       real(r8), intent(inout) :: sustr(LBi:UBi,LBj:UBj)
       real(r8), intent(inout) :: svstr(LBi:UBi,LBj:UBj)
 #   endif
@@ -264,6 +286,34 @@
      &                     dqdt(i,j)*(t(i,j,N(ng),nrhs,itemp)-sst(i,j))
         END DO
       END DO
+#  endif
+
+#  ifdef ADD_WWB
+!
+!-----------------------------------------------------------------------
+!  Add wind burst to zonal wind stress field
+!-----------------------------------------------------------------------
+!
+      DO j=JstrR,JendR
+        DO i=IstrR,IendR
+          sustr(i,j) = sustr(i,j) + WWBamp / rho0 *                     &
+     &                 EXP(-((lonu(i,j)-WWBxC(ng))/WWBxW(ng))**2 -      &
+     &                      ((latu(i,j)-WWByC(ng))/WWByW(ng))**2)
+        END DO
+      END DO
+
+      IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+        CALL exchange_u2d_tile (ng, tile,                               &
+     &                          LBi, UBi, LBj, UBj,                     &
+     &                          sustr)
+      END IF
+#   ifdef DISTRIBUTE
+      CALL mp_exchange2d (ng, tile, iNLM, 2,                            &
+     &                    LBi, UBi, LBj, UBj,                           &
+     &                    NghostPoints,                                 &
+     &                    EWperiodic(ng), NSperiodic(ng),               &
+     &                    sustr)
+#   endif
 #  endif
 
 #  ifdef LIMIT_STFLX_COOLING
