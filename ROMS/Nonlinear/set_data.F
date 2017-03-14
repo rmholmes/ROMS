@@ -384,11 +384,15 @@
       END IF
 #  endif
 
-#  ifdef QCORRECTION
+#  if defined QCORRECTION || defined SVD_ENSO
 !
 !-----------------------------------------------------------------------
+#   ifdef SVD_ENSO
+!  Set mean sea surface temperature (SST) for SVD_ENSO
+#   else
 !  Set sea surface temperature (SST) and heat flux sensitivity to
 !  SST (dQdSST) which are used for surface heat flux correction.
+#   endif
 !-----------------------------------------------------------------------
 !
 #   ifdef ANA_SST
@@ -401,6 +405,8 @@
      &                     update)
       IF (exit_flag.ne.NoError) RETURN
 #   endif
+#  endif
+#  ifdef QCORRECTION
 !
 #   ifdef ANA_DQDSST
       CALL ana_dqdsst (ng, tile, iNLM)

@@ -477,11 +477,15 @@
           real(r8), pointer :: btflxG(:,:,:,:)
 # endif
 
-# ifdef QCORRECTION
+# if defined QCORRECTION || defined SVD_ENSO
+#  ifdef QCORRECTION
           real(r8), pointer :: dqdt(:,:)
+#  endif
           real(r8), pointer :: sst(:,:)
 #  ifndef ANA_SST
+#   ifdef QCORRECTION
           real(r8), pointer :: dqdtG(:,:,:)
+#   endif
           real(r8), pointer :: sstG(:,:,:)
 #  endif
 # endif
@@ -875,12 +879,16 @@
       allocate ( FORCES(ng) % btflxG(LBi:UBi,LBj:UBj,2,NT(ng)) )
 # endif
 
-# ifdef QCORRECTION
+# if defined QCORRECTION || defined SVD_ENSO
+#  ifdef QCORRECTION
       allocate ( FORCES(ng) % dqdt(LBi:UBi,LBj:UBj) )
+#  endif
       allocate ( FORCES(ng) % sst(LBi:UBi,LBj:UBj) )
 
 #  ifndef ANA_SST
+#   ifdef QCORRECTION
       allocate ( FORCES(ng) % dqdtG(LBi:UBi,LBj:UBj,2) )
+#   endif
       allocate ( FORCES(ng) % sstG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
@@ -1329,12 +1337,16 @@
             FORCES(ng) % rainG(i,j,1) = IniVal
             FORCES(ng) % rainG(i,j,2) = IniVal
 # endif
-# ifdef QCORRECTION
+# if defined QCORRECTION || defined SVD_ENSO
+#  ifdef QCORRECTION
             FORCES(ng) % dqdt(i,j) = IniVal
+#  endif
             FORCES(ng) % sst(i,j) = IniVal
 #  ifndef ANA_SST
+#   ifdef QCORRECTION
             FORCES(ng) % dqdtG(i,j,1) = IniVal
             FORCES(ng) % dqdtG(i,j,2) = IniVal
+#   endif
             FORCES(ng) % sstG(i,j,1) = IniVal
             FORCES(ng) % sstG(i,j,2) = IniVal
 #  endif

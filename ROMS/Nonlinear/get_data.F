@@ -857,11 +857,15 @@
       END IF
 # endif
 
-# if !defined ANA_SST && defined QCORRECTION
+# if (!defined ANA_SST && defined QCORRECTION) || defined SVD_ENSO
 !
 !-----------------------------------------------------------------------
+#  ifdef SVD_ENSO
+!  Mean Sea Surface Temperature (SST) field for SVD_ENSO
+#  else
 !  Surface net heat flux correction fields: sea surface temperature
 !  (SST).
+#  endif
 !-----------------------------------------------------------------------
 !
       CALL get_2dfld (ng, iNLM, idSSTc, ncFRCid(idSSTc,ng),             &
