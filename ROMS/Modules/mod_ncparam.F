@@ -257,6 +257,7 @@
         integer  :: idSSSc        ! SSS climatology
         integer  :: idSSSP        ! SSS climatology anomaly
         integer  :: idSSTc        ! SST climatology
+        integer  :: idSSTP        ! SST climatology anomaly
         integer  :: idShea        ! net sensible heat flux
         integer  :: idSWCW        ! SIN(omega(k)*t)*COS(omega(l)*t)
         integer  :: idsfwf        ! surface freswater flux
@@ -1299,6 +1300,8 @@
               idSSSP=varid
             CASE ('idSSTc')
               idSSTc=varid
+            CASE ('idSSTP')
+              idSSTP=varid
 #if defined AD_SENSITIVITY   || defined IS4DVAR_SENSITIVITY || \
     defined OPT_OBSERVATIONS || defined SENSITIVITY_4DVAR   || \
     defined SO_SEMI

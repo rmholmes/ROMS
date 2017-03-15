@@ -1866,6 +1866,15 @@
   'r2dvar'
   1.0d0
 
+'SSTP'                                             ! Input
+  'sea surface temperature anomaly'
+  'Celsius'                                        ! [Celsius]
+  'SST anomaly, scalar, series'
+  'prt_time'
+  'idSSTP'
+  'r2dvar'
+  1.0d0
+
 !
 !------------------------------------------------------------------------------
 !  Tidal forcing variables.

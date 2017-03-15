@@ -822,7 +822,7 @@
 !
       CALL ana_spinning (ng, tile, iNLM)
 # endif
-# ifdef STATS_ENSO
+# if defined STATS_ENSO && !defined SVD_ENSO
 !
 !-----------------------------------------------------------------------
 !  Mean SST index values
