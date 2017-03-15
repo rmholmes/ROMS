@@ -64,7 +64,7 @@
 !  avgSSTm    time-averaged SST climatology                            !
 #  else
 !  avgSSTiClim time-averaged SST index climatology                     !
-#  end
+#  endif
 # endif
 !                                                                      !
 !  Time-averaged surface and bottom fluxes.                            !

@@ -103,7 +103,7 @@
 !  Read-in SST SVD patterns
 !-----------------------------------------------------------------------
 !
-      CALL get_2dfld (ng, iNLM, idSSTP, ncFRCid(idSSTP,ng),             &
+      CALL get_svdfld (ng, iNLM, idSSTP, ncFRCid(idSSTP,ng),             &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
 #  ifdef MASKING
@@ -122,8 +122,8 @@
         my_cov(k,2) = 0.0_r8
         my_var(k,1) = 0.0_r8
         my_var(k,2) = 0.0_r8
-        DO j=JstrR,JendR
-           DO i=IstrR,IendR
+        DO j=LBj,UBj
+          DO i=LBi,UBi
            my_cov(k,1) = my_cov(k,1) + FORCES(ng)%ssta(i,j) *           &
                   FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
            my_cov(k,2) = my_cov(k,2) + FORCES(ng)%ssta(i,j) *           &
@@ -256,7 +256,11 @@
       IF (exit_flag.ne.NoError) RETURN
 # ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idUairP, ncFRCid(idUairP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idUairP, ncFRCid(idUairP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -274,8 +278,8 @@
 #  ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%UwindG(i,j,1)=FORCES(ng)%UwindOG(i,j,1)          &
-            FORCES(ng)%UwindG(i,j,2)=FORCES(ng)%UwindOG(i,j,2)          &
+            FORCES(ng)%UwindG(i,j,1)=FORCES(ng)%UwindOG(i,j,1)          
+            FORCES(ng)%UwindG(i,j,2)=FORCES(ng)%UwindOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%UwindG(i,j,1) = FORCES(ng)%UwindG(i,j,1) +     &
      &        Rc(k,1)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,k,1)
@@ -293,8 +297,8 @@
      &      stenIanom(ng)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,2)
           END DO
         END DO
-      END IF
 #  endif
+      END IF
 # endif
 
       CALL get_2dfld (ng , iNLM, idVair, ncFRCid(idVair,ng),            &
@@ -311,7 +315,11 @@
       IF (exit_flag.ne.NoError) RETURN
 # ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idVairP, ncFRCid(idVairP,ng),          &
+#  else
       CALL get_2dfld (ng , iNLM, idVairP, ncFRCid(idVairP,ng),          &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -329,8 +337,8 @@
 #  ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%VwindG(i,j,1)=FORCES(ng)%VwindOG(i,j,1)          &
-            FORCES(ng)%VwindG(i,j,2)=FORCES(ng)%VwindOG(i,j,2)          &
+            FORCES(ng)%VwindG(i,j,1)=FORCES(ng)%VwindOG(i,j,1)          
+            FORCES(ng)%VwindG(i,j,2)=FORCES(ng)%VwindOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%VwindG(i,j,1) = FORCES(ng)%VwindG(i,j,1) +     &
      &        Rc(k,1)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,k,1)
@@ -348,8 +356,8 @@
      &      stenIanom(ng)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,2)
           END DO
         END DO
-      END IF
 #  endif
+      END IF
 # endif
 # ifdef SET_WINDSPEED
 !
@@ -371,7 +379,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idSairP, ncFRCid(idSairP,ng),          &
+#  else
       CALL get_2dfld (ng , iNLM, idSairP, ncFRCid(idSairP,ng),          &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #   ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -389,8 +401,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%wMagG(i,j,1)=FORCES(ng)%wMagOG(i,j,1)            &
-            FORCES(ng)%wMagG(i,j,2)=FORCES(ng)%wMagOG(i,j,2)            &
+            FORCES(ng)%wMagG(i,j,1)=FORCES(ng)%wMagOG(i,j,1)            
+            FORCES(ng)%wMagG(i,j,2)=FORCES(ng)%wMagOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%wMagG(i,j,1) = FORCES(ng)%wMagG(i,j,1) +       &
      &        Rc(k,1)*stenRwmag(ng)*FORCES(ng)%wMagPG(i,j,k,1)
@@ -435,7 +447,11 @@
       IF (exit_flag.ne.NoError) RETURN
 # ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idHblyP, ncFRCid(idHblyP,ng),          &
+#  else
       CALL get_2dfld (ng , iNLM, idHblyP, ncFRCid(idHblyP,ng),          &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -453,8 +469,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%blhG(i,j,1)=FORCES(ng)%blhOG(i,j,1)              &
-            FORCES(ng)%blhG(i,j,2)=FORCES(ng)%blhOG(i,j,2)              &
+            FORCES(ng)%blhG(i,j,1)=FORCES(ng)%blhOG(i,j,1)              
+            FORCES(ng)%blhG(i,j,2)=FORCES(ng)%blhOG(i,j,2)              
             DO k=1,stenNmod
               FORCES(ng)%blhG(i,j,1) = FORCES(ng)%blhG(i,j,1) +         &
      &        Rc(k,1)*stenRblh(ng)*FORCES(ng)%blhPG(i,j,k,1)
@@ -499,7 +515,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idUsmsP, ncFRCid(idUsmsP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idUsmsP, ncFRCid(idUsmsP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -516,8 +536,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%sustrG(i,j,1)=FORCES(ng)%sustrOG(i,j,1)          &
-            FORCES(ng)%sustrG(i,j,2)=FORCES(ng)%sustrOG(i,j,2)          &
+            FORCES(ng)%sustrG(i,j,1)=FORCES(ng)%sustrOG(i,j,1)          
+            FORCES(ng)%sustrG(i,j,2)=FORCES(ng)%sustrOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%sustrG(i,j,1) = FORCES(ng)%sustrG(i,j,1) +     &
      &        Rc(k,1)*stenRustr(ng)*FORCES(ng)%sustrPG(i,j,k,1)
@@ -554,7 +574,11 @@
 # endif
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idVsmsP, ncFRCid(idVsmsP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idVsmsP, ncFRCid(idVsmsP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -571,8 +595,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%svstrG(i,j,1)=FORCES(ng)%svstrOG(i,j,1)          &
-            FORCES(ng)%svstrG(i,j,2)=FORCES(ng)%svstrOG(i,j,2)          &
+            FORCES(ng)%svstrG(i,j,1)=FORCES(ng)%svstrOG(i,j,1)          
+            FORCES(ng)%svstrG(i,j,2)=FORCES(ng)%svstrOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%svstrG(i,j,1) = FORCES(ng)%svstrG(i,j,1) +     &
      &        Rc(k,1)*stenRvstr(ng)*FORCES(ng)%svstrPG(i,j,k,1)
@@ -644,7 +668,11 @@
       IF (exit_flag.ne.NoError) RETURN
 # ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idPairP, ncFRCid(idPairP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idPairP, ncFRCid(idPairP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -662,8 +690,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%PairG(i,j,1)=FORCES(ng)%PairOG(i,j,1)            &
-            FORCES(ng)%PairG(i,j,2)=FORCES(ng)%PairOG(i,j,2)            &
+            FORCES(ng)%PairG(i,j,1)=FORCES(ng)%PairOG(i,j,1)            
+            FORCES(ng)%PairG(i,j,2)=FORCES(ng)%PairOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%PairG(i,j,1) = FORCES(ng)%PairG(i,j,1) +       &
      &        Rc(k,1)*stenRpair(ng)*FORCES(ng)%PairPG(i,j,k,1)
@@ -819,7 +847,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idSradP, ncFRCid(idSradP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idSradP, ncFRCid(idSradP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -837,8 +869,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%srflxG(i,j,1)=FORCES(ng)%srflxOG(i,j,1)          &
-            FORCES(ng)%srflxG(i,j,2)=FORCES(ng)%srflxOG(i,j,2)          &
+            FORCES(ng)%srflxG(i,j,1)=FORCES(ng)%srflxOG(i,j,1)          
+            FORCES(ng)%srflxG(i,j,2)=FORCES(ng)%srflxOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%srflxG(i,j,1) = FORCES(ng)%srflxG(i,j,1) +     &
      &        Rc(k,1)*stenRsrad(ng)*FORCES(ng)%srflxPG(i,j,k,1)
@@ -913,7 +945,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idLdwnP, ncFRCid(idLdwnP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idLdwnP, ncFRCid(idLdwnP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -931,8 +967,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%lrflxG(i,j,1)=FORCES(ng)%lrflxOG(i,j,1)          &
-            FORCES(ng)%lrflxG(i,j,2)=FORCES(ng)%lrflxOG(i,j,2)          &
+            FORCES(ng)%lrflxG(i,j,1)=FORCES(ng)%lrflxOG(i,j,1)          
+            FORCES(ng)%lrflxG(i,j,2)=FORCES(ng)%lrflxOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%lrflxG(i,j,1) = FORCES(ng)%lrflxG(i,j,1) +     &
      &        Rc(k,1)*stenRlrad(ng)*FORCES(ng)%lrflxPG(i,j,k,1)
@@ -977,7 +1013,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idTairP, ncFRCid(idTairP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idTairP, ncFRCid(idTairP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -995,8 +1035,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%TairG(i,j,1)=FORCES(ng)%TairOG(i,j,1)            &
-            FORCES(ng)%TairG(i,j,2)=FORCES(ng)%TairOG(i,j,2)            &
+            FORCES(ng)%TairG(i,j,1)=FORCES(ng)%TairOG(i,j,1)            
+            FORCES(ng)%TairG(i,j,2)=FORCES(ng)%TairOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%TairG(i,j,1) = FORCES(ng)%TairG(i,j,1) +       &
      &        Rc(k,1)*stenRtair(ng)*FORCES(ng)%TairPG(i,j,k,1)
@@ -1039,7 +1079,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idQairP, ncFRCid(idQairP,ng),          &
+#  else
       CALL get_2dfld (ng, iNLM, idQairP, ncFRCid(idQairP,ng),           &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -1057,8 +1101,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%HairG(i,j,1)=FORCES(ng)%HairOG(i,j,1)            &
-            FORCES(ng)%HairG(i,j,2)=FORCES(ng)%HairOG(i,j,2)            &
+            FORCES(ng)%HairG(i,j,1)=FORCES(ng)%HairOG(i,j,1)            
+            FORCES(ng)%HairG(i,j,2)=FORCES(ng)%HairOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%HairG(i,j,1) = FORCES(ng)%HairG(i,j,1) +       &
      &        Rc(k,1)*stenRqair(ng)*FORCES(ng)%HairPG(i,j,k,1)
@@ -1118,7 +1162,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #  ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idTsurP(itemp),                        &
+#  else
       CALL get_2dfld (ng, iNLM, idTsurP(itemp),                         &
+#  endif
      &                ncFRCid(idTsurP(itemp),ng),                       &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
@@ -1313,7 +1361,11 @@
       IF (exit_flag.ne.NoError) RETURN
 #   ifdef STATS_ENSO
       IF (update(1)) stenUpdte(ng) = .TRUE.
+#  ifdef SVD_ENSO
+      CALL get_svdfld (ng, iNLM, idSSSP, ncFRCid(idSSSP,ng),            &
+#  else
       CALL get_2dfld (ng, iNLM, idSSSP, ncFRCid(idSSSP,ng),             &
+#  endif
      &                nFfiles(ng), FRC(1,ng), update(1),                &
 #  ifdef SVD_ENSO
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
@@ -1331,8 +1383,8 @@
 #   ifdef SVD_ENSO
         DO j=LBj,UBj
           DO i=LBi,UBi
-            FORCES(ng)%sssG(i,j,1)=FORCES(ng)%sssOG(i,j,1)              &
-            FORCES(ng)%sssG(i,j,2)=FORCES(ng)%sssOG(i,j,2)              &
+            FORCES(ng)%sssG(i,j,1)=FORCES(ng)%sssOG(i,j,1)              
+            FORCES(ng)%sssG(i,j,2)=FORCES(ng)%sssOG(i,j,2)              
             DO k=1,stenNmod
               FORCES(ng)%sssG(i,j,1) = FORCES(ng)%sssG(i,j,1) +         &
      &        Rc(k,1)*stenRsss(ng)*FORCES(ng)%sssPG(i,j,k,1)

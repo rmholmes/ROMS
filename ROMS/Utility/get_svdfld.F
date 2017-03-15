@@ -1,5 +1,6 @@
 #include "cppdefs.h"
-      SUBROUTINE get_2dfld (ng, model, ifield, ncid, nfiles, S,         &
+#ifdef SVD_ENSO
+      SUBROUTINE get_svdfld (ng, model, ifield, ncid, nfiles, S,        &
      &                      update, LBi, UBi, LBj, UBj, Iout, Irec,     &
 #ifdef MASKING
      &                      Fmask,                                      &
@@ -66,7 +67,7 @@
 #ifdef MASKING
       real(r8), intent(in) :: Fmask(LBi:UBi,LBj:UBj)
 #endif
-      real(r8), intent(inout) :: Fout(LBi:UBi,LBj:UBj,Iout)
+      real(r8), intent(inout) :: Fout(LBi:UBi,LBj:UBj,Irec,Iout)
 !
 !  Local variable declarations.
 !
@@ -83,7 +84,7 @@
 
       character (len=14) :: t_code
 !
-      SourceFile='get_2dfld.F'
+      SourceFile='get_svdfld.F'
 !
 !-----------------------------------------------------------------------
 !  Initialize.
@@ -157,14 +158,12 @@
 !  calling program.  If Irec > 1, this routine is used to read a 2D
 !  field varying in another non-time dimension.
 !
-          IF (.not.special.and.(Irec.eq.1)) THEN
-            IF (Iout.eq.1) THEN
-              Tindex=1
-            ELSE
-              Tindex=3-Tindex
-            END IF
-            Iinfo(8,ifield,ng)=Tindex
-          END IF
+           IF (Iout.eq.1) THEN
+             Tindex=1
+           ELSE
+             Tindex=3-Tindex
+           END IF
+           Iinfo(8,ifield,ng)=Tindex
 !
 !  Read in time coordinate and scale it to day units.
 !
@@ -190,29 +189,17 @@
             Fmin=0.0_r8
             Fmax=0.0_r8
             IF (Lgridded) THEN
-              IF (special) THEN
-                Vsize(3)=Irec
-                gtype=Vtype+4
-                status=nf_fread3d(ng, model, ncfile, ncid,              &
+               Vsize(3)=Irec
+               gtype=Vtype+4
+               status=nf_fread3d(ng, model, ncfile, ncid,               &
      &                            Vname(1,ifield), Vid,                 &
-     &                            0, gtype, Vsize,                      &
+     &                            Trec, gtype, Vsize,                   &
      &                            LBi, UBi, LBj, UBj, 1, Irec,          &
      &                            Fscale(ifield,ng), Fmin, Fmax,        &
 #ifdef MASKING
      &                            Fmask,                                &
 #endif
-     &                            Fout)
-              ELSE
-                status=nf_fread2d(ng, model, ncfile, ncid,              &
-     &                            Vname(1,ifield), Vid,                 &
-     &                            Trec, Vtype, Vsize,                   &
-     &                            LBi, UBi, LBj, UBj,                   &
-     &                            Fscale(ifield,ng), Fmin, Fmax,        &
-#ifdef MASKING
-     &                            Fmask,                                &
-#endif
-     &                            Fout(:,:,Tindex))
-              END IF
+     &                            Fout(:,:,:,Tindex))
             ELSE
               CALL netcdf_get_fvar (ng, model, ncfile, Vname(1,ifield), &
      &                              Fval,                               &
@@ -231,18 +218,14 @@
             Finfo(8,ifield,ng)=Fmin
             Finfo(9,ifield,ng)=Fmax
             IF (Master) THEN
-              IF (special) THEN
-                WRITE (stdout,50) TRIM(Vname(2,ifield)), Fmin, Fmax
-              ELSE
-                lstr=SCAN(ncfile,'/',BACK=.TRUE.)+1
-                lend=LEN_TRIM(ncfile)
-                lvar=MIN(43,LEN_TRIM(Vname(2,ifield)))
-                Tval=Tval*day2sec
-                CALL time_string (Tval, t_code)
-                WRITE (stdout,60) Vname(2,ifield)(1:lvar), t_code,      &
+               lstr=SCAN(ncfile,'/',BACK=.TRUE.)+1
+               lend=LEN_TRIM(ncfile)
+               lvar=MIN(43,LEN_TRIM(Vname(2,ifield)))
+               Tval=Tval*day2sec
+               CALL time_string (Tval, t_code)
+               WRITE (stdout,60) Vname(2,ifield)(1:lvar), t_code,       &
      &                            Trec, Tindex, ncfile(lstr:lend),      &
      &                            Tmin, Tmax, Fmin, Fmax
-              END IF
             END IF
             update=.TRUE.
           END IF
@@ -265,20 +248,21 @@
       END IF
 !
 
-  10  FORMAT (/,' GET_2DFLD   - unable to find dimension ',a,           &
+  10  FORMAT (/,' GET_SVDFLD   - unable to find dimension ',a,          &
      &        /,15x,'for variable: ',a,/,15x,'in file: ',a,             &
      &        /,15x,'file is not CF compliant...')
-  20  FORMAT (/,' GET_2DFLD   - unable to find requested variable: ',a, &
+  20  FORMAT (/,' GET_SVDFLD   - unable to find requested variable: ',a,&
      &        /,15x,'in ',a)
-  30  FORMAT (/,' GET_2DFLD   - unable to open input NetCDF file: ',a)
-  40  FORMAT (/,' GET_2DFLD   - error while reading variable: ',a,2x,   &
+  30  FORMAT (/,' GET_SVDFLD   - unable to open input NetCDF file: ',a)
+  40  FORMAT (/,' GET_SVDFLD   - error while reading variable: ',a,2x   &
      &        ' at TIME index = ',i7)
-  50  FORMAT (3x,' GET_2DFLD   - ',a,/,19x,'(Min = ',1p,e15.8,0p,       &
+  50  FORMAT (3x,' GET_SVDFLD   - ',a,/,19x,'(Min = ',1p,e15.8,0p,      &
      &        ' Max = ',1p,e15.8,0p,')')
-  60  FORMAT (3x,' GET_2DFLD   - ',a,',',t62,'t = ',a,/,19x,            &
+  60  FORMAT (3x,' GET_SVDFLD   - ',a,',',t62,'t = ',a,/,19x,           &
      &        '(Rec=',i7.7,', Index=',i1,', File: ',a,')',/,19x,        &
      &        '(Tmin= ', f15.4, ' Tmax= ', f15.4,')',/, 19x,            &
      &        '(Min = ', 1p,e15.8,0p,' Max = ',1p,e15.8,0p,')')
 
       RETURN
-      END SUBROUTINE get_2dfld
+      END SUBROUTINE get_svdfld
+#endif

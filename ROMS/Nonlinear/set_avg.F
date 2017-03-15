@@ -2789,7 +2789,7 @@
           DO i=IstrR,IendR
             FORCES(ng)%ssta(i,j) = (FORCES(ng)%ssta(i,j)*(stenNdays-1)  &
      &                       +  AVERAGE(ng)%avgt(i,j,N(ng),itemp)       &
-     &                       -  AVERAGE(ng)%SSTm(i,j))/stenNdays
+     &                       -  AVERAGE(ng)%avgSSTm(i,j))/stenNdays
           ENDDO
         ENDDO
         IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
@@ -2805,7 +2805,7 @@
 #   endif
         END IF
         stenUpdte(ng)=.TRUE.
-# elseif
+# else
 !
 !-----------------------------------------------------------------------
 !  Calculate SST index for statistical ENSO model 

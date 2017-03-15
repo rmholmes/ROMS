@@ -276,7 +276,7 @@
 #  else
           real(r8), pointer :: sustrPG(:,:,:)
           real(r8), pointer :: svstrPG(:,:,:)
-#  end
+#  endif
           real(r8), pointer :: sustrOG(:,:,:)
           real(r8), pointer :: svstrOG(:,:,:)
 # endif
@@ -467,14 +467,14 @@
 #    endif
           real(r8), pointer :: UwindOG(:,:,:)
           real(r8), pointer :: VwindOG(:,:,:)
-#   ifdef SET_WINDSPEED
-#    ifdef SVD_ENSO
+#    ifdef SET_WINDSPEED
+#     ifdef SVD_ENSO
           real(r8), pointer :: wMagPG(:,:,:,:)
-#    else
+#     else
           real(r8), pointer :: wMagPG(:,:,:)
-#    endif
+#     endif
           real(r8), pointer :: wMagOG(:,:,:)
-#   endif
+#    endif
 #   endif
 #  endif
 #  if defined ABLM && defined ABLM_BLHVAR
@@ -535,7 +535,7 @@
 #   ifdef QCORRECTION
           real(r8), pointer :: dqdtG(:,:,:)
 #   else
-          real(r8), pointer :: sstPG(:,:,:)
+          real(r8), pointer :: sstPG(:,:,:,:)
 #   endif
           real(r8), pointer :: sstG(:,:,:)
 #  endif
@@ -916,7 +916,11 @@
       allocate ( FORCES(ng) % UwindOG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindOG(LBi:UBi,LBj:UBj,2) )
 #    ifdef SET_WINDSPEED
+#     ifdef SVD_ENSO
+      allocate ( FORCES(ng) % wMagPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#     else
       allocate ( FORCES(ng) % wMagPG(LBi:UBi,LBj:UBj,2) )
+#     endif
       allocate ( FORCES(ng) % wMagOG(LBi:UBi,LBj:UBj,2) )
 #    endif
 #   endif
@@ -984,7 +988,7 @@
 #   ifdef QCORRECTION
       allocate ( FORCES(ng) % dqdtG(LBi:UBi,LBj:UBj,2) )
 #   else
-      allocate ( FORCES(ng) % sstPG(LBi:UBi,LBj:UBj,2) )
+      allocate ( FORCES(ng) % sstPG(LBi:UBi,LBj:UBj,stenNmod,2) )
 #   endif
       allocate ( FORCES(ng) % sstG(LBi:UBi,LBj:UBj,2) )
 #  endif
@@ -1486,8 +1490,15 @@
             FORCES(ng) % VwindOG(i,j,1) = IniVal
             FORCES(ng) % VwindOG(i,j,2) = IniVal
 #    ifdef SET_WINDSPEED
+#     ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % wMagPG(i,j,k,1) = IniVal
+              FORCES(ng) % wMagPG(i,j,k,2) = IniVal
+            END DO
+#     else
             FORCES(ng) % wMagPG(i,j,1) = IniVal
             FORCES(ng) % wMagPG(i,j,2) = IniVal
+#     endif
             FORCES(ng) % wMagOG(i,j,1) = IniVal
             FORCES(ng) % wMagOG(i,j,2) = IniVal
 #    endif
@@ -1510,9 +1521,10 @@
             FORCES(ng) % dqdtG(i,j,1) = IniVal
             FORCES(ng) % dqdtG(i,j,2) = IniVal
 #   else
-            FORCES(ng) % sstPG(i,j,1) = IniVal
-            FORCES(ng) % sstPG(i,j,2) = IniVal
-#   endif
+            DO k=1,stenNmod
+              FORCES(ng) % sstPG(i,j,k,1) = IniVal
+              FORCES(ng) % sstPG(i,j,k,2) = IniVal
+            END DO
 #   endif
             FORCES(ng) % sstG(i,j,1) = IniVal
             FORCES(ng) % sstG(i,j,2) = IniVal
