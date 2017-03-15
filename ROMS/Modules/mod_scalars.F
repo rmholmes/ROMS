@@ -399,14 +399,18 @@
 !    stenRsss       Coupling coefficient of SSS pattern onto SST index
 !    stenRblh       Coupling coefficient of blh pattern onto SST index
 !
+# ifndef SVD_ENSO
 !    stenCount      Counter for current day of stenNdays
 !    stenIndex      the SST index over the last stenNdays
 !    stenIanom      Current averaged Index anomaly
+# endif
 !    stenUpdte      Current Index has been updated
+# ifndef SVD_ENSO
         real(r8), allocatable :: stenRegnN(:)       ! degrees
         real(r8), allocatable :: stenRegnE(:)       ! degrees
         real(r8), allocatable :: stenRegnS(:)       ! degrees
         real(r8), allocatable :: stenRegnW(:)       ! degrees
+# endif
 # ifdef BULK_FLUXES
         real(r8), allocatable :: stenRuwnd(:)      ! degC^(-1)
         real(r8), allocatable :: stenRvwnd(:)      ! degC^(-1)
@@ -434,9 +438,11 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         real(r8), allocatable :: stenRsss(:)       ! degC^(-1)
 # endif
+# ifndef SVD_ENSO
         integer, allocatable  :: stenCount(:)
         real(r8), allocatable :: stenIndex(:,:)    ! degC
         real(r8), allocatable :: stenIanom(:)      ! degC
+# endif
         logical, allocatable  :: stenUpdte(:)
 #endif
 #ifdef ADD_WWB
@@ -1910,10 +1916,12 @@
       allocate ( ABLM_cvthres(Ngrids) )
 #endif
 #ifdef STATS_ENSO
+# ifndef SVD_ENSO
       allocate ( stenRegnN(Ngrids) )
       allocate ( stenRegnE(Ngrids) )
       allocate ( stenRegnS(Ngrids) )
       allocate ( stenRegnW(Ngrids) )
+# endif
 # ifdef BULK_FLUXES
       allocate ( stenRuwnd(Ngrids) )
       allocate ( stenRvwnd(Ngrids) )
@@ -1940,9 +1948,11 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
       allocate ( stenRsss(Ngrids) )
 # endif
+# ifndef SVD_ENSO
       allocate ( stenCount(Ngrids) )
       allocate ( stenIndex(stenNdays,Ngrids) )
       allocate ( stenIanom(Ngrids) )
+# endif
       allocate ( stenUpdte(Ngrids) )
 #endif
 #ifdef ADD_WWB
@@ -2513,10 +2523,12 @@
           tnu4(itrc,ng)=IniVal
         END DO
 #ifdef STATS_ENSO
+# ifndef SVD_ENSO
         stenRegnN(ng)=5.0_r8
         stenRegnE(ng)=-90.0_r8
         stenRegnS(ng)=-5.0_r8
         stenRegnW(ng)=-150.0_r8
+# endif
 # ifdef BULK_FLUXES
         stenRuwnd(ng)=0.0_r8
         stenRvwnd(ng)=0.0_r8
@@ -2543,11 +2555,13 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         stenRsss(ng)=0.0_r8
 # endif
+# ifndef SVD_ENSO
         stenCount(ng)=0
         DO i=1,stenNdays
           stenIndex(i,ng) = 0.0_r8
         END DO
         stenIanom(ng)=0.0_r8
+# endif
         stenUpdte(ng)=.FALSE.
 #endif
 #ifdef ABLM

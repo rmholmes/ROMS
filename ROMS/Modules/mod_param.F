@@ -86,6 +86,9 @@
 !                                                                      !
 #ifdef STATS_ENSO
 !  stenNdays  Number of days to average SST index over                 !
+# ifdef SVD_ENSO
+!  stenNmod   Number of SVD modes to use                               !
+# endif
 #endif
 !                                                                      !
 !                                                                      !
@@ -450,6 +453,9 @@
 !
 #ifdef STATS_ENSO
       integer :: stenNdays = 0
+# ifdef SVD_ENSO
+      integer :: stenNmod = 0
+# endif
 #endif
 !-----------------------------------------------------------------------
 !  Sediment tracers parameters.

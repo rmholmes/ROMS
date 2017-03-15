@@ -235,7 +235,7 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
         status=def_dim(ng, iNLM, HIS(ng)%ncid, ncname, 'stendim',       &
      &                 stenNdays, DimIDs(33))
         IF (exit_flag.ne.NoError) RETURN

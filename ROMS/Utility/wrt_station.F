@@ -144,7 +144,7 @@
      &                      ncid = STA(ng)%ncid,                        &
      &                      varid = STA(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
 !
 !  Write out SST index and current count.
 !

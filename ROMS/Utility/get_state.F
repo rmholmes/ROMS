@@ -95,7 +95,7 @@
       integer :: IDmod, InpRec, gtype, i, ifield, itrc, lstr, lend
       integer :: Nrec, mySize, ncINPid, nvatts, nvdim, status, varid
       integer :: Vsize(4), start(4), total(4)
-#ifdef STATS_ENSO
+# if defined STATS_ENSO && !defined SVD_ENSO
       logical :: foundsten
 #endif
       real(r8), parameter :: Fscl = 1.0_r8
@@ -417,7 +417,7 @@
           IF (exit_flag.ne.NoError) RETURN
         END IF
 # endif
-# ifdef STATS_ENSO
+# if defined STATS_ENSO && !defined SVD_ENSO
 !
 ! Read in SST index and current count.
 !

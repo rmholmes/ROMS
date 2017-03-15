@@ -49,7 +49,7 @@
 !                DimIDs(30) => Number of 3D variables time levels (2). !
 !                DimIDs(31) => Number of 2D variables time levels (3). !
 !                DimIDs(32) => Number of sediment tracers.             !
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
 !                DimIDs(33) => StenIndex dimension (length stenNdays)  !
 #endif
 !                                                                      !
@@ -92,7 +92,7 @@
 
       integer :: brydim, i, ie, is, j, lstr, varid
       integer :: srdim, stadim, status, swdim, trcdim, usrdim
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
       integer :: stendim
 #endif
 #ifdef SEDIMENT
@@ -143,7 +143,7 @@
       srdim=DimIDs(9)
       swdim=DimIDs(10)
       trcdim=DimIDs(11)
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
       stendim=DimIDs(33)
 #endif
 #ifdef SEDIMENT
@@ -1444,6 +1444,15 @@
       IF (exit_flag.ne.NoError) RETURN
 #endif
 #ifdef STATS_ENSO
+# ifdef SVD_ENSO
+      Vinfo( 1)='stenNmod'
+      Vinfo( 2)='Number of SVD modes'
+      Vinfo( 3)=''
+      status=def_var(ng, model, ncid, varid, nf90_int,                  &
+     &               1, (/0/), Aval, Vinfo, ncname,                     &
+     &               SetParAccess = .FALSE.)
+      IF (exit_flag.ne.NoError) RETURN
+# else
       Vinfo( 1)='stenRegnN'
       Vinfo( 2)='SST index region northern boundary'
       Vinfo( 3)='degrees'
@@ -1475,7 +1484,7 @@
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
-
+# endif
 # ifdef BULK_FLUXES
 
       Vinfo( 1)='stenRuwnd'
@@ -1600,6 +1609,7 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
+# ifndef SVD_ENSO
       Vinfo( 1)='stenCount'
       Vinfo( 2)='Counter for current day of stenNdays'
       Vinfo( 3)=''
@@ -1615,6 +1625,7 @@
      &               1, (/stendim/), Aval, Vinfo, ncname,               &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 #ifdef ADD_WWB
       Vinfo( 1)='WWBxC'

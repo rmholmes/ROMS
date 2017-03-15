@@ -444,11 +444,7 @@
 #endif
 
 #ifdef STATS_ENSO
-      CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnN',             &
-     &                      stenRegnN(ng), (/0/), (/0/),                &
-     &                      ncid = ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
+# ifndef SVD_ENSO
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRegnN',             &
      &                      stenRegnN(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
@@ -468,7 +464,7 @@
      &                      stenRegnW(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
-
+# endif
 # ifdef BULK_FLUXES
       CALL netcdf_put_fvar (ng, model, ncname, 'stenRuwnd',             &
      &                      stenRuwnd(ng), (/0/), (/0/),                &
@@ -552,6 +548,12 @@
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
 
+# ifdef SVD_ENSO
+      CALL netcdf_put_ivar (ng, model, ncname, 'stenNmod',              &
+     &                      stenNmod, (/0/), (/0/),                     &
+     &                      ncid = ncid)
+      IF (exit_flag.ne.NoError) RETURN
+# else
       CALL netcdf_put_ivar (ng, model, ncname, 'stenCount',             &
      &                      stenCount(ng), (/0/), (/0/),                &
      &                      ncid = ncid)
@@ -561,6 +563,7 @@
      &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
      &                      ncid = ncid)
       IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 #ifdef ADD_WWB
       CALL netcdf_put_fvar (ng, model, ncname, 'WWBxC',                 &

@@ -107,7 +107,7 @@
      &                      varid = AVG(ng)%Vid(idWwb))
       IF (exit_flag.ne.NoError) RETURN
 #endif
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
 !
 !  Write out STATS_ENSO SST index anomaly time series.
 !
@@ -2124,7 +2124,7 @@
 #else
       IF (Master) WRITE (stdout,20) AVG(ng)%Rindex
 #endif
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
       IF (Master) WRITE (stdout,30) stenNdays, stenIanom(ng) 
 #endif
 !
@@ -2136,7 +2136,7 @@
 # else
      &        'in record = ',i7.7)
 # endif
-# ifdef STATS_ENSO
+# if defined STATS_ENSO && !defined SVD_ENSO
   30  FORMAT (6x,'STATS_ENSO  - ', i4.4, 'xNAVG SST anomaly = ',f5.2)
 # endif
 #else

@@ -762,6 +762,11 @@
 #  endif
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+            CASE ('stenNmod')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              stenNmod=Ivalue(1)
+#  else
             CASE ('stenRegnN')
               Npts=load_r(Nval, Rval, Ngrids, stenRegnN)
             CASE ('stenRegnE')
@@ -770,6 +775,7 @@
               Npts=load_r(Nval, Rval, Ngrids, stenRegnS)
             CASE ('stenRegnW')
               Npts=load_r(Nval, Rval, Ngrids, stenRegnW)
+#  endif
             CASE ('stenNdays')
               Npts=load_i(Nval, Rval, 1, Ivalue)
               stenNdays=Ivalue(1)
@@ -3818,6 +3824,7 @@
 # ifdef STATS_ENSO
           WRITE (out,120) stenNdays, 'stenNdays',                       &
      &          'Number of days to average SST index over.'
+#  ifndef SVD_ENSO
           WRITE (out,150) stenRegnN(ng), 'stenRegnN',                   &
      &          'SST index region northern boundary.'
           WRITE (out,150) stenRegnE(ng), 'stenRegnE',                   &
@@ -3826,6 +3833,7 @@
      &          'SST index region southern boundary.'
           WRITE (out,150) stenRegnW(ng), 'stenRegnW',                   &
      &          'SST index region western boundary.'
+#  endif
 #  ifdef BULK_FLUXES
           WRITE (out,160) stenRuwnd(ng), 'stenRuwnd',                   &
      &          'Coupling coefficient of Uwind pattern onto',           &
