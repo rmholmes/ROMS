@@ -180,7 +180,7 @@
 # endif
       real(r8) :: potvor_bar(LBi:UBi,LBj:UBj)
       real(r8) :: relvor_bar(LBi:UBi,LBj:UBj)
-# ifdef STATS_ENSO
+# if defined STATS_ENSO && !defined SVD_ENSO
       real(r8) :: my_index, my_area, index, area
       integer :: NSUB
       integer, parameter :: Nreduce = 2
@@ -589,10 +589,25 @@
         END IF
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!
+!  Initialize SST climatology.
+!
+          DO j=JstrR,JendR
+            DO i=Istr,IendR
+              AVERAGE(ng)%avgSSTm(i,j)=FORCES(ng)%sst(i,j)
+#   ifdef WET_DRY
+              AVERAGE(ng)%avgSSTm(i,j)=AVERAGE(ng)%avgSSTm(i,j)*        &
+     &                                GRID(ng)%umask_full(i,j)
+#   endif
+            END DO
+          END DO
+#  else
 !
 !  Initialize SST index climatology.
 !
         AVERAGE(ng)%avgSSTiClim = FORCES(ng)%SSTiClim
+#  endif
 # endif
 !
 !  Initialize surface and bottom fluxes.
@@ -1673,11 +1688,26 @@
         END IF
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!
+!  Accumulate SST climatology.
+!
+          DO j=JstrR,JendR
+            DO i=Istr,IendR
+              AVERAGE(ng)%avgSSTm(i,j)=AVERAGE(ng)%avgSSTm(i,j)+        &
+#   ifdef WET_DRY
+     &                                GRID(ng)%umask_full(i,j)*         &
+#   endif
+     &                                FORCES(ng)%sst(i,j)
+            END DO
+          END DO
+#  else
 !
 !  Accumulate SST index climatology.
 !
         AVERAGE(ng)%avgSSTiClim = AVERAGE(ng)%avgSSTiClim+              &
      &                         FORCES(ng)%SSTiClim
+#  endif
 # endif
 !
 !  Accumulate surface and bottom fluxes.
@@ -2721,10 +2751,61 @@
         END IF
 #endif
 #ifdef STATS_ENSO
+# ifdef SVD_ENSO
+!
+!  Calculate time-averaged SST climatology
+!
+        DO j=JstrR,JendR
+          DO i=IstrR,IendR
+             AVERAGE(ng)%avgSSTm(i,j)=rfac(i,j)*                        &
+     &                                  AVERAGE(ng)%avgSSTm(i,j)
+          END DO
+        END DO
+        IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+          CALL exchange_r2d_tile (ng, tile,                             &
+     &                            LBi, UBi, LBj, UBj,                   &
+     &                            AVERAGE(ng)%avgSSTm)
+#   ifdef DISTRIBUTE
+          CALL mp_exchange2d (ng, tile, iNLM, 1,                        &
+     &                        LBi, UBi, LBj, UBj,                       &
+     &                        NghostPoints,                             &
+     &                        EWperiodic(ng), NSperiodic(ng),           &
+     &                        AVERAGE(ng)%avgSSTm)
+#   endif
+        END IF
+# else
 !
 !  Calculate time-averaged SST index climatology
 !
         AVERAGE(ng)%avgSSTiClim = fac*AVERAGE(ng)%avgSSTiClim
+# endif
+# ifdef SVD_ENSO
+!
+!-----------------------------------------------------------------------
+!  Calculate SST anomaly for SVD ENSO model 
+!-----------------------------------------------------------------------
+!
+        DO j=JstrR,JendR
+          DO i=IstrR,IendR
+            FORCES(ng)%ssta(i,j) = (FORCES(ng)%ssta(i,j)*(stenNdays-1)  &
+     &                       +  AVERAGE(ng)%avgt(i,j,N(ng),itemp)       &
+     &                       -  AVERAGE(ng)%SSTm(i,j))/stenNdays
+          ENDDO
+        ENDDO
+        IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
+          CALL exchange_r2d_tile (ng, tile,                             &
+     &                            LBi, UBi, LBj, UBj,                   &
+     &                            FORCES(ng)%ssta)
+#   ifdef DISTRIBUTE
+          CALL mp_exchange2d (ng, tile, iNLM, 1,                        &
+     &                        LBi, UBi, LBj, UBj,                       &
+     &                        NghostPoints,                             &
+     &                        EWperiodic(ng), NSperiodic(ng),           &
+     &                        FORCES(ng)%ssta)
+#   endif
+        END IF
+        stenUpdte(ng)=.TRUE.
+# elseif
 !
 !-----------------------------------------------------------------------
 !  Calculate SST index for statistical ENSO model 
@@ -2745,11 +2826,11 @@
             END IF
           END DO
         END DO
-# ifdef DISTRIBUTE
+#  ifdef DISTRIBUTE
         NSUB=1
-# else
+#  else
         write(*,*) 'ERROR: This code will not work without DISTRIBUTE'
-# endif
+#  endif
         IF (tile_count.eq.0) THEN
           area=my_area
           index=my_index
@@ -2776,6 +2857,7 @@
         END DO
         stenIanom(ng)=stenIanom(ng)/stenNdays
         stenUpdte(ng)=.TRUE.
+# endif
 #endif
 
 #  if defined SEDIMENT && defined BEDLOAD

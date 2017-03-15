@@ -60,7 +60,11 @@
 !  avgWWBamp time-averaged WWB amplitude                               !
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!  avgSSTm    time-averaged SST climatology                            !
+#  else
 !  avgSSTiClim time-averaged SST index climatology                     !
+#  end
 # endif
 !                                                                      !
 !  Time-averaged surface and bottom fluxes.                            !
@@ -206,10 +210,17 @@
           real(r8), pointer :: avgWWBamp
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!
+!  Time-averaged SST climatology
+!
+          real(r8), pointer :: avgSSTm(:,:)
+#  else
 !
 !  Time-averaged SST index climatology.
 !
           real(r8), pointer :: avgSSTiClim
+#  endif
 # endif
 !
 !  Time-averaged surface and bottom fluxes.
@@ -444,10 +455,17 @@
       END IF
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!
+!  Time-averaged SST climatology
+!
+        allocate ( AVERAGE(ng) % avgSSTm(LBi:UBi,LBj:UBj) )
+#  else
 !
 !  Time-averaged SST index climatology
 !
       allocate ( AVERAGE(ng) % avgSSTiClim )
+#  endif
 # endif
 !
 !  Time-averaged surface and bottom fluxes.
@@ -943,10 +961,21 @@
       END IF
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!
+!  Time-averaged SST climatology
+!
+        DO j=Jmin,Jmax
+          DO i=Imin,Imax
+            AVERAGE(ng) % avgSSTm(i,j) = IniVal
+          END DO
+        END DO
+#  else
 !
 !  Time-averaged SST index climatology.
 !
       AVERAGE(ng) % avgSSTiClim = IniVal
+#  endif
 # endif
 !
 !  Time-averaged surface and bottom fluxes.

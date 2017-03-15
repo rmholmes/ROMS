@@ -180,8 +180,12 @@
 !  avcos        Cosine of average zenith angle of downwelling          !
 !                 spectral photons.                                    !
 #ifdef STATS_ENSO
+# ifdef SVD_ENSO
+!  SSTa         SST anomaly accumulated over NAVG*stenNdays for SVD    !
+# else
 !  SSTiClimG    SST index climatology, two-time snapshots              !
 !  SSTiClim     SST index climatology                                  !
+# endif
 # ifdef BULK_FLUXES
 !  UwindPG      Surface wind anomaly in the XI-direction (m/s)         !
 !               at horizontal RHO-points, two-time snapshots.          !
@@ -250,7 +254,7 @@
 !
 !  Nonlinear model state.
 !
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
           real(r8), pointer :: SSTiClimG(:)
           real(r8), pointer :: SSTiClim
 #endif
@@ -480,6 +484,8 @@
 # if defined QCORRECTION || defined SVD_ENSO
 #  ifdef QCORRECTION
           real(r8), pointer :: dqdt(:,:)
+#  else
+          real(r8), pointer :: ssta(:,:)
 #  endif
           real(r8), pointer :: sst(:,:)
 #  ifndef ANA_SST
@@ -637,7 +643,7 @@
 !
 !  Nonlinear model state
 !
-# ifdef STATS_ENSO
+# if defined STATS_ENSO && !defined SVD_ENSO
       allocate ( FORCES(ng) % SSTiClimG(2) )
       allocate ( FORCES(ng) % SSTiClim )
 # endif
@@ -882,6 +888,8 @@
 # if defined QCORRECTION || defined SVD_ENSO
 #  ifdef QCORRECTION
       allocate ( FORCES(ng) % dqdt(LBi:UBi,LBj:UBj) )
+#  else
+      allocate ( FORCES(ng) % ssta(LBi:UBi,LBj:UBj) )
 #  endif
       allocate ( FORCES(ng) % sst(LBi:UBi,LBj:UBj) )
 
@@ -1086,7 +1094,7 @@
 !  Nonlinear model state.
 !
       IF ((model.eq.0).or.(model.eq.iNLM)) THEN
-#ifdef STATS_ENSO
+#if defined STATS_ENSO && !defined SVD_ENSO
         FORCES(ng) % SSTiClimG(1) = IniVal
         FORCES(ng) % SSTiClimG(2) = IniVal
         FORCES(ng) % SSTiClim = IniVal
@@ -1340,6 +1348,8 @@
 # if defined QCORRECTION || defined SVD_ENSO
 #  ifdef QCORRECTION
             FORCES(ng) % dqdt(i,j) = IniVal
+#  else
+            FORCES(ng) % ssta(i,j) = IniVal
 #  endif
             FORCES(ng) % sst(i,j) = IniVal
 #  ifndef ANA_SST
