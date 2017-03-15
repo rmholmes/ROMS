@@ -157,14 +157,18 @@
 !  calling program.  If Irec > 1, this routine is used to read a 2D
 !  field varying in another non-time dimension.
 !
+#ifndef SVD_ENSO
           IF (.not.special.and.(Irec.eq.1)) THEN
+#endif
             IF (Iout.eq.1) THEN
               Tindex=1
             ELSE
               Tindex=3-Tindex
             END IF
             Iinfo(8,ifield,ng)=Tindex
+#ifndef SVD_ENSO
           END IF
+#endif
 !
 !  Read in time coordinate and scale it to day units.
 !
@@ -195,13 +199,21 @@
                 gtype=Vtype+4
                 status=nf_fread3d(ng, model, ncfile, ncid,              &
      &                            Vname(1,ifield), Vid,                 &
+#ifdef SVD_ENSO
+     &                            Trec, gtype, Vsize,                   &
+#else
      &                            0, gtype, Vsize,                      &
+#endif
      &                            LBi, UBi, LBj, UBj, 1, Irec,          &
      &                            Fscale(ifield,ng), Fmin, Fmax,        &
 #ifdef MASKING
      &                            Fmask,                                &
 #endif
+#ifdef SVD_ENSO
+     &                            Fout(:,:,:,Tindex))
+#else
      &                            Fout)
+#endif
               ELSE
                 status=nf_fread2d(ng, model, ncfile, ncid,              &
      &                            Vname(1,ifield), Vid,                 &

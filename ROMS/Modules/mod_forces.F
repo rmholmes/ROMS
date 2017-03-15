@@ -270,8 +270,13 @@
           real(r8), pointer :: sustrG(:,:,:)
           real(r8), pointer :: svstrG(:,:,:)
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+          real(r8), pointer :: sustrPG(:,:,:,:)
+          real(r8), pointer :: svstrPG(:,:,:,:)
+#  else
           real(r8), pointer :: sustrPG(:,:,:)
           real(r8), pointer :: svstrPG(:,:,:)
+#  end
           real(r8), pointer :: sustrOG(:,:,:)
           real(r8), pointer :: svstrOG(:,:,:)
 # endif
@@ -292,7 +297,11 @@
 # ifndef ANA_PAIR
           real(r8), pointer :: PairG(:,:,:)
 #  ifdef STATS_ENSO
+#   ifdef SVD_ENSO
+          real(r8), pointer :: PairPG(:,:,:,:)
+#   else
           real(r8), pointer :: PairPG(:,:,:)
+#   endif
           real(r8), pointer :: PairOG(:,:,:)
 #  endif
 # endif
@@ -361,7 +370,11 @@
 #  ifndef ANA_SRFLUX
           real(r8), pointer :: srflxG(:,:,:)
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+          real(r8), pointer :: srflxPG(:,:,:,:)
+#    else
           real(r8), pointer :: srflxPG(:,:,:)
+#    endif
           real(r8), pointer :: srflxOG(:,:,:)
 #   endif
 #  endif
@@ -384,7 +397,11 @@
 #  ifndef LONGWAVE
           real(r8), pointer :: lrflxG(:,:,:)
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+          real(r8), pointer :: lrflxPG(:,:,:,:)
+#    else
           real(r8), pointer :: lrflxPG(:,:,:)
+#    endif
           real(r8), pointer :: lrflxOG(:,:,:)
 #   endif
 #  endif
@@ -402,7 +419,11 @@
 #  ifndef ANA_HUMIDITY
           real(r8), pointer :: HairG(:,:,:)
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+          real(r8), pointer :: HairPG(:,:,:,:)
+#    else
           real(r8), pointer :: HairPG(:,:,:)
+#    endif
           real(r8), pointer :: HairOG(:,:,:)
 #   endif
 #  endif
@@ -414,7 +435,11 @@
 #  ifndef ANA_TAIR
           real(r8), pointer :: TairG(:,:,:)
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+          real(r8), pointer :: TairPG(:,:,:,:)
+#    else
           real(r8), pointer :: TairPG(:,:,:)
+#    endif
           real(r8), pointer :: TairOG(:,:,:)
 #   endif
 #  endif
@@ -433,12 +458,21 @@
           real(r8), pointer :: wMagG(:,:,:)
 #   endif
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+          real(r8), pointer :: UwindPG(:,:,:,:)
+          real(r8), pointer :: VwindPG(:,:,:,:)
+#    else
           real(r8), pointer :: UwindPG(:,:,:)
           real(r8), pointer :: VwindPG(:,:,:)
+#    endif
           real(r8), pointer :: UwindOG(:,:,:)
           real(r8), pointer :: VwindOG(:,:,:)
 #   ifdef SET_WINDSPEED
+#    ifdef SVD_ENSO
+          real(r8), pointer :: wMagPG(:,:,:,:)
+#    else
           real(r8), pointer :: wMagPG(:,:,:)
+#    endif
           real(r8), pointer :: wMagOG(:,:,:)
 #   endif
 #   endif
@@ -447,7 +481,11 @@
           real(r8), pointer :: blh(:,:)
           real(r8), pointer :: blhG(:,:,:)
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+          real(r8), pointer :: blhPG(:,:,:,:)
+#    else
           real(r8), pointer :: blhPG(:,:,:)
+#    endif
           real(r8), pointer :: blhOG(:,:,:)
 #   endif
 #  endif
@@ -469,7 +507,11 @@
      !defined ANA_SPFLUX
           real(r8), pointer :: stflxG(:,:,:,:)
 #  if defined STATS_ENSO && !defined BULK_FLUXES
+#    ifdef SVD_ENSO
+          real(r8), pointer :: stflxPG(:,:,:,:,:)
+#    else
           real(r8), pointer :: stflxPG(:,:,:,:)
+#    endif
           real(r8), pointer :: stflxOG(:,:,:,:)
 #  endif
 # endif
@@ -504,7 +546,11 @@
 #  ifndef ANA_SSS
           real(r8), pointer :: sssG(:,:,:)
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+          real(r8), pointer :: sssPG(:,:,:,:)
+#    else
           real(r8), pointer :: sssPG(:,:,:)
+#    endif
           real(r8), pointer :: sssOG(:,:,:)
 #   endif
 #  endif
@@ -662,8 +708,13 @@
       allocate ( FORCES(ng) % sustrG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % svstrG(LBi:UBi,LBj:UBj,2) )
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+      allocate ( FORCES(ng) % sustrPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+      allocate ( FORCES(ng) % svstrPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#  else
       allocate ( FORCES(ng) % sustrPG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % svstrPG(LBi:UBi,LBj:UBj,2) )
+#  endif
       allocate ( FORCES(ng) % sustrOG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % svstrOG(LBi:UBi,LBj:UBj,2) )
 # endif
@@ -684,7 +735,11 @@
 # ifndef ANA_PAIR
       allocate ( FORCES(ng) % PairG(LBi:UBi,LBj:UBj,2) )
 #  ifdef STATS_ENSO
+#   ifdef SVD_ENSO
+      allocate ( FORCES(ng) % PairPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#   else
       allocate ( FORCES(ng) % PairPG(LBi:UBi,LBj:UBj,2) )
+#   endif
       allocate ( FORCES(ng) % PairOG(LBi:UBi,LBj:UBj,2) )
 #  endif
 # endif
@@ -754,7 +809,11 @@
 #  ifndef ANA_SRFLUX
       allocate ( FORCES(ng) % srflxG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+      allocate ( FORCES(ng) % srflxPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#    else
       allocate ( FORCES(ng) % srflxPG(LBi:UBi,LBj:UBj,2) )
+#    endif
       allocate ( FORCES(ng) % srflxOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
@@ -780,7 +839,11 @@
 #  ifndef LONGWAVE
       allocate ( FORCES(ng) % lrflxG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+      allocate ( FORCES(ng) % lrflxPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#    else
       allocate ( FORCES(ng) % lrflxPG(LBi:UBi,LBj:UBj,2) )
+#    endif
       allocate ( FORCES(ng) % lrflxOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
@@ -801,7 +864,11 @@
 #  ifndef ANA_HUMIDITY
       allocate ( FORCES(ng) % HairG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+      allocate ( FORCES(ng) % HairPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#    else
       allocate ( FORCES(ng) % HairPG(LBi:UBi,LBj:UBj,2) )
+#    endif
       allocate ( FORCES(ng) % HairOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
@@ -816,7 +883,11 @@
 #  ifndef ANA_TAIR
       allocate ( FORCES(ng) % TairG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+      allocate ( FORCES(ng) % TairPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#    else
       allocate ( FORCES(ng) % TairPG(LBi:UBi,LBj:UBj,2) )
+#    endif
       allocate ( FORCES(ng) % TairOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
@@ -835,8 +906,13 @@
       allocate ( FORCES(ng) % wMagG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+      allocate ( FORCES(ng) % UwindPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+      allocate ( FORCES(ng) % VwindPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#    else
       allocate ( FORCES(ng) % UwindPG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindPG(LBi:UBi,LBj:UBj,2) )
+#    endif
       allocate ( FORCES(ng) % UwindOG(LBi:UBi,LBj:UBj,2) )
       allocate ( FORCES(ng) % VwindOG(LBi:UBi,LBj:UBj,2) )
 #    ifdef SET_WINDSPEED
@@ -849,7 +925,11 @@
       allocate ( FORCES(ng) % blh(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % blhG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+      allocate ( FORCES(ng) % blhPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#    else
       allocate ( FORCES(ng) % blhPG(LBi:UBi,LBj:UBj,2) )
+#    endif
       allocate ( FORCES(ng) % blhOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
@@ -873,7 +953,11 @@
      !defined ANA_SPFLUX
       allocate ( FORCES(ng) % stflxG(LBi:UBi,LBj:UBj,2,NT(ng)) )
 #  if defined STATS_ENSO && !defined BULK_FLUXES
+#    ifdef SVD_ENSO
+      allocate(FORCES(ng)%stflxPG(LBi:UBi,LBj:UBj,stenNmod,2,NT(ng)))
+#    else
       allocate ( FORCES(ng) % stflxPG(LBi:UBi,LBj:UBj,2,NT(ng)) )
+#    endif
       allocate ( FORCES(ng) % stflxOG(LBi:UBi,LBj:UBj,2,NT(ng)) )
 #  endif
 # endif
@@ -912,7 +996,11 @@
 #  ifndef ANA_SSS
       allocate ( FORCES(ng) % sssG(LBi:UBi,LBj:UBj,2) )
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+      allocate ( FORCES(ng) % sssPG(LBi:UBi,LBj:UBj,stenNmod,2) )
+#    else
       allocate ( FORCES(ng) % sssPG(LBi:UBi,LBj:UBj,2) )
+#    endif
       allocate ( FORCES(ng) % sssOG(LBi:UBi,LBj:UBj,2) )
 #   endif
 #  endif
@@ -1128,10 +1216,19 @@
             FORCES(ng) % svstrG(i,j,1) = IniVal
             FORCES(ng) % svstrG(i,j,2) = IniVal
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % sustrPG(i,j,k,1) = IniVal
+              FORCES(ng) % sustrPG(i,j,k,2) = IniVal
+              FORCES(ng) % svstrPG(i,j,k,1) = IniVal
+              FORCES(ng) % svstrPG(i,j,k,2) = IniVal
+            END DO
+#  else
             FORCES(ng) % sustrPG(i,j,1) = IniVal
             FORCES(ng) % sustrPG(i,j,2) = IniVal
             FORCES(ng) % svstrPG(i,j,1) = IniVal
             FORCES(ng) % svstrPG(i,j,2) = IniVal
+#  endif
             FORCES(ng) % sustrOG(i,j,1) = IniVal
             FORCES(ng) % sustrOG(i,j,2) = IniVal
             FORCES(ng) % svstrOG(i,j,1) = IniVal
@@ -1150,8 +1247,15 @@
             FORCES(ng) % PairG(i,j,1) = IniVal
             FORCES(ng) % PairG(i,j,2) = IniVal
 #  ifdef STATS_ENSO
+#   ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % PairPG(i,j,k,1) = IniVal
+              FORCES(ng) % PairPG(i,j,k,2) = IniVal
+            END DO
+#   else
             FORCES(ng) % PairPG(i,j,1) = IniVal
             FORCES(ng) % PairPG(i,j,2) = IniVal
+#   endif
             FORCES(ng) % PairOG(i,j,1) = IniVal
             FORCES(ng) % PairOG(i,j,2) = IniVal
 #  endif
@@ -1221,8 +1325,15 @@
             FORCES(ng) % srflxG(i,j,1) = IniVal
             FORCES(ng) % srflxG(i,j,2) = IniVal
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % srflxPG(i,j,k,1) = IniVal
+              FORCES(ng) % srflxPG(i,j,k,2) = IniVal
+            END DO
+#    else
             FORCES(ng) % srflxPG(i,j,1) = IniVal
             FORCES(ng) % srflxPG(i,j,2) = IniVal
+#    endif
             FORCES(ng) % srflxOG(i,j,1) = IniVal
             FORCES(ng) % srflxOG(i,j,2) = IniVal
 #   endif
@@ -1280,8 +1391,15 @@
             FORCES(ng) % lrflxG(i,j,1) = IniVal
             FORCES(ng) % lrflxG(i,j,2) = IniVal
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % lrflxPG(i,j,k,1) = IniVal
+              FORCES(ng) % lrflxPG(i,j,k,2) = IniVal
+            END DO
+#    else
             FORCES(ng) % lrflxPG(i,j,1) = IniVal
             FORCES(ng) % lrflxPG(i,j,2) = IniVal
+#    endif
             FORCES(ng) % lrflxOG(i,j,1) = IniVal
             FORCES(ng) % lrflxOG(i,j,2) = IniVal
 #   endif
@@ -1291,8 +1409,15 @@
             FORCES(ng) % HairG(i,j,1) = IniVal
             FORCES(ng) % HairG(i,j,2) = IniVal
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % HairPG(i,j,k,1) = IniVal
+              FORCES(ng) % HairPG(i,j,k,2) = IniVal
+            END DO
+#    else
             FORCES(ng) % HairPG(i,j,1) = IniVal
             FORCES(ng) % HairPG(i,j,2) = IniVal
+#    endif
             FORCES(ng) % HairOG(i,j,1) = IniVal
             FORCES(ng) % HairOG(i,j,2) = IniVal
 #   endif
@@ -1303,8 +1428,15 @@
             FORCES(ng) % TairG(i,j,1) = IniVal
             FORCES(ng) % TairG(i,j,2) = IniVal
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % TairPG(i,j,k,1) = IniVal
+              FORCES(ng) % TairPG(i,j,k,2) = IniVal
+            END DO
+#    else
             FORCES(ng) % TairPG(i,j,1) = IniVal
             FORCES(ng) % TairPG(i,j,2) = IniVal
+#    endif
             FORCES(ng) % TairOG(i,j,1) = IniVal
             FORCES(ng) % TairOG(i,j,2) = IniVal
 #   endif
@@ -1313,8 +1445,15 @@
             FORCES(ng) % blhG(i,j,1) = IniVal
             FORCES(ng) % blhG(i,j,2) = IniVal
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % blhPG(i,j,k,1) = IniVal
+              FORCES(ng) % blhPG(i,j,k,2) = IniVal
+            END DO
+#    else
             FORCES(ng) % blhPG(i,j,1) = IniVal
             FORCES(ng) % blhPG(i,j,2) = IniVal
+#    endif
             FORCES(ng) % blhOG(i,j,1) = IniVal
             FORCES(ng) % blhOG(i,j,2) = IniVal
 #   endif
@@ -1329,10 +1468,19 @@
             FORCES(ng) % wMagG(i,j,2) = IniVal
 #   endif
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % UwindPG(i,j,k,1) = IniVal
+              FORCES(ng) % UwindPG(i,j,k,2) = IniVal
+              FORCES(ng) % VwindPG(i,j,k,1) = IniVal
+              FORCES(ng) % VwindPG(i,j,k,2) = IniVal
+            END DO
+#    else
             FORCES(ng) % UwindPG(i,j,1) = IniVal
             FORCES(ng) % UwindPG(i,j,2) = IniVal
             FORCES(ng) % VwindPG(i,j,1) = IniVal
             FORCES(ng) % VwindPG(i,j,2) = IniVal
+#    endif
             FORCES(ng) % UwindOG(i,j,1) = IniVal
             FORCES(ng) % UwindOG(i,j,2) = IniVal
             FORCES(ng) % VwindOG(i,j,1) = IniVal
@@ -1376,8 +1524,15 @@
             FORCES(ng) % sssG(i,j,1) = IniVal
             FORCES(ng) % sssG(i,j,2) = IniVal
 #   ifdef STATS_ENSO
+#    ifdef SVD_ENSO
+            DO k=1,stenNmod
+              FORCES(ng) % sssPG(i,j,k,1) = IniVal
+              FORCES(ng) % sssPG(i,j,k,2) = IniVal
+            END DO
+#    else
             FORCES(ng) % sssPG(i,j,1) = IniVal
             FORCES(ng) % sssPG(i,j,2) = IniVal
+#    endif
             FORCES(ng) % sssOG(i,j,1) = IniVal
             FORCES(ng) % sssOG(i,j,2) = IniVal
 #   endif
@@ -1397,8 +1552,15 @@
               FORCES(ng) % stflxG(i,j,1,itrc) = IniVal
               FORCES(ng) % stflxG(i,j,2,itrc) = IniVal
 #  if defined STATS_ENSO && !defined BULK_FLUXES
+#    ifdef SVD_ENSO
+              DO k=1,stenNmod
+                FORCES(ng) % stflxPG(i,j,k,1,itrc) = IniVal
+                FORCES(ng) % stflxPG(i,j,k,2,itrc) = IniVal
+              END DO
+#    else
               FORCES(ng) % stflxPG(i,j,1,itrc) = IniVal
               FORCES(ng) % stflxPG(i,j,2,itrc) = IniVal
+#    endif
               FORCES(ng) % stflxOG(i,j,1,itrc) = IniVal
               FORCES(ng) % stflxOG(i,j,2,itrc) = IniVal
 #  endif

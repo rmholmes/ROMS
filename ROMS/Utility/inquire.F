@@ -197,12 +197,13 @@
         END IF
 !
 !  Check if processing special 2D fields with additional dimensions
-!  (for example, tides).
+!  (for example, tides). Also the case for SVD_ENSO option (nsvd)
 !
         IF (foundit.and.(ABS(job).eq.2)) THEN
           special=.FALSE.
           DO i=1,nvdim
-            IF (INDEX(TRIM(var_Dname(i)),'period').ne.0) THEN
+            IF ((INDEX(TRIM(var_Dname(i)),'period').ne.0) .or.          &
+     &          (INDEX(TRIM(var_Dname(i)),'nsvd').ne.0)) THEN
               special=.TRUE.
             END IF
           END DO
