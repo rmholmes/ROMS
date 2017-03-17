@@ -100,7 +100,7 @@
 !  Write out averaged WWB amplitude.
 !
       CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(idWwb,ng)),                      &
+     &                      TRIM(Vname(1,idWwb)),                       &
      &                      AVERAGE(ng) % avgWWBamp,                    &
      &                      (/AVG(ng)%Rindex/), (/1/),                  &
      &                      ncid = AVG(ng)%ncid,                        &
@@ -112,7 +112,7 @@
 !  Write out STATS_ENSO SST index anomaly time series.
 !
       CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
-     &                      TRIM(Vname(idIanm,ng)),                     &
+     &                      TRIM(Vname(1,idIanm)),                      &
      &                      stenIndex(stenCount(ng),ng),                &
      &                      (/AVG(ng)%Rindex/), (/1/),                  &
      &                      ncid = AVG(ng)%ncid,                        &
