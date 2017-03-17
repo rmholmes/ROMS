@@ -613,6 +613,26 @@
           IF (exit_flag.ne.NoError) RETURN
         END IF
 #endif
+#ifdef SVD_ENSO
+!
+!  Define free-surface.
+!
+        IF (Hout(idSSTa,ng)) THEN
+          Vinfo( 1)=Vname(1,idSSTa)
+          Vinfo( 2)=Vname(2,idSSTa)
+          Vinfo( 3)=Vname(3,idSSTa)
+          Vinfo(14)=Vname(4,idSSTa)
+          Vinfo(16)=Vname(1,idtime)
+# if defined WRITE_WATER && defined MASKING
+          Vinfo(20)='mask_rho'
+# endif
+          Vinfo(22)='coordinates'
+          Aval(5)=REAL(Iinfo(1,idSSTa,ng),r8)
+          status=def_var(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idSSTa),   &
+     &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+#endif
 !
 !  Define free-surface.
 !
@@ -2594,6 +2614,11 @@
             got_var(idpthW)=.TRUE.
             HIS(ng)%Vid(idpthW)=var_id(i)
 #endif
+#ifdef SVD_ENSO
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSSTa))) THEN
+            got_var(idSSTa)=.TRUE.
+            HIS(ng)%Vid(idSSTa)=var_id(i)
+#endif
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idFsur))) THEN
             got_var(idFsur)=.TRUE.
             HIS(ng)%Vid(idFsur)=var_id(i)
@@ -3049,6 +3074,14 @@
         END IF
         IF (.not.got_var(idpthW).and.Hout(idpthW,ng)) THEN
           IF (Master) WRITE (stdout,70) TRIM(Vname(1,idpthW)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+#endif
+#ifdef SVD_ENSO
+        IF (.not.got_var(idSSTa).and.Hout(idSSTa,ng)) THEN
+          IF (Master) WRITE (stdout,70) TRIM(Vname(1,idSSTa)),          &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN

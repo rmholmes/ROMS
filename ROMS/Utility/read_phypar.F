@@ -1729,6 +1729,15 @@
               END IF
               Npts=load_l(Nval, Cval, Ngrids, Hout(idSSSc,:))
 #endif
+#ifdef SVD_ENSO
+            CASE ('Hout(idSSTa)')
+              IF (idSSTa.eq.0) THEN
+                IF (Master) WRITE (out,280) 'idSSTa'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, Ngrids, Hout(idSSTa,:))
+#endif
             CASE ('Hout(idTsur)')
               IF (idTsur(itemp).eq.0) THEN
                 IF (Master) WRITE (out,280) 'idTsur'
@@ -2217,8 +2226,13 @@
               Npts=load_l(Nval, Cval, Ngrids, Aout(idWwb,:))
 #endif
 #ifdef STATS_ENSO
+# ifdef SVD_ENSO
+            CASE ('Aout(idSSTa)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idSSTa,:))
+# else
             CASE ('Aout(idIanm)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idIanm,:))
+# endif
 #endif
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
             CASE ('Aout(idSSSc)')
@@ -3824,7 +3838,10 @@
 # ifdef STATS_ENSO
           WRITE (out,120) stenNdays, 'stenNdays',                       &
      &          'Number of days to average SST index over.'
-#  ifndef SVD_ENSO
+#  ifdef SVD_ENSO
+          WRITE (out,120) stenNmod, 'stenNmod',                         &
+     &          'Number of SVD modes included in statistical ENSO.'
+#  else
           WRITE (out,150) stenRegnN(ng), 'stenRegnN',                   &
      &          'SST index region northern boundary.'
           WRITE (out,150) stenRegnE(ng), 'stenRegnE',                   &
@@ -4724,6 +4741,11 @@
      &         'Write out atmospheric boundary layer height.'
 #  endif
 # endif
+# ifdef SVD_ENSO
+            IF (Hout(idSSTa,ng)) WRITE (out,170) Hout(idSSTa,ng),       &
+     &         'Hout(idSSTa)',                                          &
+     &         'Write out SST anomaly.'
+# endif
             IF (Hout(idTsur(itemp),ng)) WRITE (out,170)                 &
      &          Hout(idTsur(itemp),ng), 'Hout(idTsur)',                 &
      &         'Write out surface net heat flux.'
@@ -5281,9 +5303,15 @@
      &         'Write out WWB amplitude.'
 #  endif
 #  ifdef STATS_ENSO
+#   ifdef SVD_ENSO
+            IF (Aout(idSSTa,ng)) WRITE (out,170) Aout(idSSTa,ng),       &
+     &         'Aout(idSSTa)',                                          &
+     &         'Write out SST anomaly.'
+#   else
             IF (Aout(idIanm,ng)) WRITE (out,170) Aout(idIanm,ng),       &
      &         'Aout(idIanm)',                                          &
      &         'Write out STATS_ENSO SST index anomaly.'
+#   endif
 #  endif
 #  if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
             IF (Aout(idSSSc,ng)) WRITE (out,170) Aout(idSSSc,ng),       &

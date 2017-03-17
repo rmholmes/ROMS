@@ -1867,11 +1867,20 @@
   1.0d0
 
 'SSTP'                                             ! Input
+  'sea surface temperature anomaly SVD'
+  'Celsius'                                        ! [Celsius]
+  'SST pattern, scalar, series'
+  'prt_time'
+  'idSSTP'
+  'r2dvar'
+  1.0d0
+
+'SSTa'                                             ! Input
   'sea surface temperature anomaly'
   'Celsius'                                        ! [Celsius]
   'SST anomaly, scalar, series'
-  'prt_time'
-  'idSSTP'
+  'ocean_time'
+  'idSSTa'
   'r2dvar'
   1.0d0
 

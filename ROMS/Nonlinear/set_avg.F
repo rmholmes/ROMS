@@ -594,7 +594,7 @@
 !  Initialize SST climatology.
 !
           DO j=JstrR,JendR
-            DO i=Istr,IendR
+            DO i=IstrR,IendR
               AVERAGE(ng)%avgSSTm(i,j)=FORCES(ng)%sst(i,j)
 #   ifdef WET_DRY
               AVERAGE(ng)%avgSSTm(i,j)=AVERAGE(ng)%avgSSTm(i,j)*        &
@@ -1693,7 +1693,7 @@
 !  Accumulate SST climatology.
 !
           DO j=JstrR,JendR
-            DO i=Istr,IendR
+            DO i=IstrR,IendR
               AVERAGE(ng)%avgSSTm(i,j)=AVERAGE(ng)%avgSSTm(i,j)+        &
 #   ifdef WET_DRY
      &                                GRID(ng)%umask_full(i,j)*         &

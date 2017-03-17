@@ -265,6 +265,7 @@
         integer  :: idWwb         ! WWB amplitude
         integer  :: idIanm        ! SST index anomaly
         integer  :: idSsti        ! SST index climatology
+        integer  :: idSSTa        ! SST anomaly
         integer  :: idTair        ! surface air temperature
         integer  :: idTairP       ! surface air temperature anomaly
         integer  :: idTdif        ! vertical T-diffusion coefficient
@@ -1136,6 +1137,8 @@
               idIanm=varid
             CASE ('idSsti')
               idSsti=varid
+            CASE ('idSSTa')
+              idSSTa=varid
             CASE ('idTair')
               idTair=varid
             CASE ('idTairP')

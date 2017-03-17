@@ -456,6 +456,26 @@
         END IF
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!
+!  Define SST anomaly.
+!
+        IF (Aout(idSSTa,ng)) THEN
+          Vinfo( 1)=Vname(1,idSSTa)
+          WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idSSTa))
+          Vinfo( 3)=Vname(3,idSSTa)
+          Vinfo(14)=Vname(4,idSSTa)
+          Vinfo(16)=Vname(1,idtime)
+#   if !defined WET_DRY && (defined WRITE_WATER && defined MASKING)
+          Vinfo(20)='mask_rho'
+#   endif
+          Vinfo(22)='coordinates'
+          Aval(5)=REAL(Iinfo(1,idSSTa,ng),r8)
+          status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idSSTa),  &
+     &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+#  else
 !
 !  Define STATS_ENSO SST index anomaly time series.
 !
@@ -471,6 +491,7 @@
 
           IF (exit_flag.ne.NoError) RETURN
         END IF
+#  endif
 # endif
 !
 !  Define free-surface.
@@ -2120,9 +2141,15 @@
             AVG(ng)%Vid(idWwb)=var_id(i)
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSSTa))) THEN
+            got_var(idSSTa)=.TRUE.
+            AVG(ng)%Vid(idSSTa)=var_id(i)
+#  else
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idIanm))) THEN
             got_var(idIanm)=.TRUE.
             AVG(ng)%Vid(idIanm)=var_id(i)
+#  endif
 # endif
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idFsur))) THEN
             got_var(idFsur)=.TRUE.
@@ -2456,12 +2483,21 @@
         END IF
 # endif
 # ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+        IF (.not.got_var(idSSTa).and.Aout(idSSTa,ng)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idSSTa)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+#  else
         IF (.not.got_var(idIanm)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idIanm)),          &
      &                                  TRIM(ncname)
           exit_flag=3
           RETURN
         END IF
+#  endif
 # endif
         IF (.not.got_var(idFsur).and.Aout(idFsur,ng)) THEN
           IF (Master) WRITE (stdout,60) TRIM(Vname(1,idFsur)),          &
