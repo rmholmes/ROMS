@@ -2790,6 +2790,10 @@
             FORCES(ng)%ssta(i,j) = (FORCES(ng)%ssta(i,j)*(stenNdays-1)  &
      &                       +  AVERAGE(ng)%avgt(i,j,N(ng),itemp)       &
      &                       -  AVERAGE(ng)%avgSSTm(i,j))/stenNdays
+#  ifdef MASKING
+            FORCES(ng)%ssta(i,j) = FORCES(ng)%ssta(i,j) *               &
+     &                                         GRID(ng)%rmask(i,j)
+#  endif
           ENDDO
         ENDDO
         IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
