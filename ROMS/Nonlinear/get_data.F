@@ -64,6 +64,7 @@
       real(r8), dimension(stenNmod,2) :: my_cov, my_var, cov, var, Rc
       integer :: NSUB, k
       integer, parameter :: Nreduce = 4
+      real(r8), parameter :: small = 1.0E-05_r8
       real(r8), dimension(Nreduce) :: buffer
       character (len=3), dimension(Nreduce) :: op_handle
 # endif
@@ -173,8 +174,8 @@
            cov(k,2)=buffer(2)
            var(k,1)=buffer(3)
            var(k,2)=buffer(4)
-           Rc(k,1) = cov(k,1)/var(k,1)
-           Rc(k,2) = cov(k,2)/var(k,2)
+           Rc(k,1) = cov(k,1)/(var(k,1) + small)
+           Rc(k,2) = cov(k,2)/(var(k,2) + small)
          END DO
       END IF
       stenUpdte(ng)=.TRUE.

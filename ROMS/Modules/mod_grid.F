@@ -46,7 +46,7 @@
 !  lonr       Longitude (degrees_east) at RHO-points.                  !
 !  lonu       Longitude (degrees_east) at U-points.                    !
 !  lonv       Longitude (degrees_east) at V-points.                    !
-!  omm        RHO-grid area (meters2).                                 !
+!  omn        RHO-grid area (meters2).                                 !
 !  om_p       PSI-grid spacing (meters) in the XI-direction.           !
 !  om_r       RHO-grid spacing (meters) in the XI-direction.           !
 !  om_u       U-grid spacing (meters) in the XI-direction.             !
