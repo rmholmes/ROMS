@@ -599,7 +599,7 @@
       IF (Master) WRITE (stdout,20) 'SET_WINDSPEED',                    &
      &   'Wind speed magnitude is explicetely set as separate input.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+13)=' SET_WINDSPEED,'
+      Coptions(is:is+15)=' SET_WINDSPEED,'
 #endif
 #if defined ABLM && defined BULK_FLUXES
       IF (Master) WRITE (stdout,20) 'ABLM',                             &
@@ -636,6 +636,12 @@
      &   'Statistical ENSO forcing.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+13)=' STATS_ENSO,'
+# ifdef SVD_ENSO
+      IF (Master) WRITE (stdout,20) 'SVD_ENSO',                         &
+     &   'Singular Value Decomposition ENSO forcing.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' SVD_ENSO,'
+# endif
 #endif
 #if defined BULK_FLUXES && defined BULK_STRESS
       IF (Master) WRITE (stdout,20) 'BULK_STRESS',                      &
@@ -3058,6 +3064,16 @@
         WRITE (stdout,270)
  270    FORMAT (/,' CHECKDEFS - AVERAGES is needed to calculate SST',   &
      &            ' index for STATS_ENSO.')
+        exit_flag=5
+      END IF
+#endif
+#if defined SVD_ENSO && !defined STATS_ENSO
+! 
+!  Stop if trying to run SVD_ENSO without STATS_ENSO defined.
+!
+      IF (Master) THEN
+        WRITE (stdout,280)
+ 280    FORMAT (/,' CHECKDEFS - STATS_ENSO is needed with SVD_ENSO')
         exit_flag=5
       END IF
 #endif
