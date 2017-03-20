@@ -95,8 +95,8 @@
       integer :: IDmod, InpRec, gtype, i, ifield, itrc, lstr, lend
       integer :: Nrec, mySize, ncINPid, nvatts, nvdim, status, varid
       integer :: Vsize(4), start(4), total(4)
-# if defined STATS_ENSO && !defined SVD_ENSO
-      logical :: foundsten
+# if defined STATS_ENSO
+      logical :: foundSTEN
 #endif
       real(r8), parameter :: Fscl = 1.0_r8
 
@@ -417,16 +417,58 @@
           IF (exit_flag.ne.NoError) RETURN
         END IF
 # endif
-# if defined STATS_ENSO && !defined SVD_ENSO
+# ifdef STATS_ENSO
+#  ifdef SVD_ENSO
+!
+! Read in SST anomaly for SVD_ENSO
+! 
+! Inquire variable:
+      CALL netcdf_inq_var (ng, IDmod, ncname,                           &
+     &                     MyVarName = 'SSTa',                          &
+     &                     SearchVar = foundSTEN)
+! Read variables if present:
+      IF (foundSTEN) THEN
+          foundit=find_string(var_name, n_var, TRIM(Vname(1,idSSTa)),   &
+     &                        varid)
+          gtype=var_flag(varid)*r2dvar
+          status=nf_fread2d(ng, IDmod, ncname, ncINPid,                 &
+     &                        Vname(1,idSSTa), varid,                   &
+     &                        InpRec, gtype, Vsize,                     &
+     &                        LBi, UBi, LBj, UBj,                       &
+     &                        Fscl, Fmin, Fmax,                         &
+#   ifdef MASKING
+     &                        GRID(ng) % rmask,                         &
+#   endif
+     &                        FORCES(ng) % ssta)
+          IF (status.ne.nf90_noerr) THEN
+            IF (Master) THEN
+              WRITE (stdout,60) string, TRIM(Vname(1,idSSTa)), InpRec,  &
+     &                          TRIM(ncname)
+            END IF
+            exit_flag=2
+            ioerror=status
+            RETURN
+          ELSE
+            IF (Master) THEN
+              WRITE (stdout,70) TRIM(Vname(2,idSSTa)), Fmin, Fmax
+            END IF
+            stenUpdte(ng)=.TRUE.
+          END IF
+      ELSE
+        IF (Master) THEN
+          WRITE (stdout,80)
+        END IF        
+      END IF
+#  else
 !
 ! Read in SST index and current count.
 !
 ! Inquire variable:
       CALL netcdf_inq_var (ng, IDmod, ncname,                           &
      &                     MyVarName = 'stenCount',                     &
-     &                     SearchVar = foundsten)
+     &                     SearchVar = foundSTEN)
 ! Read variables if present:
-      IF (foundsten) THEN
+      IF (foundSTEN) THEN
           CALL netcdf_get_fvar (ng, IDmod, ncname, 'stenIndex',         &
      &                          stenIndex(:,ng),                        &
      &                          ncid = ncINPid,                         &
@@ -455,6 +497,7 @@
         stenIanom(ng)=stenIanom(ng)/stenNdays
         stenUpdte(ng)=.TRUE.
       END IF
+#  endif
 # endif
 # if defined SEDIMENT && defined SED_MORPH
 !
@@ -4688,7 +4731,12 @@
   70  FORMAT (16x,'- ',a,/,19x,'(Min = ',1p,e15.8,                      &
      &        ' Max = ',1p,e15.8,')')
 #ifdef STATS_ENSO
+# ifdef SVD_ENSO
+  80  FORMAT (/,a,'GET_STATE, SVD_ENSO - did not find SSTa in ',        &
+     &        ' IC file: continuing with zero anomaly IC.')
+# else
   80  FORMAT (16x,'- ',a,i3.0)
+# endif
 #endif
       RETURN
       END SUBROUTINE get_state

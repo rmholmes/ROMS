@@ -227,7 +227,7 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
-#ifdef STATS_ENSO
+#ifdef STATS_ENSO && !defined SVD_ENSO
         status=def_dim(ng, iNLM, RST(ng)%ncid, ncname, 'stendim',       &
      &                 stenNdays, DimIDs(33))
         IF (exit_flag.ne.NoError) RETURN
@@ -689,6 +689,24 @@
      &                 NF_FRST, nvd3, t2dgrd, Aval, Vinfo, ncname,      &
      &                 SetFillVal = .FALSE.)
         IF (exit_flag.ne.NoError) RETURN
+#endif
+#ifdef SVD_ENSO
+!
+!  Define SST anomaly.
+!
+        Vinfo( 1)=Vname(1,idSSTa)
+        Vinfo( 2)=Vname(2,idSSTa)
+        Vinfo( 3)=Vname(3,idSSTa)
+        Vinfo(14)=Vname(4,idSSTa)
+        Vinfo(16)=Vname(1,idtime)
+#   if !defined WET_DRY && (defined WRITE_WATER && defined MASKING)
+        Vinfo(20)='mask_rho'
+#   endif
+        Vinfo(22)='coordinates'
+        Aval(5)=REAL(Iinfo(1,idSSTa,ng),r8)
+        status=def_var(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idSSTa),     &
+     &                   NF_FRST, nvd3, t2dgrd, Aval, Vinfo, ncname)
+          IF (exit_flag.ne.NoError) RETURN
 #endif
 !
 !  Define free-surface.
@@ -1583,6 +1601,11 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idFsur))) THEN
             got_var(idFsur)=.TRUE.
             RST(ng)%Vid(idFsur)=var_id(i)
+#ifdef SVD_ENSO
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idSSTa))) THEN
+            got_var(idSSTa)=.TRUE.
+            RST(ng)%Vid(idSSTa)=var_id(i)
+#endif
 #ifdef ABLM
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idTair))) THEN
             got_var(idTair)=.TRUE.
@@ -1797,6 +1820,14 @@
           exit_flag=3
           RETURN
         END IF
+#ifdef SVD_ENSO
+        IF (.not.got_var(idSSTa)) THEN
+          IF (Master) WRITE (stdout,40) TRIM(Vname(1,idSSTa)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+#endif
 #ifdef ABLM
         IF (.not.got_var(idTair)) THEN
           IF (Master) WRITE (stdout,40) TRIM(Vname(1,idTair)),          &

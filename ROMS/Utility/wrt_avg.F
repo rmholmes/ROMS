@@ -144,7 +144,7 @@
 # ifdef MASKING
      &                     GRID(ng) % rmask,                            &
 # endif
-     &                     FORCES(ng) % ssta(:,:))
+     &                     FORCES(ng) % ssta)
         IF (status.ne.nf90_noerr) THEN
           IF (Master) THEN
             WRITE (stdout,10) TRIM(Vname(1,idSSTa)), AVG(ng)%Rindex

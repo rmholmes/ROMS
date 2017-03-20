@@ -143,8 +143,29 @@
      &                      ncid = RST(ng)%ncid,                        &
      &                      varid = RST(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
-
-#if defined STATS_ENSO && !defined SVD_ENSO
+#ifdef STATS_ENSO
+# ifdef SVD_ENSO 
+!
+!  Write out SST anomaly (degC)
+!
+      scale=1.0_r8
+      gtype=gfactor*r2dvar
+      status=nf_fwrite2d(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idSSTa),   &
+     &                     RST(ng)%Rindex, gtype,                       &
+     &                     LBi, UBi, LBj, UBj, scale,                   &
+#  ifdef MASKING
+     &                     GRID(ng) % rmask,                            &
+#  endif
+     &                     FORCES(ng) % ssta)
+      IF (status.ne.nf90_noerr) THEN
+         IF (Master) THEN
+           WRITE (stdout,10) TRIM(Vname(1,idSSTa)), RST(ng)%Rindex
+         END IF
+         exit_flag=3
+         ioerror=status
+         RETURN
+      END IF
+# else
 !
 !  Write out SST index and current count.
 !
@@ -157,6 +178,7 @@
      &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
      &                      ncid = RST(ng)%ncid)
       IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 #if defined SEDIMENT && defined SED_MORPH
 !
