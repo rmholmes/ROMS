@@ -144,6 +144,13 @@
      &                      varid = RST(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
 #ifdef STATS_ENSO
+!
+!  Write out current count of SST index/anomaly.
+!
+      CALL netcdf_put_ivar (ng, iNLM, RST(ng)%name, 'stenCount',        &
+     &                      stenCount(ng), (/0/), (/0/),                &
+     &                      ncid = RST(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
 # ifdef SVD_ENSO 
 !
 !  Write out SST anomaly (degC)
@@ -167,13 +174,8 @@
       END IF
 # else
 !
-!  Write out SST index and current count.
+!  Write out SST index.
 !
-      CALL netcdf_put_ivar (ng, iNLM, RST(ng)%name, 'stenCount',        &
-     &                      stenCount(ng), (/0/), (/0/),                &
-     &                      ncid = RST(ng)%ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
       CALL netcdf_put_fvar (ng, iNLM, RST(ng)%name, 'stenIndex',        &
      &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
      &                      ncid = RST(ng)%ncid)

@@ -399,8 +399,8 @@
 !    stenRsss       Coupling coefficient of SSS pattern onto SST index
 !    stenRblh       Coupling coefficient of blh pattern onto SST index
 !
-# ifndef SVD_ENSO
 !    stenCount      Counter for current day of stenNdays
+# ifndef SVD_ENSO
 !    stenIndex      the SST index over the last stenNdays
 !    stenIanom      Current averaged Index anomaly
 # endif
@@ -438,8 +438,8 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         real(r8), allocatable :: stenRsss(:)       ! degC^(-1)
 # endif
-# ifndef SVD_ENSO
         integer, allocatable  :: stenCount(:)
+# ifndef SVD_ENSO
         real(r8), allocatable :: stenIndex(:,:)    ! degC
         real(r8), allocatable :: stenIanom(:)      ! degC
 # endif
@@ -1948,8 +1948,8 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
       allocate ( stenRsss(Ngrids) )
 # endif
-# ifndef SVD_ENSO
       allocate ( stenCount(Ngrids) )
+# ifndef SVD_ENSO
       allocate ( stenIndex(stenNdays,Ngrids) )
       allocate ( stenIanom(Ngrids) )
 # endif
@@ -2555,8 +2555,8 @@
 # if defined SALINITY && (defined SCORRECTION || defined SRELAXATION)
         stenRsss(ng)=0.0_r8
 # endif
-# ifndef SVD_ENSO
         stenCount(ng)=0
+# ifndef SVD_ENSO
         DO i=1,stenNdays
           stenIndex(i,ng) = 0.0_r8
         END DO

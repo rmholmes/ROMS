@@ -107,7 +107,15 @@
      &                      varid = AVG(ng)%Vid(idWwb))
       IF (exit_flag.ne.NoError) RETURN
 #endif
-#if defined STATS_ENSO && !defined SVD_ENSO
+#ifdef STATS_ENSO
+!
+! Write out current count of SST index/anomaly
+!
+      CALL netcdf_put_ivar (ng, iNLM, AVG(ng)%name, 'stenCount',        &
+     &                      stenCount(ng), (/0/), (/0/),                &
+     &                      ncid = AVG(ng)%ncid)
+      IF (exit_flag.ne.NoError) RETURN
+# ifndef SVD_ENSO
 !
 !  Write out STATS_ENSO SST index anomaly time series.
 !
@@ -119,17 +127,14 @@
      &                      varid = AVG(ng)%Vid(idIanm))
       IF (exit_flag.ne.NoError) RETURN
 !
-!  Write out SST index and current count.
+!  Write out SST index.
 !
-      CALL netcdf_put_ivar (ng, iNLM, AVG(ng)%name, 'stenCount',        &
-     &                      stenCount(ng), (/0/), (/0/),                &
-     &                      ncid = AVG(ng)%ncid)
-      IF (exit_flag.ne.NoError) RETURN
 
       CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name, 'stenIndex',        &
      &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
      &                      ncid = AVG(ng)%ncid)
       IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 #ifdef SVD_ENSO
 !

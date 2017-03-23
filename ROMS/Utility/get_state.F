@@ -418,15 +418,26 @@
         END IF
 # endif
 # ifdef STATS_ENSO
-#  ifdef SVD_ENSO
-!
-! Read in SST anomaly for SVD_ENSO
-! 
 ! Inquire variable:
       CALL netcdf_inq_var (ng, IDmod, ncname,                           &
-     &                     MyVarName = 'SSTa',                          &
+     &                     MyVarName = 'stenCount',                     &
      &                     SearchVar = foundSTEN)
-! Read variables if present:
+! Read in current count:
+      IF (foundSTEN) THEN
+          CALL netcdf_get_ivar (ng, IDmod, ncname, 'stenCount',         &
+     &                          stenCount(ng),                          &
+     &                          ncid = ncINPid,                         &
+     &                          start = (/1/),                          &
+     &                          total = (/1/))
+          IF (exit_flag.ne.NoError) RETURN
+          IF (Master) THEN
+            WRITE (stdout,80) 'stenCount', stenCount
+          END IF
+      END IF
+#  ifdef SVD_ENSO
+!
+! Read in SST anomaly for SVD_ENSO, if present
+! 
       IF (foundSTEN) THEN
           foundit=find_string(var_name, n_var, TRIM(Vname(1,idSSTa)),   &
      &                        varid)
@@ -461,13 +472,8 @@
       END IF
 #  else
 !
-! Read in SST index and current count.
+! Read in SST index if present.
 !
-! Inquire variable:
-      CALL netcdf_inq_var (ng, IDmod, ncname,                           &
-     &                     MyVarName = 'stenCount',                     &
-     &                     SearchVar = foundSTEN)
-! Read variables if present:
       IF (foundSTEN) THEN
           CALL netcdf_get_fvar (ng, IDmod, ncname, 'stenIndex',         &
      &                          stenIndex(:,ng),                        &
@@ -480,15 +486,6 @@
             WRITE (stdout,70) 'stenIndex', Fmin, Fmax
           END IF
 
-          CALL netcdf_get_ivar (ng, IDmod, ncname, 'stenCount',         &
-     &                          stenCount(ng),                          &
-     &                          ncid = ncINPid,                         &
-     &                          start = (/1/),                          &
-     &                          total = (/1/))
-          IF (exit_flag.ne.NoError) RETURN
-          IF (Master) THEN
-            WRITE (stdout,80) 'stenCount', stenCount
-          END IF
 ! Calculate stenIanom:
         stenIanom(ng)=0.0_r8
         DO i=1,stenNdays

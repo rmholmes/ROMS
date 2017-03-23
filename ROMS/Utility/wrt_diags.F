@@ -83,20 +83,6 @@
      &                      ncid = DIA(ng)%ncid,                        &
      &                      varid = DIA(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
-#if defined STATS_ENSO && !defined SVD_ENSO
-!
-!  Write out SST index and current count.
-!
-      CALL netcdf_put_ivar (ng, iNLM, DIA(ng)%name, 'stenCount',        &
-     &                      stenCount(ng), (/0/), (/0/),                &
-     &                      ncid = DIA(ng)%ncid)
-      IF (exit_flag.ne.NoError) RETURN
-
-      CALL netcdf_put_fvar (ng, iNLM, DIA(ng)%name, 'stenIndex',        &
-     &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
-     &                      ncid = DIA(ng)%ncid)
-      IF (exit_flag.ne.NoError) RETURN
-#endif
 
 # ifdef DIAGNOSTICS_UV
 !

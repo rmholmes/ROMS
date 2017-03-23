@@ -1609,7 +1609,6 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
-# ifndef SVD_ENSO
       Vinfo( 1)='stenCount'
       Vinfo( 2)='Counter for current day of stenNdays'
       Vinfo( 3)=''
@@ -1618,6 +1617,7 @@
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
 
+# ifndef SVD_ENSO
       Vinfo( 1)='stenIndex'
       Vinfo( 2)='the SST index over the last stenNdays'
       Vinfo( 3)='degC'

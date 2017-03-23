@@ -113,19 +113,24 @@
      &                      ncid = QCK(ng)%ncid,                        &
      &                      varid = QCK(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
-#if defined STATS_ENSO && !defined SVD_ENSO
+#ifdef STATS_ENSO
 !
-!  Write out SST index and current count.
+!  Write out current count of SSTindex/anomaly.
 !
       CALL netcdf_put_ivar (ng, iNLM, QCK(ng)%name, 'stenCount',        &
      &                      stenCount(ng), (/0/), (/0/),                &
      &                      ncid = QCK(ng)%ncid)
       IF (exit_flag.ne.NoError) RETURN
+# ifndef SVD_ENSO
+!
+!  Write out SST index.
+!
 
       CALL netcdf_put_fvar (ng, iNLM, QCK(ng)%name, 'stenIndex',        &
      &                      stenIndex(:,ng), (/1/), (/stenNdays/),      &
      &                      ncid = QCK(ng)%ncid)
       IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 
 #if defined SEDIMENT && defined SED_MORPH

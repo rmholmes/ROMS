@@ -2779,6 +2779,12 @@
 !
         AVERAGE(ng)%avgSSTiClim = fac*AVERAGE(ng)%avgSSTiClim
 # endif
+# ifdef STATS_ENSO
+!
+!  Update stenCount
+!
+        stenCount(ng) = MOD(stenCount(ng),stenNdays) + 1
+# endif
 # ifdef SVD_ENSO
 !
 !-----------------------------------------------------------------------
@@ -2815,7 +2821,6 @@
 !  Calculate SST index for statistical ENSO model 
 !-----------------------------------------------------------------------
 !
-        stenCount(ng) = MOD(stenCount(ng),stenNdays) + 1
         my_index = 0.0_r8
         my_area = 0.0_r8
         DO j=JstrR,JendR
