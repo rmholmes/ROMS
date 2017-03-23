@@ -118,67 +118,72 @@
 !  Calculate regression coefficients
 !-----------------------------------------------------------------------
 !
-      DO k=1,stenNmod
-        my_cov(k,1) = 0.0_r8
-        my_cov(k,2) = 0.0_r8
-        my_var(k,1) = 0.0_r8
-        my_var(k,2) = 0.0_r8
-        DO j=LBj,UBj
-          DO i=LBi,UBi
-           my_cov(k,1) = my_cov(k,1) + FORCES(ng)%ssta(i,j) *           &
-                  FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
-           my_cov(k,2) = my_cov(k,2) + FORCES(ng)%ssta(i,j) *           &
-                  FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
-           my_var(k,1) = my_var(k,1) + FORCES(ng)%sstPG(i,j,k,1) *      &
-                  FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
-           my_var(k,2) = my_var(k,2) + FORCES(ng)%sstPG(i,j,k,2) *      &
-                  FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
-           END DO
+      IF (stenUpdte(ng)) THEN
+        DO k=1,stenNmod
+          my_cov(k,1) = 0.0_r8
+          my_cov(k,2) = 0.0_r8
+          my_var(k,1) = 0.0_r8
+          my_var(k,2) = 0.0_r8
+          DO j=LBj,UBj
+            DO i=LBi,UBi
+             my_cov(k,1) = my_cov(k,1) + FORCES(ng)%ssta(i,j) *           &
+                    FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
+             my_cov(k,2) = my_cov(k,2) + FORCES(ng)%ssta(i,j) *           &
+                    FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
+             my_var(k,1) = my_var(k,1) + FORCES(ng)%sstPG(i,j,k,1) *      &
+                    FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
+             my_var(k,2) = my_var(k,2) + FORCES(ng)%sstPG(i,j,k,2) *      &
+                    FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
+             END DO
+          END DO
         END DO
-      END DO
 #  ifdef DISTRIBUTE
-      NSUB=1
+        NSUB=1
 #  else
-      write(*,*) 'ERROR: This code will not work without DISTRIBUTE'
+        write(*,*) 'ERROR: This code will not work without DISTRIBUTE'
 #  endif
-      IF (tile_count.eq.0) THEN
-         DO k=1,stenNmod
-           cov(k,1) = my_cov(k,1)
-           cov(k,2) = my_cov(k,2)
-           var(k,1) = my_var(k,1)
-           var(k,2) = my_var(k,2)
-         END DO
-
+        IF (tile_count.eq.0) THEN
+           DO k=1,stenNmod
+             cov(k,1) = my_cov(k,1)
+             cov(k,2) = my_cov(k,2)
+             var(k,1) = my_var(k,1)
+             var(k,2) = my_var(k,2)
+           END DO
+        ELSE
+           DO k=1,stenNmod
+             cov(k,1) = cov(k,1) + my_cov(k,1)
+             cov(k,2) = cov(k,2) + my_cov(k,2)
+             var(k,1) = var(k,1) + my_var(k,1)
+             var(k,2) = var(k,2) + my_var(k,2)
+           END DO
+        END IF
+        tile_count=tile_count+1
+        IF (tile_count.eq.NSUB) THEN
+           tile_count=0
+           DO k=1,stenNmod
+             buffer(1)=cov(k,1)
+             buffer(2)=cov(k,2)
+             buffer(3)=var(k,1)
+             buffer(4)=var(k,2)
+             op_handle(1)='SUM'
+             op_handle(2)='SUM'
+             op_handle(3)='SUM'
+             op_handle(4)='SUM'
+             CALL mp_reduce (ng, iNLM, Nreduce, buffer, op_handle)
+             cov(k,1)=buffer(1)
+             cov(k,2)=buffer(2)
+             var(k,1)=buffer(3)
+             var(k,2)=buffer(4)
+             Rc(k,1) = cov(k,1)/(var(k,1) + small)
+             Rc(k,2) = cov(k,2)/(var(k,2) + small)
+           END DO
+        END IF
       ELSE
-         DO k=1,stenNmod
-           cov(k,1) = cov(k,1) + my_cov(k,1)
-           cov(k,2) = cov(k,2) + my_cov(k,2)
-           var(k,1) = var(k,1) + my_var(k,1)
-           var(k,2) = var(k,2) + my_var(k,2)
-         END DO
+        DO k=1,stenNmod
+          Rc(k,1) = 0.0_r8
+          Rc(k,2) = 0.0_r8
+        END DO           
       END IF
-      tile_count=tile_count+1
-      IF (tile_count.eq.NSUB) THEN
-         tile_count=0
-         DO k=1,stenNmod
-           buffer(1)=cov(k,1)
-           buffer(2)=cov(k,2)
-           buffer(3)=var(k,1)
-           buffer(4)=var(k,2)
-           op_handle(1)='SUM'
-           op_handle(2)='SUM'
-           op_handle(3)='SUM'
-           op_handle(4)='SUM'
-           CALL mp_reduce (ng, iNLM, Nreduce, buffer, op_handle)
-           cov(k,1)=buffer(1)
-           cov(k,2)=buffer(2)
-           var(k,1)=buffer(3)
-           var(k,2)=buffer(4)
-           Rc(k,1) = cov(k,1)/(var(k,1) + small)
-           Rc(k,2) = cov(k,2)/(var(k,2) + small)
-         END DO
-      END IF
-      stenUpdte(ng)=.TRUE.
 # else
 !
 !-----------------------------------------------------------------------
