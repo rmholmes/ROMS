@@ -2793,25 +2793,24 @@
 !
         DO j=JstrR,JendR
           DO i=IstrR,IendR
-            FORCES(ng)%ssta(i,j) = (FORCES(ng)%ssta(i,j)*(stenNdays-1)  &
-     &                       +  AVERAGE(ng)%avgt(i,j,N(ng),itemp)       &
-     &                       -  AVERAGE(ng)%avgSSTm(i,j))/stenNdays
+            FORCES(ng)%ssta(i,j,stenCount(ng)) =                        &
+     &      AVERAGE(ng)%avgt(i,j,N(ng),itemp) - AVERAGE(ng)%avgSSTm(i,j)
 #  ifdef MASKING
-            FORCES(ng)%ssta(i,j) = FORCES(ng)%ssta(i,j) *               &
-     &                                         GRID(ng)%rmask(i,j)
+            FORCES(ng)%ssta(i,j,stenCount(ng)) =                        &
+     &        FORCES(ng)%ssta(i,j,stenCount(ng)) * GRID(ng)%rmask(i,j)
 #  endif
           ENDDO
         ENDDO
         IF (EWperiodic(ng).or.NSperiodic(ng)) THEN
           CALL exchange_r2d_tile (ng, tile,                             &
      &                            LBi, UBi, LBj, UBj,                   &
-     &                            FORCES(ng)%ssta)
+     &                            FORCES(ng)%ssta(:,:,stenCount(ng)))
 #   ifdef DISTRIBUTE
           CALL mp_exchange2d (ng, tile, iNLM, 1,                        &
      &                        LBi, UBi, LBj, UBj,                       &
      &                        NghostPoints,                             &
      &                        EWperiodic(ng), NSperiodic(ng),           &
-     &                        FORCES(ng)%ssta)
+     &                        FORCES(ng)%ssta(:,:,stenCount(ng)))
 #   endif
         END IF
         stenUpdte(ng)=.TRUE.

@@ -181,7 +181,7 @@
 !                 spectral photons.                                    !
 #ifdef STATS_ENSO
 # ifdef SVD_ENSO
-!  ssta         SST anomaly accumulated over NAVG*stenNdays for SVD    !
+!  ssta         SST anomaly for last stenNdays NAVGs.                  !
 !  sstPG        Sea surface temperature SVD pattern (Celsius).         !
 # else
 !  SSTiClimG    SST index climatology, two-time snapshots              !
@@ -528,7 +528,7 @@
 #  ifdef QCORRECTION
           real(r8), pointer :: dqdt(:,:)
 #  else
-          real(r8), pointer :: ssta(:,:)
+          real(r8), pointer :: ssta(:,:,:)
 #  endif
           real(r8), pointer :: sst(:,:)
 #  ifndef ANA_SST
@@ -980,7 +980,7 @@
 #  ifdef QCORRECTION
       allocate ( FORCES(ng) % dqdt(LBi:UBi,LBj:UBj) )
 #  else
-      allocate ( FORCES(ng) % ssta(LBi:UBi,LBj:UBj) )
+      allocate ( FORCES(ng) % ssta(LBi:UBi,LBj:UBj,stenNdays) )
 #  endif
       allocate ( FORCES(ng) % sst(LBi:UBi,LBj:UBj) )
 
@@ -1513,7 +1513,9 @@
 #  ifdef QCORRECTION
             FORCES(ng) % dqdt(i,j) = IniVal
 #  else
-            FORCES(ng) % ssta(i,j) = IniVal
+            DO k=1,stenNdays
+              FORCES(ng) % ssta(i,j,k) = IniVal
+            END DO
 #  endif
             FORCES(ng) % sst(i,j) = IniVal
 #  ifndef ANA_SST
