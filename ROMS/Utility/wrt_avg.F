@@ -138,7 +138,7 @@
 #endif
 #ifdef SVD_ENSO
 !
-!  Write out SST anomaly (degC)
+!  Write out current SST anomaly (degC)
 !
       IF (Aout(idSSTa,ng)) THEN
         scale=1.0_r8
@@ -149,7 +149,7 @@
 # ifdef MASKING
      &                     GRID(ng) % rmask,                            &
 # endif
-     &                     FORCES(ng) % ssta)
+     &                     FORCES(ng) % ssta(:,:,stenCount(ng)))
         IF (status.ne.nf90_noerr) THEN
           IF (Master) THEN
             WRITE (stdout,10) TRIM(Vname(1,idSSTa)), AVG(ng)%Rindex

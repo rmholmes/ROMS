@@ -56,6 +56,9 @@
       integer :: sp2dgrd(3), sr2dgrd(3), su2dgrd(3), sv2dgrd(3)
       integer :: sr3dgrd(4), su3dgrd(4), sv3dgrd(4)
       integer :: t2dgrd(4), u2dgrd(4), v2dgrd(4)
+#ifdef SVD_ENSO
+      integer :: svdgrd(4)
+#endif
       integer :: Vsize(4)
 
       integer :: def_dim
@@ -227,7 +230,7 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
-#ifdef STATS_ENSO && !defined SVD_ENSO
+#ifdef STATS_ENSO
         status=def_dim(ng, iNLM, RST(ng)%ncid, ncname, 'stendim',       &
      &                 stenNdays, DimIDs(33))
         IF (exit_flag.ne.NoError) RETURN
@@ -270,6 +273,11 @@
 !
 !  Define dimension vectors for staggered tracer type variables.
 !
+#ifdef SVD_ENSO
+        svdgrd(1)=DimIDs(1)
+        svdgrd(2)=DimIDs(5)
+        svdgrd(3)=DimIDs(33)
+#endif
 #if !defined PERFECT_RESTART && \
     (defined WRITE_WATER && defined MASKING)
         t2dgrd(1)=DimIDs(17)
@@ -705,7 +713,7 @@
         Vinfo(22)='coordinates'
         Aval(5)=REAL(Iinfo(1,idSSTa,ng),r8)
         status=def_var(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idSSTa),     &
-     &                   NF_FRST, nvd3, t2dgrd, Aval, Vinfo, ncname)
+     &                   NF_FRST, nvd4, svdgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
 #endif
 !

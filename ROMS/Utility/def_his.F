@@ -51,6 +51,9 @@
       integer :: IorJdim, brecdim
 #endif
       integer :: DimIDs(33), t2dgrd(3), u2dgrd(3), v2dgrd(3)
+#ifdef SVD_ENSO
+      integer :: svdgrd(4)
+#endif
 #ifdef ADJUST_BOUNDARY
       integer :: t2dobc(4)
 #endif
@@ -235,7 +238,7 @@
      &                 4, DimIDs(14))
         IF (exit_flag.ne.NoError) RETURN
 
-#if defined STATS_ENSO && !defined SVD_ENSO
+#if defined STATS_ENSO
         status=def_dim(ng, iNLM, HIS(ng)%ncid, ncname, 'stendim',       &
      &                 stenNdays, DimIDs(33))
         IF (exit_flag.ne.NoError) RETURN
@@ -274,6 +277,11 @@
 !
 !  Define dimension vectors for staggered tracer type variables.
 !
+#ifdef SVD_ENSO
+        svdgrd(1)=DimIDs(1)
+        svdgrd(2)=DimIDs(5)
+        svdgrd(3)=DimIDs(33)
+#endif
 #if defined WRITE_WATER && defined MASKING
         t2dgrd(1)=DimIDs(17)
         t2dgrd(2)=DimIDs(12)
@@ -629,7 +637,7 @@
           Vinfo(22)='coordinates'
           Aval(5)=REAL(Iinfo(1,idSSTa,ng),r8)
           status=def_var(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idSSTa),   &
-     &                   NF_FOUT, nvd3, t2dgrd, Aval, Vinfo, ncname)
+     &                   NF_FOUT, nvd4, svdgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
         END IF
 #endif
