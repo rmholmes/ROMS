@@ -442,18 +442,19 @@
           foundit=find_string(var_name, n_var, TRIM(Vname(1,idSSTa)),   &
      &                        varid)
           gtype=var_flag(varid)*r2dvar
-          status=nf_fread2d(ng, IDmod, ncname, ncINPid,                 &
+          DO i=1,stenNdays
+            status=nf_fread2d(ng, IDmod, ncname, ncINPid,               &
      &                        Vname(1,idSSTa), varid,                   &
-     &                        InpRec, gtype, Vsize,                     &
+     &                        i, gtype, Vsize,                          &
      &                        LBi, UBi, LBj, UBj,                       &
      &                        Fscl, Fmin, Fmax,                         &
 #   ifdef MASKING
      &                        GRID(ng) % rmask,                         &
 #   endif
-     &                        FORCES(ng) % ssta)
+     &                        FORCES(ng) % ssta(:,:,i))
           IF (status.ne.nf90_noerr) THEN
             IF (Master) THEN
-              WRITE (stdout,60) string, TRIM(Vname(1,idSSTa)), InpRec,  &
+              WRITE (stdout,60) string, TRIM(Vname(1,idSSTa)), i,       &
      &                          TRIM(ncname)
             END IF
             exit_flag=2
@@ -465,6 +466,7 @@
             END IF
             stenUpdte(ng)=.TRUE.
           END IF
+          END DO
       ELSE
         IF (Master) THEN
           WRITE (stdout,80)
