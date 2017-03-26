@@ -52,7 +52,7 @@
 #endif
       integer :: DimIDs(33), t2dgrd(3), u2dgrd(3), v2dgrd(3)
 #ifdef SVD_ENSO
-      integer :: svdgrd(4)
+      integer :: svdgrd(3)
 #endif
 #ifdef ADJUST_BOUNDARY
       integer :: t2dobc(4)
@@ -623,7 +623,7 @@
 #endif
 #ifdef SVD_ENSO
 !
-!  Define free-surface.
+!  Define SST anomaly.
 !
         IF (Hout(idSSTa,ng)) THEN
           Vinfo( 1)=Vname(1,idSSTa)
@@ -637,7 +637,7 @@
           Vinfo(22)='coordinates'
           Aval(5)=REAL(Iinfo(1,idSSTa,ng),r8)
           status=def_var(ng, iNLM, HIS(ng)%ncid, HIS(ng)%Vid(idSSTa),   &
-     &                   NF_FOUT, nvd4, svdgrd, Aval, Vinfo, ncname)
+     &                   NF_FOUT, nvd3, svdgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
         END IF
 #endif

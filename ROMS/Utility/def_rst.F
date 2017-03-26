@@ -57,7 +57,7 @@
       integer :: sr3dgrd(4), su3dgrd(4), sv3dgrd(4)
       integer :: t2dgrd(4), u2dgrd(4), v2dgrd(4)
 #ifdef SVD_ENSO
-      integer :: svdgrd(4)
+      integer :: svdgrd(3)
 #endif
       integer :: Vsize(4)
 
@@ -713,7 +713,7 @@
         Vinfo(22)='coordinates'
         Aval(5)=REAL(Iinfo(1,idSSTa,ng),r8)
         status=def_var(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idSSTa),     &
-     &                   NF_FRST, nvd4, svdgrd, Aval, Vinfo, ncname)
+     &                   NF_FRST, nvd3, svdgrd, Aval, Vinfo, ncname)
           IF (exit_flag.ne.NoError) RETURN
 #endif
 !

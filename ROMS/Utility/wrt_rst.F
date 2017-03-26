@@ -157,21 +157,23 @@
 !
       scale=1.0_r8
       gtype=gfactor*r2dvar
-      status=nf_fwrite2d(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idSSTa),   &
-     &                     stenCount(ng), gtype,                        &
+      DO i=1,stenNdays
+        status=nf_fwrite2d(ng, iNLM, RST(ng)%ncid, RST(ng)%Vid(idSSTa), &
+     &                     i, gtype,                                    &
      &                     LBi, UBi, LBj, UBj, scale,                   &
 #  ifdef MASKING
      &                     GRID(ng) % rmask,                            &
 #  endif
-     &                     FORCES(ng) % ssta(:,:,stenCount(ng)))
-      IF (status.ne.nf90_noerr) THEN
-         IF (Master) THEN
-           WRITE (stdout,10) TRIM(Vname(1,idSSTa)), stenCount(ng)
-         END IF
-         exit_flag=3
-         ioerror=status
-         RETURN
-      END IF
+     &                     FORCES(ng) % ssta(:,:,i))
+        IF (status.ne.nf90_noerr) THEN
+           IF (Master) THEN
+             WRITE (stdout,10) TRIM(Vname(1,idSSTa)), i
+           END IF
+           exit_flag=3
+           ioerror=status
+           RETURN
+        END IF
+      END DO
 # else
 !
 !  Write out SST index.
