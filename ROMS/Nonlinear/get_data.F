@@ -39,6 +39,9 @@
       USE mod_scalars
       USE mod_sources
       USE mod_stepping
+#  ifdef SVD_ENSO
+      USE distribute_mod, ONLY : mp_reduce
+#  endif
 
 !
       implicit none
@@ -58,11 +61,13 @@
 #ifdef STATS_ENSO
       integer :: j
 # ifdef SVD_ENSO
-      real(r8), dimension(BOUNDS(ng)%LBi(-1):BOUNDS(ng)%UBi(-1),        &
-     &                    BOUNDS(ng)%LBj(-1):BOUNDS(ng)%UBj(-1)) :: SSTa
-      real(r8), dimension(stenNmod,2) :: cov, var, Rc
-      integer :: k
+      real(r8), dimension(stenNmod,2) :: my_cov, my_var, cov, var, Rc
+      real(r8) :: cff
+      integer :: NSUB, k, m
+      integer, parameter :: Nreduce = 4
       real(r8), parameter :: small = 1.0E-05_r8
+      real(r8), dimension(Nreduce) :: buffer
+      character (len=3), dimension(Nreduce) :: op_handle
 # endif
 #endif
 !
@@ -100,7 +105,7 @@
 !  Read-in SST SVD patterns
 !-----------------------------------------------------------------------
 !
-      CALL get_svdfld (ng, iNLM, idSSTP, ncFRCid(idSSTP,ng),             &
+      CALL get_svdfld (ng, iNLM, idSSTP, ncFRCid(idSSTP,ng),            &
      &                nFfiles(ng), FRC(1,ng), update(1),                &
      &                LBi, UBi, LBj, UBj, 2, stenNmod,                  &
 #  ifdef MASKING
@@ -115,38 +120,70 @@
 !-----------------------------------------------------------------------
 !
       IF (stenUpdte(ng)) THEN
-! Calculate averaged SST anomaly:
-        DO j=LBj,UBj
-          DO i=LBi,UBi
-            SSTa(i,j) = 0.0_r8
-            DO k=1,stenNdays
-              SSTa(i,j) = SSTa(i,j) + FORCES(ng)%ssta(i,j,k)
-            END DO
-            SSTa(i,j) = SSTa(i,j)/stenNdays
-          END DO
-        END DO
-
         DO k=1,stenNmod
-! Calculate covariance and variance for each mode:
-          cov(k,1) = 0.0_r8
-          cov(k,2) = 0.0_r8
-          var(k,1) = 0.0_r8
-          var(k,2) = 0.0_r8
+          my_cov(k,1) = 0.0_r8
+          my_cov(k,2) = 0.0_r8
+          my_var(k,1) = 0.0_r8
+          my_var(k,2) = 0.0_r8
           DO j=LBj,UBj
             DO i=LBi,UBi
-             cov(k,1) = cov(k,1) + SSTa(i,j) *                          &
-                    FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
-             cov(k,2) = cov(k,2) + SSTa(i,j) *                          &
-                    FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
-             var(k,1) = var(k,1) + FORCES(ng)%sstPG(i,j,k,1) *          &
-                    FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
-             var(k,2) = var(k,2) + FORCES(ng)%sstPG(i,j,k,2) *          &
-                    FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
-             END DO
+              cff = 0.0_r8
+              DO m=1,stenNdays
+                cff = cff + FORCES(ng)%ssta(i,j,m)
+              END DO
+              cff = cff / stenNdays
+              my_cov(k,1) = my_cov(k,1) + cff *                         &
+     &              FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
+              my_cov(k,2) = my_cov(k,2) + cff *                         &
+     &              FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
+              my_var(k,1) = my_var(k,1) + FORCES(ng)%sstPG(i,j,k,1) *   &
+     &              FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
+              my_var(k,2) = my_var(k,2) + FORCES(ng)%sstPG(i,j,k,2) *   &
+     &              FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
+            END DO
           END DO
-          Rc(k,1) = cov(k,1)/(var(k,1) + small)
-          Rc(k,2) = cov(k,2)/(var(k,2) + small)
         END DO
+#  ifdef DISTRIBUTE
+        NSUB=1
+#  else
+        write(*,*) 'ERROR: This code will not work without DISTRIBUTE'
+#  endif
+        IF (tile_count.eq.0) THEN
+           DO k=1,stenNmod
+             cov(k,1) = my_cov(k,1)
+             cov(k,2) = my_cov(k,2)
+             var(k,1) = my_var(k,1)
+             var(k,2) = my_var(k,2)
+           END DO
+        ELSE
+           DO k=1,stenNmod
+             cov(k,1) = cov(k,1) + my_cov(k,1)
+             cov(k,2) = cov(k,2) + my_cov(k,2)
+             var(k,1) = var(k,1) + my_var(k,1)
+             var(k,2) = var(k,2) + my_var(k,2)
+           END DO
+        END IF
+        tile_count=tile_count+1
+        IF (tile_count.eq.NSUB) THEN
+           tile_count=0
+           DO k=1,stenNmod
+             buffer(1)=cov(k,1)
+             buffer(2)=cov(k,2)
+             buffer(3)=var(k,1)
+             buffer(4)=var(k,2)
+             op_handle(1)='SUM'
+             op_handle(2)='SUM'
+             op_handle(3)='SUM'
+             op_handle(4)='SUM'
+             CALL mp_reduce (ng, iNLM, Nreduce, buffer, op_handle)
+             cov(k,1)=buffer(1)
+             cov(k,2)=buffer(2)
+             var(k,1)=buffer(3)
+             var(k,2)=buffer(4)
+             Rc(k,1) = cov(k,1)/(var(k,1) + small)
+             Rc(k,2) = cov(k,2)/(var(k,2) + small)
+           END DO
+        END IF
       ELSE
         DO k=1,stenNmod
           Rc(k,1) = 0.0_r8
