@@ -190,6 +190,14 @@
           Rc(k,2) = 0.0_r8
         END DO           
       END IF
+      IF (stenUpdte(ng)) THEN
+        IF (Master) THEN
+          WRITE (stdout,1000) stenCount(ng), iic(ng), var(k,1),         &
+     &                      cov(k,1), Rc(k,1)
+ 1000     FORMAT (/,' GET_DATA - stenCount = ', i2, ' iic = ', i7,/,    &
+     &            ' var = ', e15.7, ' cov = ', e15.7, ' Rc = ', f10.7)
+        END IF
+      END IF
 # else
 !
 !-----------------------------------------------------------------------
