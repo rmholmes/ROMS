@@ -60,15 +60,6 @@
       integer :: i, ic, my_tile
 #ifdef STATS_ENSO
       integer :: j
-# ifdef SVD_ENSO
-      real(r8), dimension(stenNmod,2) :: my_cov, my_var, cov, var, Rc
-      real(r8) :: cff
-      integer :: NSUB, k, m
-      integer, parameter :: Nreduce = 4
-      real(r8), parameter :: small = 1.0E-05_r8
-      real(r8), dimension(Nreduce) :: buffer
-      character (len=3), dimension(Nreduce) :: op_handle
-# endif
 #endif
 !
 !  Lower and upper bounds for nontiled (global values) boundary arrays.
@@ -120,83 +111,10 @@
 !-----------------------------------------------------------------------
 !
       IF (stenUpdte(ng)) THEN
-        DO k=1,stenNmod
-          my_cov(k,1) = 0.0_r8
-          my_cov(k,2) = 0.0_r8
-          my_var(k,1) = 0.0_r8
-          my_var(k,2) = 0.0_r8
-          DO j=LBj,UBj
-            DO i=LBi,UBi
-              cff = 0.0_r8
-              DO m=1,stenNdays
-                cff = cff + FORCES(ng)%ssta(i,j,m)
-              END DO
-              cff = cff / stenNdays
-              my_cov(k,1) = my_cov(k,1) + cff *                         &
-     &              FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
-              my_cov(k,2) = my_cov(k,2) + cff *                         &
-     &              FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
-              my_var(k,1) = my_var(k,1) + FORCES(ng)%sstPG(i,j,k,1) *   &
-     &              FORCES(ng)%sstPG(i,j,k,1) * GRID(ng) % omn(i,j)
-              my_var(k,2) = my_var(k,2) + FORCES(ng)%sstPG(i,j,k,2) *   &
-     &              FORCES(ng)%sstPG(i,j,k,2) * GRID(ng) % omn(i,j)
-            END DO
-          END DO
+        DO tile=first_tile(ng),last_tile(ng),+1
+           CALL svd_regcoef (ng, tile)
         END DO
-#  ifdef DISTRIBUTE
-        NSUB=1
-#  else
-        write(*,*) 'ERROR: This code will not work without DISTRIBUTE'
-#  endif
-        IF (tile_count.eq.0) THEN
-           DO k=1,stenNmod
-             cov(k,1) = my_cov(k,1)
-             cov(k,2) = my_cov(k,2)
-             var(k,1) = my_var(k,1)
-             var(k,2) = my_var(k,2)
-           END DO
-        ELSE
-           DO k=1,stenNmod
-             cov(k,1) = cov(k,1) + my_cov(k,1)
-             cov(k,2) = cov(k,2) + my_cov(k,2)
-             var(k,1) = var(k,1) + my_var(k,1)
-             var(k,2) = var(k,2) + my_var(k,2)
-           END DO
-        END IF
-        tile_count=tile_count+1
-        IF (tile_count.eq.NSUB) THEN
-           tile_count=0
-           DO k=1,stenNmod
-             buffer(1)=cov(k,1)
-             buffer(2)=cov(k,2)
-             buffer(3)=var(k,1)
-             buffer(4)=var(k,2)
-             op_handle(1)='SUM'
-             op_handle(2)='SUM'
-             op_handle(3)='SUM'
-             op_handle(4)='SUM'
-             CALL mp_reduce (ng, iNLM, Nreduce, buffer, op_handle)
-             cov(k,1)=buffer(1)
-             cov(k,2)=buffer(2)
-             var(k,1)=buffer(3)
-             var(k,2)=buffer(4)
-             Rc(k,1) = cov(k,1)/(var(k,1) + small)
-             Rc(k,2) = cov(k,2)/(var(k,2) + small)
-           END DO
-        END IF
-      ELSE
-        DO k=1,stenNmod
-          Rc(k,1) = 0.0_r8
-          Rc(k,2) = 0.0_r8
-        END DO           
-      END IF
-      IF (stenUpdte(ng)) THEN
-        IF (Master) THEN
-          WRITE (stdout,1000) stenCount(ng), iic(ng), var(k,1),         &
-     &                      cov(k,1), Rc(k,1)
- 1000     FORMAT (/,' GET_DATA - stenCount = ', i2, ' iic = ', i7,/,    &
-     &            ' var = ', e15.7, ' cov = ', e15.7, ' Rc = ', f10.7)
-        END IF
+        IF (exit_flag.ne.NoError) RETURN
       END IF
 # else
 !
@@ -302,9 +220,11 @@
             FORCES(ng)%UwindG(i,j,2)=FORCES(ng)%UwindOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%UwindG(i,j,1) = FORCES(ng)%UwindG(i,j,1) +     &
-     &        Rc(k,1)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRuwnd(ng) *                       &
+     &          FORCES(ng)%UwindPG(i,j,k,1)
               FORCES(ng)%UwindG(i,j,2) = FORCES(ng)%UwindG(i,j,2) +     &
-     &        Rc(k,2)*stenRuwnd(ng)*FORCES(ng)%UwindPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRuwnd(ng) *                       &
+     &          FORCES(ng)%UwindPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -361,9 +281,11 @@
             FORCES(ng)%VwindG(i,j,2)=FORCES(ng)%VwindOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%VwindG(i,j,1) = FORCES(ng)%VwindG(i,j,1) +     &
-     &        Rc(k,1)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRvwnd(ng) *                       &
+     &          FORCES(ng)%VwindPG(i,j,k,1)
               FORCES(ng)%VwindG(i,j,2) = FORCES(ng)%VwindG(i,j,2) +     &
-     &        Rc(k,2)*stenRvwnd(ng)*FORCES(ng)%VwindPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRvwnd(ng) *                       &
+     &          FORCES(ng)%VwindPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -425,9 +347,11 @@
             FORCES(ng)%wMagG(i,j,2)=FORCES(ng)%wMagOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%wMagG(i,j,1) = FORCES(ng)%wMagG(i,j,1) +       &
-     &        Rc(k,1)*stenRwmag(ng)*FORCES(ng)%wMagPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRwmag(ng) *                       &
+     &          FORCES(ng)%wMagPG(i,j,k,1)
               FORCES(ng)%wMagG(i,j,2) = FORCES(ng)%wMagG(i,j,2) +       &
-     &        Rc(k,2)*stenRwmag(ng)*FORCES(ng)%wMagPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRwmag(ng) *                       &
+     &          FORCES(ng)%wMagPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -493,9 +417,9 @@
             FORCES(ng)%blhG(i,j,2)=FORCES(ng)%blhOG(i,j,2)              
             DO k=1,stenNmod
               FORCES(ng)%blhG(i,j,1) = FORCES(ng)%blhG(i,j,1) +         &
-     &        Rc(k,1)*stenRblh(ng)*FORCES(ng)%blhPG(i,j,k,1)
+     &        stenRcoef(k,1,ng)*stenRblh(ng)*FORCES(ng)%blhPG(i,j,k,1)
               FORCES(ng)%blhG(i,j,2) = FORCES(ng)%blhG(i,j,2) +         &
-     &        Rc(k,2)*stenRblh(ng)*FORCES(ng)%blhPG(i,j,k,2)
+     &        stenRcoef(k,2,ng)*stenRblh(ng)*FORCES(ng)%blhPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -560,9 +484,11 @@
             FORCES(ng)%sustrG(i,j,2)=FORCES(ng)%sustrOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%sustrG(i,j,1) = FORCES(ng)%sustrG(i,j,1) +     &
-     &        Rc(k,1)*stenRustr(ng)*FORCES(ng)%sustrPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRustr(ng) *                       &
+     &          FORCES(ng)%sustrPG(i,j,k,1)
               FORCES(ng)%sustrG(i,j,2) = FORCES(ng)%sustrG(i,j,2) +     &
-     &        Rc(k,2)*stenRustr(ng)*FORCES(ng)%sustrPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRustr(ng) *                       &
+     &          FORCES(ng)%sustrPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -619,9 +545,11 @@
             FORCES(ng)%svstrG(i,j,2)=FORCES(ng)%svstrOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%svstrG(i,j,1) = FORCES(ng)%svstrG(i,j,1) +     &
-     &        Rc(k,1)*stenRvstr(ng)*FORCES(ng)%svstrPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRvstr(ng) *                       &
+     &          FORCES(ng)%svstrPG(i,j,k,1)
               FORCES(ng)%svstrG(i,j,2) = FORCES(ng)%svstrG(i,j,2) +     &
-     &        Rc(k,2)*stenRvstr(ng)*FORCES(ng)%svstrPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRvstr(ng) *                       &
+     &          FORCES(ng)%svstrPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -714,9 +642,11 @@
             FORCES(ng)%PairG(i,j,2)=FORCES(ng)%PairOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%PairG(i,j,1) = FORCES(ng)%PairG(i,j,1) +       &
-     &        Rc(k,1)*stenRpair(ng)*FORCES(ng)%PairPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRpair(ng) *                       &
+     &          FORCES(ng)%PairPG(i,j,k,1)
               FORCES(ng)%PairG(i,j,2) = FORCES(ng)%PairG(i,j,2) +       &
-     &        Rc(k,2)*stenRpair(ng)*FORCES(ng)%PairPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRpair(ng) *                       &
+     &          FORCES(ng)%PairPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -893,9 +823,11 @@
             FORCES(ng)%srflxG(i,j,2)=FORCES(ng)%srflxOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%srflxG(i,j,1) = FORCES(ng)%srflxG(i,j,1) +     &
-     &        Rc(k,1)*stenRsrad(ng)*FORCES(ng)%srflxPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRsrad(ng) *                       &
+     &          FORCES(ng)%srflxPG(i,j,k,1)
               FORCES(ng)%srflxG(i,j,2) = FORCES(ng)%srflxG(i,j,2) +     &
-     &        Rc(k,2)*stenRsrad(ng)*FORCES(ng)%srflxPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRsrad(ng) *                       &
+     &          FORCES(ng)%srflxPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -991,9 +923,11 @@
             FORCES(ng)%lrflxG(i,j,2)=FORCES(ng)%lrflxOG(i,j,2)          
             DO k=1,stenNmod
               FORCES(ng)%lrflxG(i,j,1) = FORCES(ng)%lrflxG(i,j,1) +     &
-     &        Rc(k,1)*stenRlrad(ng)*FORCES(ng)%lrflxPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRlrad(ng) *                       &
+     &          FORCES(ng)%lrflxPG(i,j,k,1)
               FORCES(ng)%lrflxG(i,j,2) = FORCES(ng)%lrflxG(i,j,2) +     &
-     &        Rc(k,2)*stenRlrad(ng)*FORCES(ng)%lrflxPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRlrad(ng) *                       &
+     &          FORCES(ng)%lrflxPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -1059,9 +993,11 @@
             FORCES(ng)%TairG(i,j,2)=FORCES(ng)%TairOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%TairG(i,j,1) = FORCES(ng)%TairG(i,j,1) +       &
-     &        Rc(k,1)*stenRtair(ng)*FORCES(ng)%TairPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRtair(ng) *                       &
+     &          FORCES(ng)%TairPG(i,j,k,1)
               FORCES(ng)%TairG(i,j,2) = FORCES(ng)%TairG(i,j,2) +       &
-     &        Rc(k,2)*stenRtair(ng)*FORCES(ng)%TairPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRtair(ng) *                       &
+     &          FORCES(ng)%TairPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -1125,9 +1061,11 @@
             FORCES(ng)%HairG(i,j,2)=FORCES(ng)%HairOG(i,j,2)            
             DO k=1,stenNmod
               FORCES(ng)%HairG(i,j,1) = FORCES(ng)%HairG(i,j,1) +       &
-     &        Rc(k,1)*stenRqair(ng)*FORCES(ng)%HairPG(i,j,k,1)
+     &          stenRcoef(k,1,ng)*stenRqair(ng) *                       &
+     &          FORCES(ng)%HairPG(i,j,k,1)
               FORCES(ng)%HairG(i,j,2) = FORCES(ng)%HairG(i,j,2) +       &
-     &        Rc(k,2)*stenRqair(ng)*FORCES(ng)%HairPG(i,j,k,2)
+     &          stenRcoef(k,2,ng)*stenRqair(ng) *                       &
+     &          FORCES(ng)%HairPG(i,j,k,2)
             END DO
           END DO
         END DO
@@ -1212,10 +1150,12 @@
             DO k=1,stenNmod
               FORCES(ng)%stflxG(i,j,1,itemp) =
      &            FORCES(ng)%stflxG(i,j,1,itemp) +                      &
-     &        Rc(k,1)*stenRhflx(ng)*FORCES(ng)%stflxPG(i,j,k,1,itemp)
+     &            stenRcoef(k,1,ng)*stenRhflx(ng) *                     &
+     &            FORCES(ng)%stflxPG(i,j,k,1,itemp)
               FORCES(ng)%stflxG(i,j,2,itemp) =
      &            FORCES(ng)%stflxG(i,j,2,itemp) +                      &
-     &        Rc(k,2)*stenRhflx(ng)*FORCES(ng)%stflxPG(i,j,k,2,itemp)
+     &            stenRcoef(k,2,ng)*stenRhflx(ng) *                     &
+     &            FORCES(ng)%stflxPG(i,j,k,2,itemp)
             END DO
           END DO
         END DO
@@ -1407,9 +1347,9 @@
             FORCES(ng)%sssG(i,j,2)=FORCES(ng)%sssOG(i,j,2)              
             DO k=1,stenNmod
               FORCES(ng)%sssG(i,j,1) = FORCES(ng)%sssG(i,j,1) +         &
-     &        Rc(k,1)*stenRsss(ng)*FORCES(ng)%sssPG(i,j,k,1)
+     &        stenRcoef(k,1,ng)*stenRsss(ng)*FORCES(ng)%sssPG(i,j,k,1)
               FORCES(ng)%sssG(i,j,2) = FORCES(ng)%sssG(i,j,2) +         &
-     &        Rc(k,2)*stenRsss(ng)*FORCES(ng)%sssPG(i,j,k,2)
+     &        stenRcoef(k,2,ng)*stenRsss(ng)*FORCES(ng)%sssPG(i,j,k,2)
             END DO
           END DO
         END DO

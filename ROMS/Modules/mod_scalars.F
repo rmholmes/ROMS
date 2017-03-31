@@ -400,7 +400,9 @@
 !    stenRblh       Coupling coefficient of blh pattern onto SST index
 !
 !    stenCount      Counter for current day of stenNdays
-# ifndef SVD_ENSO
+# ifdef SVD_ENSO
+!    stenRcoef      Computed SVD regression coefficients, two-time snapshots
+# else
 !    stenIndex      the SST index over the last stenNdays
 !    stenIanom      Current averaged Index anomaly
 # endif
@@ -439,7 +441,9 @@
         real(r8), allocatable :: stenRsss(:)       ! degC^(-1)
 # endif
         integer, allocatable  :: stenCount(:)
-# ifndef SVD_ENSO
+# ifdef SVD_ENSO
+        real(r8), allocatable :: stenRcoef(:,:,:)
+# else
         real(r8), allocatable :: stenIndex(:,:)    ! degC
         real(r8), allocatable :: stenIanom(:)      ! degC
 # endif
@@ -1949,7 +1953,9 @@
       allocate ( stenRsss(Ngrids) )
 # endif
       allocate ( stenCount(Ngrids) )
-# ifndef SVD_ENSO
+# ifdef SVD_ENSO
+      allocate ( stenRcoef(stenNmod,2,Ngrids) )
+# else
       allocate ( stenIndex(stenNdays,Ngrids) )
       allocate ( stenIanom(Ngrids) )
 # endif
@@ -2556,7 +2562,12 @@
         stenRsss(ng)=0.0_r8
 # endif
         stenCount(ng)=0
-# ifndef SVD_ENSO
+# ifdef SVD_ENSO
+        DO i=1,stenNmod
+          stenRcoef(i,1,ng) = 0.0_r8
+          stenRcoef(i,2,ng) = 0.0_r8
+        END DO
+# else
         DO i=1,stenNdays
           stenIndex(i,ng) = 0.0_r8
         END DO
