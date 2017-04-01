@@ -116,6 +116,11 @@
            CALL svd_regcoef (ng, tile)
         END DO
         IF (exit_flag.ne.NoError) RETURN
+        IF (Master) THEN
+          WRITE (stdout,1000) stenRcoef(1,1,ng), stenRcoef(1,2,ng)
+ 1000     FORMAT (/,'    SVD_ENSO - New Regcoefs: ', 2f10.7)
+        END IF
+
       END IF
 # else
 !

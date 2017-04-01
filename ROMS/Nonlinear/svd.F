@@ -162,13 +162,6 @@
           stenRcoef(k,2,ng) = cov(k,2)/(var(k,2) + small)
         END IF
       END DO
-      IF (Master) THEN
-        WRITE (*,1000) stenCount(ng), var(k,1),                         &
-     &                      cov(k,1), stenRcoef(k,1,ng)
- 1000   FORMAT (/,' GET_DATA - stenCount = ', i2, ' iic = ', i7,/,      &
-     &            ' var = ', e15.7, ' cov = ', e15.7, ' Rc = ', f10.7)
-      END IF
-
 
       RETURN
       END SUBROUTINE svd_regcoef_tile
