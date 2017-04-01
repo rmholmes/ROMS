@@ -1,6 +1,6 @@
 #include "cppdefs.h"
+      MODULE svd_mod
 #ifdef SVD_ENSO
-      SUBROUTINE svd_regcoef (ng, tile)
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
@@ -16,9 +16,20 @@
 !                                                                      !
 !=======================================================================
 !
+      implicit none
+!
+      PRIVATE
+      PUBLIC  :: svd_regcoef
+!
+      CONTAINS
+!
+!***********************************************************************      
+      SUBROUTINE svd_regcoef (ng, tile)
+!***********************************************************************
+!
       USE mod_param
       USE mod_grid
-      USE mode_forces
+      USE mod_forces
 !
 !  Imported variable declarations.
 !
@@ -71,7 +82,7 @@
 !
 !  Local variable declarations.
 !
-      integer :: NSUB, i, j, n, k
+      integer :: NSUB, i, j, k
       integer, parameter :: Nreduce = 4
       real(r8), parameter :: small = 1.0E-05_r8
       real(r8), dimension(stenNmod,2) :: my_cov, my_var, cov, var
@@ -89,8 +100,8 @@
       DO j=JstrR,JendR
         DO i=IstrR,IendR
           avg_ssta(i,j) = 0.0_r8
-          DO n=1,stenNdays
-            avg_ssta(i,j) = avg_ssta(i,j) + ssta(i,j,n)
+          DO k=1,stenNdays
+            avg_ssta(i,j) = avg_ssta(i,j) + ssta(i,j,k)
           END DO
           avg_ssta(i,j) = avg_ssta(i,j) / stenNdays
         END DO
@@ -152,7 +163,7 @@
         END IF
       END DO
       IF (Master) THEN
-        WRITE (stdout,1000) stenCount(ng), iic(ng), var(k,1),           &
+        WRITE (*,1000) stenCount(ng), var(k,1),                         &
      &                      cov(k,1), stenRcoef(k,1,ng)
  1000   FORMAT (/,' GET_DATA - stenCount = ', i2, ' iic = ', i7,/,      &
      &            ' var = ', e15.7, ' cov = ', e15.7, ' Rc = ', f10.7)
@@ -161,3 +172,6 @@
 
       RETURN
       END SUBROUTINE svd_regcoef_tile
+#endif
+      END MODULE svd_mod
+

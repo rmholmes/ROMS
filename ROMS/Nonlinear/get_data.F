@@ -19,9 +19,6 @@
 !=======================================================================
 !
       USE mod_param
-#ifdef SVD_ENSO
-      USE mod_parallel
-#endif
 #if defined RED_TIDE
       USE mod_biology
 #endif
@@ -39,9 +36,10 @@
       USE mod_scalars
       USE mod_sources
       USE mod_stepping
-#  ifdef SVD_ENSO
-      USE distribute_mod, ONLY : mp_reduce
-#  endif
+#ifdef SVD_ENSO
+      USE mod_parallel
+      USE svd_mod, ONLY : svd_regcoef
+#endif
 
 !
       implicit none
@@ -60,6 +58,9 @@
       integer :: i, ic, my_tile
 #ifdef STATS_ENSO
       integer :: j
+# ifdef SVD_ENSO
+      integer :: k, tile
+# endif
 #endif
 !
 !  Lower and upper bounds for nontiled (global values) boundary arrays.
