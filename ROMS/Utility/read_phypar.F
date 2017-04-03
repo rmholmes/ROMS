@@ -82,6 +82,9 @@
 
       real(r8), allocatable :: Rtracer(:,:)
       real(r8), allocatable :: tracer(:,:)
+#ifdef SVD_ENSO
+      real(r8), allocatable :: Nmodes(:,:)
+#endif
 
       real(r8) :: Rvalue(1)
 
@@ -254,6 +257,11 @@
                 RETURN
               END IF
 #endif
+#ifdef SVD_ENSO
+            CASE ('stenNmod')
+              Npts=load_i(Nval, Rval, 1, Ivalue)
+              stenNmod=Ivalue(1)
+#endif
 #ifdef SOLVE3D
             CASE ('NAT')
               Npts=load_i(Nval, Rval, 1, Ivalue)
@@ -372,6 +380,11 @@
               IF (.not.allocated(tracer)) THEN
                 allocate (tracer(MT,Ngrids))
               END IF
+#ifdef SVD_ENSO
+              IF (.not.allocated(Nmodes)) THEN
+                allocate (Nmodes(stenNmod,Ngrids))
+              END IF
+#endif
             CASE ('LBC(isFsur)')
               Npts=load_lbc(Nval, Cval, line, nline, isFsur, igrid,     &
      &                      0, 0, Vname(1,idFsur), LBC)
@@ -763,9 +776,13 @@
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
-            CASE ('stenNmod')
-              Npts=load_i(Nval, Rval, 1, Ivalue)
-              stenNmod=Ivalue(1)
+            CASE ('stenRmax')
+              Npts=load_r(Nval, Rval, stenNmod*Ngrids, Nmodes)
+              DO ng=1,Ngrids
+                DO i=1,stenNmod
+                  stenRmax(i,ng)=Nmodes(i,ng)
+                END DO
+              END DO
 #  else
             CASE ('stenRegnN')
               Npts=load_r(Nval, Rval, Ngrids, stenRegnN)
@@ -3841,6 +3858,10 @@
 #  ifdef SVD_ENSO
           WRITE (out,120) stenNmod, 'stenNmod',                         &
      &          'Number of SVD modes included in statistical ENSO.'
+          DO i=1,stenNmod
+            WRITE (out,340) stenRmax(i,ng), 'stenRmax', i,              &
+     &           'Maximum Regression Coefficient for Mode ', i
+          END DO
 #  else
           WRITE (out,150) stenRegnN(ng), 'stenRegnN',                   &
      &          'SST index region northern boundary.'
@@ -6122,6 +6143,9 @@
  320  FORMAT (/,' READ_PHYPAR - could not find input parameter: ', a,   &
      &        /,15x,'in ROMS standard input script.',/,15x,a)
  330  FORMAT (/,' READ_PHYPAR - Invalid input parameter, ',a,i4,/,15x,a)
+#ifdef SVD_ENSO
+ 340  FORMAT (1x,f10.3,2x,a,'(',i2.2,')',t32,a,i2.2)
+#endif
 
       RETURN
       END SUBROUTINE read_PhyPar

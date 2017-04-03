@@ -402,6 +402,7 @@
 !    stenCount      Counter for current day of stenNdays
 # ifdef SVD_ENSO
 !    stenRcoef      Computed SVD regression coefficients, two-time snapshots
+!    stenRmax       Maximum regression coefficients for each mode
 # else
 !    stenIndex      the SST index over the last stenNdays
 !    stenIanom      Current averaged Index anomaly
@@ -443,6 +444,7 @@
         integer, allocatable  :: stenCount(:)
 # ifdef SVD_ENSO
         real(r8), allocatable :: stenRcoef(:,:,:)
+        real(r8), allocatable :: stenRmax(:,:)
 # else
         real(r8), allocatable :: stenIndex(:,:)    ! degC
         real(r8), allocatable :: stenIanom(:)      ! degC
@@ -1955,6 +1957,7 @@
       allocate ( stenCount(Ngrids) )
 # ifdef SVD_ENSO
       allocate ( stenRcoef(stenNmod,2,Ngrids) )
+      allocate ( stenRmax(stenNmod,Ngrids) )
 # else
       allocate ( stenIndex(stenNdays,Ngrids) )
       allocate ( stenIanom(Ngrids) )
@@ -2566,6 +2569,7 @@
         DO i=1,stenNmod
           stenRcoef(i,1,ng) = 0.0_r8
           stenRcoef(i,2,ng) = 0.0_r8
+          stenRmax(i,ng) = 10000.0_r8
         END DO
 # else
         DO i=1,stenNdays

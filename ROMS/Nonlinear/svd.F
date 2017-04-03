@@ -158,8 +158,10 @@
           cov(k,2)=buffer(2)
           var(k,1)=buffer(3)
           var(k,2)=buffer(4)
-          stenRcoef(k,1,ng) = cov(k,1)/(var(k,1) + small)
-          stenRcoef(k,2,ng) = cov(k,2)/(var(k,2) + small)
+          stenRcoef(k,1,ng) = MAX(MIN(cov(k,1)/(var(k,1) + small),      &
+     &                            stenRmax(k,ng)),-stenRmax(k,ng))
+          stenRcoef(k,2,ng) = MAX(MIN(cov(k,2)/(var(k,2) + small),      &
+     &                            stenRmax(k,ng)),-stenRmax(k,ng))
         END IF
       END DO
 
