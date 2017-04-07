@@ -96,16 +96,32 @@
      &                      varid = AVG(ng)%Vid(idtime))
       IF (exit_flag.ne.NoError) RETURN
 #ifdef ADD_WWB
+      IF (Aout(idWwb,ng)) THEN
 !
 !  Write out averaged WWB amplitude.
 !
-      CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                     &
+        CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                   &
      &                      TRIM(Vname(1,idWwb)),                       &
      &                      AVERAGE(ng) % avgWWBamp,                    &
      &                      (/AVG(ng)%Rindex/), (/1/),                  &
      &                      ncid = AVG(ng)%ncid,                        &
      &                      varid = AVG(ng)%Vid(idWwb))
-      IF (exit_flag.ne.NoError) RETURN
+        IF (exit_flag.ne.NoError) RETURN
+      END IF
+# ifdef SHIFT_WWB
+      IF (Aout(idWwbC,ng)) THEN
+!
+!  Write out averaged WWB center longitude.
+!
+        CALL netcdf_put_fvar (ng, iNLM, AVG(ng)%name,                   &
+     &                      TRIM(Vname(1,idWwbC)),                      &
+     &                      AVERAGE(ng) % avgWWBxC,                     &
+     &                      (/AVG(ng)%Rindex/), (/1/),                  &
+     &                      ncid = AVG(ng)%ncid,                        &
+     &                      varid = AVG(ng)%Vid(idWwbC))
+        IF (exit_flag.ne.NoError) RETURN
+      END IF
+# endif
 #endif
 #ifdef STATS_ENSO
 !

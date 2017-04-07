@@ -147,6 +147,18 @@
      &                  1, 1, 1, 2, 1, 1, 1,                            &
      &                  FORCES(ng) % WWBampG )
         IF (exit_flag.ne.NoError) RETURN
+# ifdef SHIFT_WWB
+!
+!-----------------------------------------------------------------------
+!  WWB center longitude
+!-----------------------------------------------------------------------
+!
+        CALL get_ngfld (ng, iNLM, idWwbC, ncFRCid(idWwbC,ng),           &
+     &                  nFfiles(ng), FRC(1,ng), update(1),              &
+     &                  1, 1, 1, 2, 1, 1, 1,                            &
+     &                  FORCES(ng) % WWBxCG )
+        IF (exit_flag.ne.NoError) RETURN
+# endif
 #endif
 #ifndef ANA_PSOURCE
 !

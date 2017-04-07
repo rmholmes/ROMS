@@ -837,8 +837,10 @@
 #  endif
 # endif
 # ifdef ADD_WWB
+#  ifndef SHIFT_WWB
             CASE ('WWBxC')
               Npts=load_r(Nval, Rval, Ngrids, WWBxC)
+#  endif
             CASE ('WWByC')
               Npts=load_r(Nval, Rval, Ngrids, WWByC)
             CASE ('WWBxW')
@@ -2241,6 +2243,10 @@
 #ifdef ADD_WWB
             CASE ('Aout(idWwb)')
               Npts=load_l(Nval, Cval, Ngrids, Aout(idWwb,:))
+# ifdef SHIFT_WWB
+            CASE ('Aout(idWwbC)')
+              Npts=load_l(Nval, Cval, Ngrids, Aout(idWwbC,:))
+# endif
 #endif
 #ifdef STATS_ENSO
 # ifdef SVD_ENSO
@@ -3926,8 +3932,10 @@
 #  endif
 # endif
 # ifdef ADD_WWB
+#  ifndef SHIFT_WWB
           WRITE (out,150) WWBxC(ng), 'WWBxC',                           &
      &          'Central longitude of WWB.'
+#  endif
           WRITE (out,150) WWByC(ng), 'WWByC',                           &
      &          'Central latitude of WWB.'
           WRITE (out,150) WWBxW(ng), 'WWBxW',                           &
@@ -5322,6 +5330,11 @@
             IF (Aout(idWwb,ng)) WRITE (out,170) Aout(idWwb,ng),         &
      &         'Aout(idWwb)',                                           &
      &         'Write out WWB amplitude.'
+#   ifdef SHIFT_WWB
+            IF (Aout(idWwbC,ng)) WRITE (out,170) Aout(idWwbC,ng),       &
+     &         'Aout(idWwbC)',                                          &
+     &         'Write out WWB center longitude.'
+#   endif
 #  endif
 #  ifdef STATS_ENSO
 #   ifdef SVD_ENSO

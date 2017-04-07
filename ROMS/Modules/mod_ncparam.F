@@ -263,6 +263,7 @@
         integer  :: idsfwf        ! surface freswater flux
         integer  :: idTLmo        ! TLM at observation locations
         integer  :: idWwb         ! WWB amplitude
+        integer  :: idWwbC        ! WWB center longitude
         integer  :: idIanm        ! SST index anomaly
         integer  :: idSsti        ! SST index climatology
         integer  :: idSSTa        ! SST anomaly
@@ -1133,6 +1134,8 @@
               idPairP=varid
             CASE ('idWwb')
               idWwb=varid
+            CASE ('idWwbC')
+              idWwbC=varid
             CASE ('idIanm')
               idIanm=varid
             CASE ('idSsti')

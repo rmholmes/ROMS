@@ -67,6 +67,9 @@
      &                   GRID(ng) % lonu,                               &
      &                   GRID(ng) % latu,                               &
      &                   FORCES(ng) % WWBamp,                           &
+#   ifdef SHIFT_WWB
+     &                   FORCES(ng) % WWBxC,                            &
+#   endif
 #  endif
      &                   OCEAN(ng) % t,                                 &
 #  if !defined BBL_MODEL || defined ICESHELF
@@ -121,7 +124,10 @@
 #  endif
 #  ifdef ADD_WWB
      &                         lonu, latu, WWBamp,                      &
-# endif
+#   ifdef SHIFT_WWB
+     &                         WWBxC,                                   &
+#   endif
+#  endif
      &                         t,                                       &
 #  if !defined BBL_MODEL || defined ICESHELF
      &                         u, v,                                    &
@@ -163,6 +169,9 @@
       integer, intent(in) :: nrhs
 # ifdef ADD_WWB
       real(r8), intent(in) :: WWBamp
+#  ifdef SHIFT_WWB
+      real(r8), intent(in) :: WWBxC
+#  endif
 # endif
 !
 #  ifdef ASSUMED_SHAPE
@@ -260,6 +269,9 @@
 !  Local variable declarations.
 !
       integer :: i, j, itrc
+#  ifdef ADD_WWB
+      real(r8) :: WWBxClocal
+#  endif
 
 #  if !defined BBL_MODEL || defined ICESHELF || \
        defined LIMIT_STFLX_COOLING
@@ -294,10 +306,15 @@
 !  Add wind burst to zonal wind stress field
 !-----------------------------------------------------------------------
 !
+#   ifdef SHIFT_WWB
+      WWBxClocal = WWBxC
+#   else
+      WWBxClocal = WWBxC(ng)
+#   endif
       DO j=JstrR,JendR
         DO i=IstrR,IendR
           sustr(i,j) = sustr(i,j) + WWBamp / rho0 *                     &
-     &                 EXP(-((lonu(i,j)-WWBxC(ng))/WWBxW(ng))**2 -      &
+     &                 EXP(-((lonu(i,j)-WWBxClocal)/WWBxW(ng))**2 -     &
      &                      ((latu(i,j)-WWByC(ng))/WWByW(ng))**2)
         END DO
       END DO

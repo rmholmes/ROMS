@@ -243,6 +243,10 @@
 #ifdef ADD_WWB
 !  WWBampG      WWB amplitude, two-time snapshots                      !
 !  WWBamp       WWB amplitude                                          !
+# ifdef SHIFT_WWB
+!  WWBxCG      WWB center longitude, two-time snapshots                !
+!  WWBxC       WWB center longitude                                    !
+# endif
 #endif
 !                                                                      !
 !=======================================================================
@@ -262,6 +266,10 @@
 #ifdef ADD_WWB
           real(r8), pointer :: WWBampG(:)
           real(r8), pointer :: WWBamp
+# ifdef SHIFT_WWB
+          real(r8), pointer :: WWBxCG(:)
+          real(r8), pointer :: WWBxC
+# endif
 #endif
           real(r8), pointer :: sustr(:,:)
           real(r8), pointer :: svstr(:,:)
@@ -699,6 +707,10 @@
 # ifdef ADD_WWB
       allocate ( FORCES(ng) % WWBampG(2) )
       allocate ( FORCES(ng) % WWBamp )
+#  ifdef SHIFT_WWB
+      allocate ( FORCES(ng) % WWBxCG(2) )
+      allocate ( FORCES(ng) % WWBxC )
+#  endif
 # endif
       allocate ( FORCES(ng) % sustr(LBi:UBi,LBj:UBj) )
       allocate ( FORCES(ng) % svstr(LBi:UBi,LBj:UBj) )
@@ -1200,6 +1212,11 @@
         FORCES(ng) % WWBampG(1) = IniVal
         FORCES(ng) % WWBampG(2) = IniVal
         FORCES(ng) % WWBamp = IniVal
+# ifdef SHIFT_WWB
+        FORCES(ng) % WWBxCG(1) = IniVal
+        FORCES(ng) % WWBxCG(2) = IniVal
+        FORCES(ng) % WWBxC = IniVal
+# endif
 #endif
         DO j=Jmin,Jmax
           DO i=Imin,Imax

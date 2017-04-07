@@ -454,6 +454,23 @@
 
           IF (exit_flag.ne.NoError) RETURN
         END IF
+#  ifdef SHIFT_WWB
+!
+!  Define WWB center longitude time series.
+!
+        IF (Aout(idWwbC,ng)) THEN
+          Vinfo( 1)=Vname(1,idWwbC)
+          WRITE (Vinfo( 2),'(a,1x,a)') Prefix, TRIM(Vname(2,idWwbC))
+          Vinfo( 3)=Vname(3,idWwbC)
+          Vinfo(14)=Vname(4,idWwbC)
+          Vinfo(16)=Vname(1,idtime)
+          status=def_var(ng, model, AVG(ng)%ncid, AVG(ng)%Vid(idWwbC),  &
+       &                 NF_TYPE, 1, (/recdim/), Aval, Vinfo, ncname,   &
+       &                 SetParAccess = .FALSE.)
+
+          IF (exit_flag.ne.NoError) RETURN
+        END IF
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
@@ -2139,6 +2156,11 @@
           ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idWwb))) THEN
             got_var(idWwb)=.TRUE.
             AVG(ng)%Vid(idWwb)=var_id(i)
+#  ifdef SHIFT_WWB
+          ELSE IF (TRIM(var_name(i)).eq.TRIM(Vname(1,idWwbC))) THEN
+            got_var(idWwbC)=.TRUE.
+            AVG(ng)%Vid(idWwbC)=var_id(i)
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
@@ -2481,6 +2503,14 @@
           exit_flag=3
           RETURN
         END IF
+#  ifdef SHIFT_WWB
+        IF (.not.got_var(idWwbC)) THEN
+          IF (Master) WRITE (stdout,60) TRIM(Vname(1,idWwbC)),          &
+     &                                  TRIM(ncname)
+          exit_flag=3
+          RETURN
+        END IF
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO

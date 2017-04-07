@@ -462,7 +462,9 @@
 !    WWBxW       Longitudinal width of WWB
 !    WWByW       Latitudinal width of WWB
 !
+# ifndef SHIFT_WWB
         real(r8), allocatable :: WWBxC(:)        ! deg
+# endif
         real(r8), allocatable :: WWByC(:)        ! deg
         real(r8), allocatable :: WWBxW(:)        ! deg
         real(r8), allocatable :: WWByW(:)        ! deg
@@ -1965,7 +1967,9 @@
       allocate ( stenUpdte(Ngrids) )
 #endif
 #ifdef ADD_WWB
+# ifndef SHIFT_WWB
       allocate ( WWBxC(Ngrids) )
+# endif
       allocate ( WWByC(Ngrids) )
       allocate ( WWBxW(Ngrids) )
       allocate ( WWByW(Ngrids) )
@@ -2590,7 +2594,9 @@
         ABLM_cvthres(ng) = 28.0_r8
 #endif
 #ifdef ADD_WWB
+# ifndef SHIFT_WWB
         WWBxC = -200.0_r8
+# endif
         WWByC = 0.0_r8
         WWBxW = 20.0_r8
         WWByW = 6.0_r8

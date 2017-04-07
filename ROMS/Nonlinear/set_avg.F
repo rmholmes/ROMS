@@ -587,6 +587,11 @@
         IF (Aout(idWwb,ng)) THEN
           AVERAGE(ng)%avgWWBamp = FORCES(ng)%WWBamp
         END IF
+#  ifdef SHIFT_WWB
+        IF (Aout(idWwbC,ng)) THEN
+          AVERAGE(ng)%avgWWBxC = FORCES(ng)%WWBxC
+        END IF
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
@@ -1686,6 +1691,12 @@
           AVERAGE(ng)%avgWWBamp = AVERAGE(ng)%avgWWBamp+                &
      &                         FORCES(ng)%WWBamp
         END IF
+#  ifdef SHIFT_WWB
+        IF (Aout(idWwbC,ng)) THEN
+          AVERAGE(ng)%avgWWBxC = AVERAGE(ng)%avgWWBxC+                  &
+     &                         FORCES(ng)%WWBxC
+        END IF
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
@@ -2749,6 +2760,11 @@
         IF (Aout(idWwb,ng)) THEN
           AVERAGE(ng)%avgWWBamp = fac*AVERAGE(ng)%avgWWBamp
         END IF
+# ifdef SHIFT_WWB
+        IF (Aout(idWwbC,ng)) THEN
+          AVERAGE(ng)%avgWWBxC = fac*AVERAGE(ng)%avgWWBxC
+        END IF
+# endif
 #endif
 #ifdef STATS_ENSO
 # ifdef SVD_ENSO

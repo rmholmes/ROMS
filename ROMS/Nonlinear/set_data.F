@@ -845,6 +845,18 @@
      &                    FORCES(ng) % WWBamp,                          &
      &                    update)
           IF (exit_flag.ne.NoError) RETURN
+#  ifdef SHIFT_WWB
+!
+!-----------------------------------------------------------------------
+!  WWB center longitude
+!-----------------------------------------------------------------------
+!
+          CALL set_svfld (ng, iNLM, idWwbC,                             &
+     &                    FORCES(ng) % WWBxCG,                          &
+     &                    FORCES(ng) % WWBxC,                           &
+     &                    update)
+          IF (exit_flag.ne.NoError) RETURN
+#  endif
 # endif
 !
 !-----------------------------------------------------------------------

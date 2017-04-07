@@ -58,6 +58,9 @@
 # endif
 # ifdef ADD_WWB
 !  avgWWBamp time-averaged WWB amplitude                               !
+#  ifdef SHIFT_WWB
+!  avgWWBxC  time-averaged WWB center longitude                        !
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
@@ -208,6 +211,9 @@
 !  Time-averaged WWB amplitude.
 !
           real(r8), pointer :: avgWWBamp
+#  ifdef SHIFT_WWB
+          real(r8), pointer :: avgWWBxC
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
@@ -453,6 +459,11 @@
       IF (Aout(idWwb,ng)) THEN
         allocate ( AVERAGE(ng) % avgWWBamp )
       END IF
+#  ifdef SHIFT_WWB
+      IF (Aout(idWwbC,ng)) THEN
+        allocate ( AVERAGE(ng) % avgWWBxC )
+      END IF
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO
@@ -959,6 +970,11 @@
       IF (Aout(idWwb,ng)) THEN
         AVERAGE(ng) % avgWWBamp = IniVal
       END IF
+#  ifdef SHIFT_WWB
+      IF (Aout(idWwbC,ng)) THEN
+        AVERAGE(ng) % avgWWBxC = IniVal
+      END IF
+#  endif
 # endif
 # ifdef STATS_ENSO
 #  ifdef SVD_ENSO

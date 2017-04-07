@@ -1628,6 +1628,7 @@
 # endif
 #endif
 #ifdef ADD_WWB
+# ifndef SHIFT_WWB
       Vinfo( 1)='WWBxC'
       Vinfo( 2)='Central longitude of WWB'
       Vinfo( 3)='degrees'
@@ -1635,7 +1636,7 @@
      &               1, (/0/), Aval, Vinfo, ncname,                     &
      &               SetParAccess = .FALSE.)
       IF (exit_flag.ne.NoError) RETURN
-
+# endif
       Vinfo( 1)='WWByC'
       Vinfo( 2)='Central latitude of WWB'
       Vinfo( 3)='degrees'
