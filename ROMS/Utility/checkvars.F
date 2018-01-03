@@ -1,6 +1,6 @@
 #include "cppdefs.h"
-      SUBROUTINE checkvars (ng, model, ncname, string, Nrec, Nvar,      &
-     &                      tvarnam, get_var, have_var)
+      SUBROUTINE checkvars (ng, model, ncname, ncid, string, Nrec,      &
+     &                      Nvar,tvarnam, get_var, have_var)
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
@@ -17,6 +17,7 @@
 !     ng         Nested grid number.                                   !
 !     model      Calling model identifier.                             !
 !     ncname     NetCDF file name.                                     !
+!     ncid       NetCDF file ID.                                       !
 !     string     Identification string.                                !
 !     Nvar       Size of logical switches arrays.                      !
 !                                                                      !
@@ -45,9 +46,11 @@
 #endif
       USE mod_scalars
 !
+      USE strings_mod, ONLY : FoundError
+!
 !  Imported variable declarations.
 !
-      integer, intent(in) :: ng, model, Nvar
+      integer, intent(in) :: ng, model, ncid, Nvar
       integer, intent(inout) :: Nrec
 
       character (len=*), intent(in) :: ncname
@@ -62,7 +65,7 @@
 !
       integer :: IDmod, i, itrc
 !
-      SourceFile='checkvars.F'
+      SourceFile=__FILE__
 !
 !-----------------------------------------------------------------------
 !  Determine state variables needed and check if they are available in
@@ -80,14 +83,18 @@
 !
 !  Inquire about the dimensions and check for consistency.
 !
-      CALL netcdf_check_dim (ng, IDmod, ncname)
-      IF (exit_flag.ne.NoError) RETURN
+      CALL netcdf_check_dim (ng, IDmod, ncname,                         &
+     &                       ncid = ncid)
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
       Nrec=rec_size
 !
 !  Inquire about the variables.
 !
-      CALL netcdf_check_var (ng, model, ncname)
-      IF (exit_flag.ne.NoError) RETURN
+      CALL netcdf_check_var (ng, IDmod, ncname,                         &
+     &                       ncid = ncid)
+      IF (FoundError(exit_flag, NoError, __LINE__,                      &
+     &               __FILE__)) RETURN
 !
 !  Initialize logical switches.
 !

@@ -79,7 +79,7 @@
 # include "tile.h"
 !
 # ifdef PROFILE
-      CALL wclock_on (ng, iNLM, 17)
+      CALL wclock_on (ng, iNLM, 17, __LINE__, __FILE__)
 # endif
       CALL bulk_flux_tile (ng, tile,                                    &
      &                     LBi, UBi, LBj, UBj,                          &
@@ -140,7 +140,7 @@
      &                     FORCES(ng) % sustr,                          &
      &                     FORCES(ng) % svstr)
 # ifdef PROFILE
-      CALL wclock_off (ng, iNLM, 17)
+      CALL wclock_off (ng, iNLM, 17, __LINE__, __FILE__)
 # endif
 
       RETURN
@@ -557,7 +557,11 @@
 !
 !  Compute latent heat of vaporization (J/kg) at sea surface, Hlv.
 !
+#ifdef REGCM_COUPLING
+          Hlv(i,j)=2.5104E+6_r8 ! to be consistent with RegCM
+#else
           Hlv(i,j)=(2.501_r8-0.00237_r8*TseaC(i))*1.0E+6_r8
+#endif
 !
 !  Assume that wind is measured relative to sea surface and include
 !  gustiness.
@@ -768,7 +772,9 @@
      &                                     (blk_Cpa*diffh))
           Hsr=rain(i,j)*wet_bulb*blk_Cpw*                               &
      &        ((TseaC(i)-TairC(i))+(Qsea(i)-Q(i))*Hlv(i,j)/blk_Cpa)
+# ifndef REGCM_COUPLING
           SHeat(i,j)=(Hs+Hsr)
+# endif
 # ifdef MASKING
           SHeat(i,j)=SHeat(i,j)*rmask(i,j)
 # endif
@@ -785,7 +791,9 @@
           upvel=-1.61_r8*Wstar(i)*Qstar(i)-                             &
      &          (1.0_r8+1.61_r8*Q(i))*Wstar(i)*Tstar(i)/TairK(i)
           Hlw=rhoAir(i)*Hlv(i,j)*upvel*Q(i)
+# ifndef REGCM_COUPLING
           LHeat(i,j)=(Hl+Hlw)
+# endif
 # ifdef MASKING
           LHeat(i,j)=LHeat(i,j)*rmask(i,j)
 # endif
