@@ -3997,6 +3997,7 @@
      &          'Longitudinal width of WWB.'
           WRITE (out,150) WWByW(ng), 'WWByW',                           &
      &          'Latitudinal width of WWB.'
+# endif
 # if defined LIMIT_VDIFF && \
     (defined GLS_MIXING  || defined LMD_MIXING || defined MY25_MIXING)
           DO itrc=1,NAT

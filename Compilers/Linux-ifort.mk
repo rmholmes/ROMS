@@ -25,7 +25,7 @@
 #
                FC := ifort
            FFLAGS := -fp-model precise
-#          FFLAGS += -heap-arrays
+           FFLAGS += -heap-arrays
               CPP := /usr/bin/cpp
          CPPFLAGS := -P -traditional
           LDFLAGS :=
@@ -85,11 +85,11 @@ ifdef USE_DEBUG
 #          FFLAGS += -fp-stack-check
            FFLAGS += -traceback
            FFLAGS += -warn interfaces,nouncalled -gen-interfaces
-           FFLAGS += -Wl,-no_compact_unwind
-           FFLAGS += -Wl,-stack_size,0x64000000
+           # FFLAGS += -Wl,-no_compact_unwind
+           # FFLAGS += -Wl,-stack_size,0x64000000
 else
            FFLAGS += -ip -O3
-           FFLAGS += -Wl,-stack_size,0x64000000
+           # FFLAGS += -Wl,-stack_size,0x64000000
 endif
 
 ifdef USE_MCT
