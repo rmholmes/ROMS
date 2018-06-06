@@ -4,7 +4,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2017 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2018 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -35,7 +35,7 @@
 !  (10/2004).                                                          !
 !                                                                      !
 !  Modified by Kate Hedstrom for COARE version 3.0 (03/2005).          !
-!  Modified by Jim Edson to correct specific hunidities.               !
+!  Modified by Jim Edson to correct specific humidities.               !
 !                                                                      !
 !  Reference:                                                          !
 !                                                                      !
@@ -102,6 +102,10 @@
 #ifdef ABLM_WATER
      &                     FORCES(ng) % Q100,                           &
 #endif
+# ifdef WIND_MINUS_CURRENT
+     &                     OCEAN(ng) % u,                               &
+     &                     OCEAN(ng) % v,                               &
+# endif
      &                     FORCES(ng) % Hair,                           &
      &                     FORCES(ng) % Pair,                           &
      &                     FORCES(ng) % Tair,                           &
@@ -160,6 +164,9 @@
      &                           alpha, beta, rho, t,                   &
 # ifdef ABLM_WATER
      &                           Q100,                                  &
+# endif
+# ifdef WIND_MINUS_CURRENT
+     &                           u, v,                                  &
 # endif
      &                           Hair, Pair, Tair, Uwind, Vwind,        &
 # ifdef SET_WINDSPEED
@@ -222,11 +229,20 @@
 #  ifdef ABLM_WATER
       real(r8), intent(out) :: Q100(LBi:,LBj:)
 #  endif
+#  ifdef WIND_MINUS_CURRENT
+      real(r8), intent(in) :: u(LBi:,LBj:,:,:)
+      real(r8), intent(in) :: v(LBi:,LBj:,:,:)
+#  endif
       real(r8), intent(in) :: Hair(LBi:,LBj:)
       real(r8), intent(in) :: Pair(LBi:,LBj:)
       real(r8), intent(in) :: Tair(LBi:,LBj:)
+#  ifdef WIND_MINUS_CURRENT
+      real(r8), intent(inout) :: Uwind(LBi:,LBj:)
+      real(r8), intent(inout) :: Vwind(LBi:,LBj:)
+#  else
       real(r8), intent(in) :: Uwind(LBi:,LBj:)
       real(r8), intent(in) :: Vwind(LBi:,LBj:)
+#  endif
 #  ifdef SET_WINDSPEED
       real(r8), intent(in) :: extWmag(LBi:,LBj:)
 #  endif
@@ -279,11 +295,20 @@
 #  ifdef ABLM_WATER
       real(r8), intent(in) :: Q100(LBi:UBi,LBj:UBj)
 #  endif
+#  ifdef WIND_MINUS_CURRENT
+      real(r8), intent(in) :: u(LBi:UBi,LBj:UBj,N(ng),3)
+      real(r8), intent(in) :: v(LBi:UBi,LBj:UBj,N(ng),3)
+#  endif
       real(r8), intent(in) :: Hair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Pair(LBi:UBi,LBj:UBj)
       real(r8), intent(in) :: Tair(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: Uwind(LBi:UBi,LBj:UBj)
-      real(r8), intent(in) :: Vwind(LBi:UBi,LBj:UBj)
+#  ifdef WIND_MINUS_CURRENT
+      real(r8), intent(inout) :: Uwind(LBi:,LBj:)
+      real(r8), intent(inout) :: Vwind(LBi:,LBj:)
+#  else
+      real(r8), intent(in) :: Uwind(LBi:,LBj:)
+      real(r8), intent(in) :: Vwind(LBi:,LBj:)
+#  endif
 #  ifdef SET_WINDSPEED
       real(r8), intent(in) :: extWmag(LBi:UBi,LBj:UBj)
 #  endif
@@ -403,6 +428,26 @@
 !=======================================================================
 !  Atmosphere-Ocean bulk fluxes parameterization.
 !=======================================================================
+!
+#ifdef WIND_MINUS_CURRENT
+!
+!  Modify near-surface (2m or 10m) effective winds by subtracting the
+!  ocean surface current (J Wilkin). See:
+!
+!  Bye, J.A.T. and J.-O. Wolff, 1999: Atmosphere-ocean momentum exchange
+!     in general circulation models. J. Phys. Oceanogr. 29, 671-691.
+!
+      DO j=Jstr-1,JendR
+        DO i=Istr-1,IendR
+          Uwind(i,j)=Uwind(i,j)-                                        &
+     &               0.5_r8*(u(i,j,N(ng),nrhs)+u(i+1,j,N(ng),nrhs))
+          Vwind(i,j)=Vwind(i,j)-                                        &
+     &               0.5_r8*(v(i,j,N(ng),nrhs)+v(i,j+1,N(ng),nrhs))
+        END DO
+      END DO
+#endif
+!
+!  Compute Atmosphere-ocean fluxes using a bulk flux parameterization.
 !
       Hscale=rho0*Cp
       twopi_inv=0.5_r8/pi

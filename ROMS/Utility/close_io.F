@@ -3,7 +3,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2017 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2018 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -371,6 +371,16 @@
       ELSE IF (exit_flag.eq.8) THEN
         IF (Master) WRITE (stdout,130)
       END IF
+
+#ifdef ROMS_STDOUT
+!
+!-----------------------------------------------------------------------
+!  Close ROMS standard outpu file.
+!-----------------------------------------------------------------------
+!
+      CALL my_flush (stdout)
+      CLOSE (stdout)
+#endif
 !
  10   FORMAT (/,' ROMS/TOMS - Output NetCDF summary for Grid ',         &
      &        i2.2,':')

@@ -3,7 +3,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2017 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2018 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -787,13 +787,12 @@
       Coptions(is:is+13)=' CORRELATION,'
       idriver=idriver+1
 #endif
-#if defined COUPLING_INTERP && defined MODEL_COUPLING
+#ifdef DATA_COUPLING
 !
-      IF (Master) WRITE (stdout,20) 'COUPLING_INTERP',                  &
-     &   'Time interpolation from coupling snapshots arrays.'
+      IF (Master) WRITE (stdout,20) 'DATA_COUPLING',                     &
+     &   'DATA model included in coupling.'
       is=LEN_TRIM(Coptions)+1
-      Coptions(is:is+17)=' COUPLING_INTERP,'
-      iatms=iatms+1
+      Coptions(is:is+15)=' DATA_COUPLING,'
 #endif
 #if defined DATALESS_LOOPS && defined W4DVAR
 !
@@ -1065,6 +1064,13 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+15)=' FORWARD_WRITE,'
 #endif
+#if defined FRC_COUPLING && defined MODEL_COUPLING
+!
+      IF (Master) WRITE (stdout,20) 'FRC_COUPLING',                     &
+     &   'Atmospheric forcing fields are from ESM coupling.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+14)=' FRC_COUPLING,'
+#endif
 #ifdef FSOBC_REDUCED
 !
       IF (Master) WRITE (stdout,20) 'FSOBC_REDUCED',                    &
@@ -1167,6 +1173,22 @@
      &   'Include Ice Shelf Cavities.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+10)=' ICESHELF,'
+#endif
+#if defined IMPACT_INNER        && defined OBS_IMPACT          && \
+   (defined W4DVAR_SENSITIVITY  || defined W4DPSAS_SENSITIVITY || \
+    defined IS4DVAR_SENSITIVITY)
+!
+      IF (Master) WRITE (stdout,20) 'IMPACT_INNER',                     &
+     &   'Writing observations impacts for each inner loop.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+14)=' IMPACT_INNER,'
+#endif
+#ifdef IMPLICIT_NUDGING
+!
+      IF (Master) WRITE (stdout,20) 'IMPLICIT_NUDGING',                 &
+     &   'Implicit nudging term in momentum radiation conditions.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+18)=' IMPLICIT_NUDGING,'
 #endif
 #if defined IMPLICIT_VCONV && defined FOUR_DVAR && defined VCONVOLUTION
 !
@@ -1907,6 +1929,21 @@
       Coptions(is:is+10)=' RED_TIDE,'
       ibiology=ibiology+1
 #endif
+#if defined REGRESS_STARTCLOCK && defined MODEL_COUPLING && \
+    defined ESMF_LIB
+!
+      IF (Master) WRITE (stdout,20) 'REGRESS_STARTCLOCK',               &
+     &   'Regressing start clock by one coupling interval.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+20)=' REGRESS_STARTCLOCK,'
+#endif
+#ifdef ROMS_STDOUT
+!
+      IF (Master) WRITE (stdout,20) 'ROMS_STDOUT',                      &
+     &   'Red tide biological model.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' ROMS_STDOUT,'
+#endif
 #ifdef R_SYMMETRY
 !
       IF (Master) WRITE (stdout,20) 'REP_MATRIX',                       &
@@ -2298,6 +2335,13 @@
      &   'Weak-constraint 4D-Var time convolution.'
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+11)=' TIME_CONV,'
+#endif
+#if defined TIME_INTERP && defined MODEL_COUPLING
+!
+      IF (Master) WRITE (stdout,20) 'TIME_INTERP',                  &
+     &   'Time interpolation from coupling snapshots arrays.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+13)=' TIME_INTERP,'
 #endif
 #if defined TIME_INTERP_FLUX && defined NESTING && defined SOLVE3D
 !
@@ -2835,6 +2879,13 @@
       is=LEN_TRIM(Coptions)+1
       Coptions(is:is+9)=' WET_DRY,'
 #endif
+#ifdef WIND_MINUS_CURRENT && defined BULK_FLUXES && defined SOLVE3D
+!
+      IF (Master) WRITE (stdout,20) 'WIND_MINUS_CURRENT',               &
+     &   'Compute effective wind by removing surface ocean current.'
+      is=LEN_TRIM(Coptions)+1
+      Coptions(is:is+20)=' WIND_MINUS_CURRENT,'
+#endif
 #ifdef WIND_WAVES
 !
       IF (Master) WRITE (stdout,20) 'WIND_WAVES',                       &
@@ -3234,7 +3285,7 @@
 #endif
 #ifdef ATM_COUPLING
 !
-!  Stop if more than one vertical closure scheme is selected.
+!  Stop if more than one atmosphere model is selected for coupling.
 !
       IF (Master.and.(iatms.gt.1)) THEN
         WRITE (stdout,270)

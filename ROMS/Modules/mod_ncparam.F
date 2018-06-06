@@ -3,7 +3,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2017 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2018 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -370,6 +370,7 @@
         integer  :: idW3yy        ! 3D radiation stress, Syy-component
         integer  :: idW3zx        ! 3D radiation stress, Szx-component
         integer  :: idW3zy        ! 3D radiation stress, Szy-component
+        integer  :: idWads        ! 3D W-velocity adjoint sensitivity
         integer  :: idWamp        ! wind-induced wave amplitude
         integer  :: idWbrk        ! wind-induced wave breaking
         integer  :: idWdis        ! wind-induced wave dissipation
@@ -450,6 +451,7 @@
         integer  :: isVbar = 3                ! 2D V-velocity
         integer  :: isUvel = 4                ! 3D U-velocity
         integer  :: isVvel = 5                ! 3D V-velocity
+        integer  :: isWvel                    ! 3D W-velocity
         integer  :: isRadial = 0              ! HF radial-velocity
         integer  :: isUstr                    ! surface u-stress
         integer  :: isVstr                    ! surface v-stress
@@ -797,6 +799,7 @@
         isTsur(i)=ic
       END DO
 #endif
+      isWvel=ic+1
 !
 !  Set generic lateral boundary indices for LBC structure.  Use the same
 !  values of the state variables at the same C-grid location.  Generic
@@ -1332,6 +1335,8 @@
               idTads(itemp)=varid
             CASE ('idTads(isalt)')
               idTads(isalt)=varid
+            CASE ('idWads')
+              idWads=varid
 #endif
 #ifdef WEAK_CONSTRAINT
             CASE ('idZtlf')
@@ -2129,7 +2134,7 @@
                 END DO
             END SELECT
 #endif
-#if defined SOLVE3D && defined AVERAGES
+#if defined SOLVE3D && (defined AVERAGES || defined AD_AVERAGES)
 !
 !  Determine metadata for quadratic tracer averages.
 !

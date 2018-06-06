@@ -4,7 +4,7 @@
 !
 !svn $Id$
 !=======================================================================
-!  Copyright (c) 2002-2017 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2018 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                           Hernan G. Arango   !
 !========================================== Alexander F. Shchepetkin ===
@@ -109,7 +109,7 @@
 !
         nl=0
 #ifdef NESTING
-        TwoWayCounter(1:Ngrids)=0
+        TwoWayInterval(1:Ngrids)=0.0_r8
 #endif
 !
         NEST_LAYER : DO WHILE (DoNestLayer)
@@ -118,8 +118,8 @@
 !  based on the specified time interval (seconds), RunInterval. Non
 !  nesting applications have NestLayers=1. Notice that RunInterval is
 !  set in the calling driver. Its value may span the full period of the
-!  simulation, or a multi-model coupling interval, or just a single
-!  step.
+!  simulation, a multi-model coupling interval (RunInterval > ifac*dt),
+!  or just a single step (RunInterval=0).
 !
           CALL ntimesteps (iNLM, RunInterval, nl, Nsteps, Rsteps)
           IF (FoundError(exit_flag, NoError, __LINE__,                  &
@@ -542,7 +542,7 @@
             DO il=NestLayers,1,-1
               DO ig=1,GridsInLayer(il)
                 ng=GridNumber(ig,il)
-                IF (do_twoway(nl,il,ng,istep)) THEN
+                IF (do_twoway(iNLM, nl, il, ng, istep)) THEN
                   CALL nesting (ng, iNLM, n2way)
                 END IF
               END DO

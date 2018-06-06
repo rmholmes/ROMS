@@ -3,7 +3,7 @@
 **
 ** svn $Id$
 ********************************************************** Hernan G. Arango ***
-** Copyright (c) 2002-2017 The ROMS/TOMS Group     Alexander F. Shchepetkin  **
+** Copyright (c) 2002-2018 The ROMS/TOMS Group     Alexander F. Shchepetkin  **
 **   Licensed under a MIT/X style license                                    **
 **   See License_ROMS.txt                                                    **
 *******************************************************************************
@@ -421,6 +421,12 @@
       defined OBS_IMPACT
 # undef OBS_IMPACT
 #endif
+#if !(defined OBS_IMPACT             && \
+      (defined W4DVAR_SENSITIVITY    || defined W4DPSAS_SENSITIVITY || \
+       defined IS4DVAR_SENSITIVITY))
+# undef IMPACT_INNER
+#endif
+
 
 /*
 ** Activate internal switch to process 4DVAR observations.
@@ -564,10 +570,13 @@
 #if defined COAMPS_COUPLING || defined REGCM_COUPLING || \
     defined WRF_COUPLING
 # define ATM_COUPLING
+# ifndef FRC_COUPLING
+#  define FRC_COUPLING
+# endif
 #endif
 
 #if defined CICE_COUPLING
-  define ICE_COUPLING
+# define ICE_COUPLING
 #endif
 
 #if defined REFDIF_COUPLING || defined SWAN_COUPLING || \
@@ -575,8 +584,13 @@
 # define WAV_COUPLING
 #endif
 
-#if defined ATM_COUPLING || ICE_COUPLING || WAV_COUPLING
+#if defined ATM_COUPLING || defined DATA_COUPLING || \
+    defined ICE_COUPLING || defined WAV_COUPLING
 # define MODEL_COUPLING
+#endif
+
+#if defined MODEL_COUPLING && defined ESMF_LIB
+# define REGRESS_STARTCLOCK
 #endif
 
 /*
@@ -666,36 +680,36 @@
 #  endif
 # endif
 # if !defined ANA_BTFLUX   || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
      !defined BULK_FLUXES  && !defined ANA_SMFLUX)   || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
      !defined BULK_FLUXES  && !defined ANA_STFLUX)   || \
     ( defined BIOLOGY      && !defined ANA_SPFLUX)   || \
     ( defined BIOLOGY      && !defined ANA_BPFLUX)   || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined LONGWAVE)     || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined ANA_PAIR)     || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined ANA_TAIR)     || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined ANA_HUMIDITY) || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined ANA_CLOUD)    || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined ANA_RAIN)     || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined ANA_WINDS)    || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined BULK_FLUXES  && !defined ANA_SRFLUX)   || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined LMD_SKPP     && !defined ANA_SRFLUX)   || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined RED_TIDE)    || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined SALINITY     && !defined ANA_SSFLUX    && \
      (defined BULK_FLUXES  && !defined EMINUSP))     || \
-    (!defined ATM_COUPLING && \
+    (!defined FRC_COUPLING && \
       defined SOLAR_SOURCE && !defined ANA_SRFLUX)   || \
     ( defined BBL_MODEL    && (!defined ANA_WWAVE    && \
      !defined WAV_COUPLING))                         || \
@@ -706,7 +720,7 @@
 #  define FRC_FILE
 # endif
 #else
-# if(!defined ATM_COUPLING && !defined ANA_SMFLUX)
+# if(!defined FRC_COUPLING && !defined ANA_SMFLUX)
 #  define FRC_FILE
 # endif
 #endif

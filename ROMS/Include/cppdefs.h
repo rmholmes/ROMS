@@ -3,7 +3,7 @@
 **
 ** svn $Id$
 ********************************************************** Hernan G. Arango ***
-** Copyright (c) 2002-2017 The ROMS/TOMS Group                               **
+** Copyright (c) 2002-2018 The ROMS/TOMS Group                               **
 **   Licensed under a MIT/X style license                                    **
 **   See License_ROMS.txt                                                    **
 *******************************************************************************
@@ -184,6 +184,7 @@
 ** EMINUSP             use if computing E-P                                  **
 ** STATS_ENSO          use if altering surface forcing using a               **
 **                     statistical ENSO model                                **
+** WIND_MINUS_CURRENT  use if compute effective wind by removing current     **
 **                                                                           **
 ** OPTIONS for wave roughness formulation in bulk fluxes:                    **
 **                                                                           **
@@ -380,6 +381,7 @@
 **                                                                           **
 ** Lateral boundary conditions OPTIONS:                                      **
 **                                                                           **
+** IMPLICIT_NUDGING    use if implicit nudging term in momentum radiation    **
 ** RADIATION_2D        use if tangential phase speed in radiation conditions **
 **                                                                           **
 ** OPTIONS for tidal forcing at open boundaries:                             **
@@ -463,6 +465,7 @@
 ** FORWARD_WRITE       use if writing out forward solution, basic state      **
 ** FORWARD_READ        use if reading in  forward solution, basic state      **
 ** FORWARD_RHS         use if processing forward right-hand-side terms       **
+** IMPACT_INNER        use to write observations impacts for each inner loop **
 ** IMPLICIT_VCONV      use if implicit vertical convolution algorithm        **
 ** IMPULSE             use if processing adjoint impulse forcing             **
 ** MINRES              use if Minimal Residual Method for 4DVar minimization **
@@ -546,10 +549,24 @@
 ** ONE_WAY             use if one-way nesting in refinement grids            **
 ** TIME_INTERP_FLUX    time interpolate coarse mass flux instead of persist  **
 **                                                                           **
-** OPTIONS for two-way coupling to other models:                             **
+** OPTIONS for coupling to other Earth System Models (ESM) via the Earth     **
+** Modeling Framework (ESMF) or Modeling Coupling Toolkit (MCT) libraries.   **
+** If coupling with ESMF library, it uses the National Unified Operational   **
+** Prediction Capability (NUOPC) layer "cap" files to facilitate exchanges   **
+** with other ESM components.                                                **
 **                                                                           **
+** ESMF_LIB            use if coupling with the ESMF/NUOPC library           **
+** MCT_LIB             use if Coupling with the MCT library                  **
+**                                                                           **
+** CICE_COUPLING       use if coupling to CICE sea ice model                 **
+** COAMPS_COUPLING     use if coupling to COAMPS atmospheric model           **
+** DATA_COUPLING       use if coupling to DATA model                         **
+** FRC_COUPLING        use if forcing from Atmopheric or Data model          **
 ** REFDIF_COUPLING     use if coupling to REFDIT wave model                  **
+** REGCM_COUPLING      use if coupling to RegCM atmospheric model            **
 ** SWAN_COUPLING       use if coupling to SWAN wave model                    **
+** TIME_INTERP         use if importing snapshots for time interpolation     **
+** WAM_COUPLING        use if coupling to WAM wave model                     **
 ** WRF_COUPLING        use if coupling to WRF atmospheric model              **
 **                                                                           **
 ** Nearshore and shallow water model OPTIONS:                                **
@@ -601,11 +618,6 @@
 ** WRITE_WATER         use if only writing water points data                 **
 ** RST_SINGLE          use if writing single precision restart fields        **
 ** OUT_DOUBLE          use if writing double precision output fields         **
-**                                                                           **
-** Coupling Library OPTIONS:                                                 **
-**                                                                           **
-** ESMF_LIB            use Earth System Modeling Framework Library           **
-** MCT_LIB             use Model Coupling Toolkit Library                    **
 **                                                                           **
 ** OPTION to process 3D data by levels (2D slabs) to reduce memory needs in  **
 ** distributed-memory configurations. This option is convenient for large    **

@@ -3,7 +3,7 @@
 !
 !svn $Id$
 !================================================== Hernan G. Arango ===
-!  Copyright (c) 2002-2017 The ROMS/TOMS Group                         !
+!  Copyright (c) 2002-2018 The ROMS/TOMS Group                         !
 !    Licensed under a MIT/X style license                              !
 !    See License_ROMS.txt                                              !
 !=======================================================================
@@ -185,7 +185,7 @@
 # endif
 #endif
 
-#if !(defined ANA_WINDS   || defined ATM_COUPLING) && \
+#if !(defined ANA_WINDS   || defined FRC_COUPLING) && \
      (defined BULK_FLUXES || defined ECOSIM)
 !
 !-----------------------------------------------------------------------
@@ -454,7 +454,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
-#if !(defined ANA_SMFLUX || defined ATM_COUPLING || \ 
+#if !(defined ANA_SMFLUX || defined FRC_COUPLING || \ 
       defined BULK_FLUXES) || defined BULK_STRESS
 !
 !-----------------------------------------------------------------------
@@ -616,7 +616,7 @@
       END IF
 #endif
 
-#if !(defined ANA_PAIR    || defined ATM_COUPLING) && \
+#if !(defined ANA_PAIR    || defined FRC_COUPLING) && \
      (defined BULK_FLUXES || defined ECOSIM        || defined ATM_PRESS)
 !
 !-----------------------------------------------------------------------
@@ -792,7 +792,7 @@
 
 #ifdef SOLVE3D
 
-# if !(defined ANA_CLOUD || defined ATM_COUPLING) && defined CLOUDS
+# if !(defined ANA_CLOUD || defined FRC_COUPLING) && defined CLOUDS
 !
 !-----------------------------------------------------------------------
 !  Cloud fraction.
@@ -809,7 +809,7 @@
      &               __FILE__)) RETURN
 # endif
 
-# if !(defined ANA_SRFLUX || defined ATM_COUPLING) && defined SHORTWAVE
+# if !(defined ANA_SRFLUX || defined FRC_COUPLING) && defined SHORTWAVE
 !
 !-----------------------------------------------------------------------
 !  Surface solar shortwave radiation.
@@ -897,7 +897,7 @@
 # endif
 
 # if defined BULK_FLUXES  && \
-   !(defined ATM_COUPLING || defined LONGWAVE || defined LONGWAVE_OUT)
+   !(defined FRC_COUPLING || defined LONGWAVE || defined LONGWAVE_OUT)
 !
 !-----------------------------------------------------------------------
 !  Surface net longwave radiation.
@@ -915,7 +915,7 @@
 # endif
 
 # if defined BULK_FLUXES  && defined LONGWAVE_OUT && \
-    !defined ATM_COUPLING
+    !defined FRC_COUPLING
 !
 !-----------------------------------------------------------------------
 !  Surface downwelling longwave radiation.
@@ -985,7 +985,7 @@
      &               __FILE__)) RETURN
 # endif
 
-# if !(defined ANA_TAIR   || defined ATM_COUPLING) && \
+# if !(defined ANA_TAIR   || defined FRC_COUPLING) && \
     ( defined BULK_FLUXES || defined ECOSIM        || \
      (defined SHORTWAVE   && defined ANA_SRFLUX    && defined ALBEDO) )
 !
@@ -1057,7 +1057,7 @@
      &               __FILE__)) RETURN
 # endif
 
-# if !(defined ANA_HUMIDITY || defined ATM_COUPLING) && \
+# if !(defined ANA_HUMIDITY || defined FRC_COUPLING) && \
       (defined BULK_FLUXES  || defined ECOSIM)
 !
 !-----------------------------------------------------------------------
@@ -1128,7 +1128,7 @@
      &               __FILE__)) RETURN
 # endif
 
-# if !(defined ANA_RAIN || defined ATM_COUPLING) && defined BULK_FLUXES
+# if !(defined ANA_RAIN || defined FRC_COUPLING) && defined BULK_FLUXES
 !
 !-----------------------------------------------------------------------
 !  Rain fall rate.
@@ -1145,7 +1145,7 @@
      &               __FILE__)) RETURN
 # endif
 
-# if !(defined ANA_STFLUX || defined ATM_COUPLING || \
+# if !(defined ANA_STFLUX || defined FRC_COUPLING || \
        defined BULK_FLUXES)
 !
 !-----------------------------------------------------------------------
@@ -1319,7 +1319,7 @@
       IF (FoundError(exit_flag, NoError, __LINE__,                      &
      &               __FILE__)) RETURN
 
-#  elif !(defined ANA_SSFLUX || defined ATM_COUPLING || \
+#  elif !(defined ANA_SSFLUX || defined FRC_COUPLING || \
           defined EMINUSP    || defined SRELAXATION)
 !
 !-----------------------------------------------------------------------
