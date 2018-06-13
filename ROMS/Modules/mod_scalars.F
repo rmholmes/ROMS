@@ -71,6 +71,12 @@
 !  reference-time. This parameter also provides information about the
 !  calendar used:
 !
+!    If TIME_REF = -3, the model time and DSTART are in a common year
+!                  calendar with 365 days. The "units" attribute
+!                  is:
+!
+!                  'time-units since 0001-01-01 00:00:00'
+!
 !    If TIME_REF = -2, the model time and DSTART are in modified Julian
 !                  days units.  The time "units" attribute is:
 !

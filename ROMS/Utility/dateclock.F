@@ -125,10 +125,13 @@
 
       integer :: MyDay, MyHour, MyMinutes, MySeconds
       integer :: MyMonth, MyYday, MyYear
-      integer :: ja, jalpha, jb, jc, jd, jday, je
+      integer :: ja, jalpha, jb, jc, jd, jday, je, i
 
       real(r8) :: CT, DateNumber
       real(r8) :: DayFraction, Hour, Minutes, Seconds
+      integer, parameter, dimension(13) ::  noleapnd = (/0,31,59,90,    &
+     &                           120,151,181,212,243,273,304,334,365/)
+      Integer :: noleapcd
 !
 !-----------------------------------------------------------------------
 !  Get calendar date from model current time (days).
@@ -223,6 +226,38 @@
         IF (MyMonth.gt.2) MyYear=MyYear-1
         IF (MyYear .le.0) MyYear=MyYear-1
         MyYday=yearday(MyYear, MyMonth, MyDay)
+!
+        Seconds=DayFraction*86400.0_r8
+        CT=3.0_r8*EPSILON(Seconds)           ! comparison tolerance
+        Seconds=ROUND(Seconds, CT)           ! tolerant round function
+        Hour=Seconds/3600.0_r8
+        MyHour=INT(Hour)
+        Seconds=ABS(Seconds-REAL(MyHour*3600,r8))
+        Minutes=Seconds/60.0_r8
+        MyMinutes=INT(Minutes)
+        Seconds=ABS(Seconds-REAL(MyMinutes*60,r8))
+        MySeconds=INT(Seconds)
+!
+!  The model clock is the elapsed time since reference time of the form
+!  'time-units since 0001-01-01 00:00:00'.  It can be used for
+!  climatological solutions. It has a year length of 365 days based on a
+!  no leap-day year. It is called the noleap calendar.
+!
+      ELSE IF (INT(time_ref).eq.-3) THEN
+        DateNumber=Rclock%Dnumber+CurrentTime
+        DayFraction=ABS(DateNumber-AINT(DateNumber))
+!
+        MyYear=INT(DateNumber/365.0_r8)
+        MyYday=INT(DateNumber-REAL(MyYear*365,r8)+1)
+!
+        DO i=1,12
+          noleapcd = MyYday-noleapnd(i+1)
+          IF (noleapcd.le.0) THEN
+            MyMonth = i
+            MyDay = MyYday-noleapnd(i)
+            EXIT
+          END IF
+        END DO
 !
         Seconds=DayFraction*86400.0_r8
         CT=3.0_r8*EPSILON(Seconds)           ! comparison tolerance
@@ -898,6 +933,22 @@
         yday=yearday(iyear, month, iday)
         DateNumber(1)=2440000.0_r8               ! Truncated offset
         DateNumber(2)=DateNumber(1)*86400_r8
+!
+!  The model clock is the elapsed time since reference time of the form
+!  'time-units since 0001-01-01 00:00:00'.  It has a year length of
+!  365 days based on a no-leap day year.
+!
+      ELSE IF (INT(r_time).eq.-3) THEN           ! day 0: Jan 1, 0000
+        calendar='noleap'
+        iyear=1
+        month=1
+        iday=1
+        ihour=0
+        minute=0
+        isec=0
+        yday=0
+        DateNumber(1)=0.0_r8
+        DateNumber(2)=DateNumber(1)*86400.0_r8
       END IF
 !
 !-----------------------------------------------------------------------
