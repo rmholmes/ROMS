@@ -337,11 +337,11 @@
 !  Compute interior diffusivity due to wave breaking (Gargett and
 !  Holloway.
 !
-            cff=1.0_r8/SQRT(MAX(bvf(i,j,k),1.0E-7_r8))
-            lmd_iwm=1.0E-6_r8*cff
-            lmd_iws=1.0E-7_r8*cff
-!           lmd_iwm=lmd_nuwm
-!           lmd_iws=lmd_nuws
+!           cff=1.0_r8/SQRT(MAX(bvf(i,j,k),1.0E-7_r8))
+!           lmd_iwm=1.0E-6_r8*cff
+!           lmd_iws=1.0E-7_r8*cff
+            lmd_iwm=lmd_nuwm
+            lmd_iws=lmd_nuws
 !
 ! Sum contributions due to internal wave breaking, shear instability
 ! and convective diffusivity due to shear instability.
