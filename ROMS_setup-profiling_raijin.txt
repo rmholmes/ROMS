@@ -1,0 +1,69 @@
+Notes for installation and running of ROMS on raijin,
+Ryan Holmes July 2016
+----------------------------------------------------------------------
+
+
+Downloaded using svn into $nciDAT/software/ROMS and $nciDAT/software/ROMS_matlab
+
+Trying ifort compiler:
+USE_NETCDF4 = on and set nf-config in Linux-ifort.mk
+
+Must load netcdf module:
+module load netcdf (defaults to 4.2.1.1)
+
+Also, needed to change
+NETCDF_INCDIR ?= $(shell $(NC_CONFIG) --prefix)/include
+to
+NETCDF_INCDIR ?= $(shell $(NC_CONFIG) --prefix)/include/Intel
+
+This successfully runs the upwelling test case in serial.
+
+For mpi run:
+USE_MPI =  on
+USE_MPIF90 = on
+
+Profiling Table: Pacific SAPEQ simulations (681x253x50) initialized
+from jd2 restart. STATS_ENSO turned on. Timing from end of first day
+to end of second day (i.e. one day runtime, 144 time steps).
+
+| ncpus |  XxY  |  sec/day | SUs / yr | Relative speedup (ideal) |
+|   64  | 16x4  |   62.9   |   403    |    1.00 (1.0)            |
+|   96  | 16x6  |   49.7   |   477    |    1.26 (1.5)            |
+|   96  | 12x8  |   46.6   |   447    |    1.35 (1.5)
+|  128  | 16x8  |   41.0   |   525    |    1.53 (2.0)
+|  128  | 32x4  |   42.4   |   542    |    1.48 (2.0)
+|  160  | 16x10 |   35.4   |   566    |    1.78 (2.5)
+|  160  | 20x8  |   35.0   |   560    |    1.80 (2.5)
+|  192  | 16x12 |   31.4   |   603    |    2.00 (3.0)
+|  192  | 24x8  |   32.7   |   628    |    1.92 (3.0)
+|  192  | 16x12 |   22.54  |   432    |    2.79 (3.0)  5-day output averaged.
+|  192  | 24x8  |   31.6   |   607    |    1.99 (3.0)
+|  224  | 28x8  |   31.0   |   695    |    2.02 (3.5)
+|  256  | 32x8  |   Divide by zero....
+|  256  | 16x16 |   Divide by zero error....
+|  288  | 32x9  |   28.2   |   812    |    2.23 (4.5)
+|  320  | 32x10 |   28.2   |   902    |    2.23 (5.0)
+
+Previous profiling results (doesn't include initialization or
+output/input):
+   64     16x4  | 0.367 secs/dt = 52.8 sec/day = 338 SUs / year
+  128     16x8  | 0.202 secs/dt = 29 sec/day   = 371 SUs / year
+
+NOTE: Using TS_MPDATA slows down the simulations a lot! Swaping from
+TS_MPDATA to TS_U3HADVECTION and TS_C4VADVECTION increases speed (for
+3-day output) by ~50%.
+
+2017-07-09: Presumably after some library/compiler changes on raijin
+the compiling step no longer worked. Fixed by updating intel-fc
+compiler from the default (intel-fc/12.1.9.293) to the latest
+(17.0.1.132)
+
+2018-06-06: New code runs if I do the following module loads before
+compiling:
+
+module purge
+module load intel-fc
+module load intel-cc
+module load openmpi
+module load netcdf
+
