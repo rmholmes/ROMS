@@ -3023,7 +3023,7 @@
                 END DO
 #  endif
               END DO
-#  ifdef KPP_NONLOCAL
+#  ifdef LMD_NONLOCAL
             CASE ('Dout(iTvdifNOL)')
               IF (iTvdifNOL.le.0) THEN
                 IF (Master) WRITE (out,280) 'iTvdifNOL'
@@ -5899,7 +5899,7 @@
      &              TRIM(Vname(1,idTvar(itrc)))
             END DO
 #  endif
-#  ifdef KPP_NONLOCAL
+#  ifdef LMD_NONLOCAL
             DO itrc=1,NAT
               IF (Dout(idDtrc(itrc,iTvdifNOL),ng))                      &
      &          WRITE (out,180) .TRUE., 'Dout(iTvdifNOL)',              &

@@ -2428,7 +2428,7 @@
       iTvdifDIF=ic+1
       iTvdifSHF=ic+2
       ic=ic+2
-#   ifdef KPP_NONLOCAL
+#   ifdef LMD_NONLOCAL
       iTvdifNOL=ic+1
       ic=ic+1
 #   endif

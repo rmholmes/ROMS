@@ -2166,7 +2166,7 @@
                   WRITE (Vname(5,varid),'(a)')                          &
      &                  TRIM(ADJUSTL(Vinfo(5)))
                 END DO
-#  ifdef KPP_NONLOCAL
+#  ifdef LMD_NONLOCAL
               CASE ('_vdiffNOL')
                 varid=varid-1
                 DO i=1,MT
