@@ -2423,7 +2423,17 @@
 #   endif
 #  endif
       iTvdif=ic+1
-      iTrate=ic+2
+      ic=ic+1
+#  ifdef DIAGNOSTICS_TS_VDIF
+      iTvdifDIF=ic+1
+      iTvdifSHF=ic+2
+      ic=ic+2
+#   ifdef KPP_NONLOCAL
+      iTvdifNOL=ic+1
+      ic=ic+1
+#   endif
+#  endif
+      iTrate=ic+1
 # endif
 # ifdef DIAGNOSTICS_UV
 !
