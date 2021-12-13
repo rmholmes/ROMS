@@ -835,6 +835,17 @@
      &                 t(i,j,k  ,nstp,itrc))
             END DO
           END DO
+#  if defined DIAGNOSTICS_TS && defined DIAGNOSTICS_TS_VDIF
+          DO i=Istr,Iend
+            FC(i,0) = 0.0_r8
+            FC(i,N(ng)) = 0.0_r8
+          END DO
+          DO k=1,N(ng)
+            DO i=Istr,Iend
+              DiaTwrk(i,j,k,itrc,iTvdifDIF)=FC(i,k)-FC(i,k-1)
+            END DO
+          END DO
+#  endif
 
 #  ifdef LMD_NONLOCAL
 !
@@ -850,6 +861,14 @@
      &                  dt(ng)*Akt(i,j,k,itrc)*ghats(i,j,k,itrc)
               END DO
             END DO
+#  if defined DIAGNOSTICS_TS && defined DIAGNOSTICS_TS_VDIF
+            DO k=1,N(ng)
+              DO i=Istr,Iend
+                DiaTwrk(i,j,k,itrc,iTvdifNOL)=FC(i,k)-FC(i,k-1)-        &
+     &                            DiaTwrk(i,j,k,itrc,iTvdifDIF)
+              END DO
+            END DO
+#  endif
           END IF
 #  endif
 #  ifdef SOLAR_SOURCE
@@ -877,6 +896,19 @@
             FC(i,0)=dt(ng)*btflx(i,j,itrc)
             FC(i,N(ng))=dt(ng)*stflx(i,j,itrc)
           END DO
+#   if defined DIAGNOSTICS_TS && defined DIAGNOSTICS_TS_VDIF
+            DO k=1,N(ng)
+              DO i=Istr,Iend
+                DiaTwrk(i,j,k,itrc,iTvdifSHF)=FC(i,k)-FC(i,k-1)-        &
+     &                            DiaTwrk(i,j,k,itrc,iTvdifDIF)
+#    ifdef LMD_NONLOCAL
+                DiaTwrk(i,j,k,itrc,iTvdifSHF)=                          &
+     &                              DiaTwrk(i,j,k,itrc,iTvdifSHF)-      &
+     &                              DiaTwrk(i,j,k,itrc,iTvdifNOL)
+#    endif
+              END DO
+            END DO
+#   endif
 !
 !  Compute new tracer field (m Tunits).
 !
