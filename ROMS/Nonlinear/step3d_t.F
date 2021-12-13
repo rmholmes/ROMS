@@ -1059,6 +1059,10 @@
 #  ifdef DIAGNOSTICS_TS
               DiaTwrk(i,j,k,itrc,iTvdif)=DiaTwrk(i,j,k,itrc,iTvdif)+    &
      &                                   cff1
+#   ifdef DIAGNOSTICS_TS_VDIF
+              DiaTwrk(i,j,k,itrc,iTvdifDIF)=                            &
+     &                       DiaTwrk(i,j,k,itrc,iTvdifDIF)+cff1
+#   endif
 #  endif
             END DO
           END DO
@@ -1119,6 +1123,11 @@
              DiaTwrk(i,j,N(ng),itrc,iTvdif)=                            &
      &                              DiaTwrk(i,j,N(ng),itrc,iTvdif)+     &
      &                              t(i,j,N(ng),nnew,itrc)-cff1
+#   ifdef DIAGNOSTICS_TS_VDIF
+             DiaTwrk(i,j,N(ng),itrc,iTvdifDIF)=                         &
+     &                           DiaTwrk(i,j,N(ng),itrc,iTvdifDIF)+     &
+     &                              t(i,j,N(ng),nnew,itrc)-cff1
+#   endif
 #  endif
           END DO
           DO k=N(ng)-1,1,-1
@@ -1131,6 +1140,10 @@
 #  ifdef DIAGNOSTICS_TS
               DiaTwrk(i,j,k,itrc,iTvdif)=DiaTwrk(i,j,k,itrc,iTvdif)+    &
      &                                   t(i,j,k,nnew,itrc)-cff1
+#   ifdef DIAGNOSTICS_TS_VDIF
+              DiaTwrk(i,j,k,itrc,iTvdifDIF)=                            &
+     &           DiaTwrk(i,j,k,itrc,iTvdifDIF)+t(i,j,k,nnew,itrc)-cff1
+#   endif
 #  endif
             END DO
           END DO

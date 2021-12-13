@@ -886,6 +886,12 @@
       NDT=NDT+1      ! Horizontal S-diffusion due to rotated tensor
 #   endif
 #  endif
+#  ifdef DIAGNOSTICS_TS_VDIF
+      NDT=NDT+2
+#   ifdef LMD_NONLOCAL
+      NDT=NDT+1
+#   endif
+#  endif
 # else
       NDT=0          ! No tracer diagnostics
 # endif

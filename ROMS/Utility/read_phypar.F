@@ -3004,6 +3004,64 @@
                 END DO
 # endif
               END DO
+# ifdef DIAGNOSTICS_TS_VDIF
+            CASE ('Dout(iTvdifDIF)')
+              IF (iTvdifDIF.le.0) THEN
+                IF (Master) WRITE (out,280) 'iTvdifDIF'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, (NAT+NPT)*Ngrids, Ltracer)
+              DO ng=1,Ngrids
+                DO itrc=1,NAT
+                  Dout(idDtrc(itrc,iTvdifDIF),ng)=Ltracer(itrc,ng)
+                END DO
+#  ifdef T_PASSIVE
+                DO i=1,NPT
+                  itrc=inert(i)
+                  Dout(idDtrc(itrc,iTvdifDIF),ng)=Ltracer(NAT+i,ng)
+                END DO
+#  endif
+              END DO
+#  ifdef KPP_NONLOCAL
+            CASE ('Dout(iTvdifNOL)')
+              IF (iTvdifNOL.le.0) THEN
+                IF (Master) WRITE (out,280) 'iTvdifNOL'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, (NAT+NPT)*Ngrids, Ltracer)
+              DO ng=1,Ngrids
+                DO itrc=1,NAT
+                  Dout(idDtrc(itrc,iTvdifNOL),ng)=Ltracer(itrc,ng)
+                END DO
+#   ifdef T_PASSIVE
+                DO i=1,NPT
+                  itrc=inert(i)
+                  Dout(idDtrc(itrc,iTvdifNOL),ng)=Ltracer(NAT+i,ng)
+                END DO
+#   endif
+              END DO
+#  endif
+            CASE ('Dout(iTvdifSHF)')
+              IF (iTvdifSHF.le.0) THEN
+                IF (Master) WRITE (out,280) 'iTvdifSHF'
+                exit_flag=5
+                RETURN
+              END IF
+              Npts=load_l(Nval, Cval, (NAT+NPT)*Ngrids, Ltracer)
+              DO ng=1,Ngrids
+                DO itrc=1,NAT
+                  Dout(idDtrc(itrc,iTvdifSHF),ng)=Ltracer(itrc,ng)
+                END DO
+#  ifdef T_PASSIVE
+                DO i=1,NPT
+                  itrc=inert(i)
+                  Dout(idDtrc(itrc,iTvdifSHF),ng)=Ltracer(NAT+i,ng)
+                END DO
+#  endif
+              END DO
+# endif
 #endif
             CASE ('NUSER')
               Npts=load_i(Nval, Rval, 1, Ivalue)
@@ -5824,6 +5882,55 @@
      &              'Write out vertical diffusion, tracer ', itrc,      &
      &              TRIM(Vname(1,idTvar(itrc)))
             END DO
+# endif
+# ifdef DIAGNOSTICS_TS_VDIF
+            DO itrc=1,NAT
+              IF (Dout(idDtrc(itrc,iTvdifDIF),ng))                      &
+     &          WRITE (out,180) .TRUE., 'Dout(iTvdifDIF)',              &
+     &              'Write out vertical diffusion DIF, tracer ', itrc,  &
+     &              TRIM(Vname(1,idTvar(itrc)))
+            END DO
+#  ifdef T_PASSIVE
+            DO i=1,NPT
+              itrc=inert(i)
+              IF (Dout(idDtrc(itrc,iTvdifDIF),ng))                      &
+     &          WRITE (out,180) .TRUE., 'Dout(iTvdifDIF)',              &
+     &              'Write out vertical diffusion DIF, tracer ', itrc,  &
+     &              TRIM(Vname(1,idTvar(itrc)))
+            END DO
+#  endif
+#  ifdef KPP_NONLOCAL
+            DO itrc=1,NAT
+              IF (Dout(idDtrc(itrc,iTvdifNOL),ng))                      &
+     &          WRITE (out,180) .TRUE., 'Dout(iTvdifNOL)',              &
+     &              'Write out vertical diffusion NOL, tracer ', itrc,  &
+     &              TRIM(Vname(1,idTvar(itrc)))
+            END DO
+#   ifdef T_PASSIVE
+            DO i=1,NPT
+              itrc=inert(i)
+              IF (Dout(idDtrc(itrc,iTvdifNOL),ng))                      &
+     &          WRITE (out,180) .TRUE., 'Dout(iTvdifNOL)',              &
+     &              'Write out vertical diffusion NOL, tracer ', itrc,  &
+     &              TRIM(Vname(1,idTvar(itrc)))
+            END DO
+#   endif
+#  endif
+            DO itrc=1,NAT
+              IF (Dout(idDtrc(itrc,iTvdifSHF),ng))                      &
+     &          WRITE (out,180) .TRUE., 'Dout(iTvdifSHF)',              &
+     &              'Write out vertical diffusion SHF, tracer ', itrc,  &
+     &              TRIM(Vname(1,idTvar(itrc)))
+            END DO
+#  ifdef T_PASSIVE
+            DO i=1,NPT
+              itrc=inert(i)
+              IF (Dout(idDtrc(itrc,iTvdifSHF),ng))                      &
+     &          WRITE (out,180) .TRUE., 'Dout(iTvdifSHF)',              &
+     &              'Write out vertical diffusion SHF, tracer ', itrc,  &
+     &              TRIM(Vname(1,idTvar(itrc)))
+            END DO
+#  endif
 # endif
           END IF
 #endif

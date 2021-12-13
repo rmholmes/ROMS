@@ -144,6 +144,9 @@
         integer :: iTxadv          ! Tracer, horizontal X-advection
         integer :: iTyadv          ! Tracer, horizontal Y-advection
         integer :: iTvdif          ! Tracer, vertical diffusion
+        integer :: iTvdifDIF       ! Tracer, vertical diffusion, diffusion
+        integer :: iTvdifNOL       ! Tracer, vertical diffusion, KPP nonlocal
+        integer :: iTvdifSHF       ! Tracer, vertical diffusion, surface forcing
         integer :: iThdif          ! Tracer, horizontal diffusion
         integer :: iTxdif          ! Tracer, horizontal X-diffusion
         integer :: iTydif          ! Tracer, horizontal Y-diffusion

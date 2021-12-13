@@ -1597,6 +1597,16 @@
 # endif
             CASE ('idDtrc(iTvdif)')
               load=.TRUE.
+# ifdef DIAGNOSTICS_TS_VDIF
+            CASE ('idDtrc(iTvdifDIF)')
+              load=.TRUE.
+#  ifdef LMD_NONLOCAL
+            CASE ('idDtrc(iTvdifNOL)')
+              load=.TRUE.
+#  endif
+            CASE ('idDtrc(iTvdifSHF)')
+              load=.TRUE.
+# endif
 #endif
 #if defined FORWARD_READ || defined FORWARD_WRITE
             CASE ('idRuct')
@@ -2132,6 +2142,79 @@
                   WRITE (Vname(5,varid),'(a)')                          &
      &                  TRIM(ADJUSTL(Vinfo(5)))
                 END DO
+# ifdef DIAGNOSTICS_TS_VDIF
+              CASE ('_vdiffDIF')
+                varid=varid-1
+                DO i=1,MT
+                  varid=varid+1
+                  idDtrc(i,iTvdifDIF)=varid
+                  DO ng=1,Ngrids
+                    Fscale(varid,ng)=scale
+                    Iinfo(1,varid,ng)=gtype
+                  END DO
+                  WRITE (Vname(1,varid),'(a,a)')                        &
+     &                  TRIM(ADJUSTL(Vname(1,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(1)))
+                  WRITE (Vname(2,varid),'(a,", ",a)')                   &
+     &                  TRIM(ADJUSTL(Vname(2,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(2)))
+                  WRITE (Vname(3,varid),'(a,1x,a)')                     &
+     &                  TRIM(ADJUSTL(Vname(3,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(3)))
+                  WRITE (Vname(4,varid),'(a,a)')                        &
+     &                  TRIM(Vname(1,varid)), ', scalar, series'
+                  WRITE (Vname(5,varid),'(a)')                          &
+     &                  TRIM(ADJUSTL(Vinfo(5)))
+                END DO
+#  ifdef KPP_NONLOCAL
+              CASE ('_vdiffNOL')
+                varid=varid-1
+                DO i=1,MT
+                  varid=varid+1
+                  idDtrc(i,iTvdifNOL)=varid
+                  DO ng=1,Ngrids
+                    Fscale(varid,ng)=scale
+                    Iinfo(1,varid,ng)=gtype
+                  END DO
+                  WRITE (Vname(1,varid),'(a,a)')                        &
+     &                  TRIM(ADJUSTL(Vname(1,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(1)))
+                  WRITE (Vname(2,varid),'(a,", ",a)')                   &
+     &                  TRIM(ADJUSTL(Vname(2,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(2)))
+                  WRITE (Vname(3,varid),'(a,1x,a)')                     &
+     &                  TRIM(ADJUSTL(Vname(3,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(3)))
+                  WRITE (Vname(4,varid),'(a,a)')                        &
+     &                  TRIM(Vname(1,varid)), ', scalar, series'
+                  WRITE (Vname(5,varid),'(a)')                          &
+     &                  TRIM(ADJUSTL(Vinfo(5)))
+                END DO
+#  endif
+              CASE ('_vdiffSHF')
+                varid=varid-1
+                DO i=1,MT
+                  varid=varid+1
+                  idDtrc(i,iTvdifSHF)=varid
+                  DO ng=1,Ngrids
+                    Fscale(varid,ng)=scale
+                    Iinfo(1,varid,ng)=gtype
+                  END DO
+                  WRITE (Vname(1,varid),'(a,a)')                        &
+     &                  TRIM(ADJUSTL(Vname(1,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(1)))
+                  WRITE (Vname(2,varid),'(a,", ",a)')                   &
+     &                  TRIM(ADJUSTL(Vname(2,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(2)))
+                  WRITE (Vname(3,varid),'(a,1x,a)')                     &
+     &                  TRIM(ADJUSTL(Vname(3,idTvar(i)))),              &
+     &                  TRIM(ADJUSTL(Vinfo(3)))
+                  WRITE (Vname(4,varid),'(a,a)')                        &
+     &                  TRIM(Vname(1,varid)), ', scalar, series'
+                  WRITE (Vname(5,varid),'(a)')                          &
+     &                  TRIM(ADJUSTL(Vinfo(5)))
+                END DO
+# endif
             END SELECT
 #endif
 #if defined SOLVE3D && (defined AVERAGES || defined AD_AVERAGES)

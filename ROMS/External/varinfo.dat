@@ -5374,6 +5374,33 @@
   'r3dvar'
   1.0d0
 
+'_vdiffDIF'                                        ! Input/Output
+  'vertical diffusion term due to diffusion'
+  'second-1'
+  '_vdiff, scalar, series'
+  'ocean_time'
+  'idDtrc(iTvdifDIF)'
+  'r3dvar'
+  1.0d0
+
+'_vdiffNOL'                                        ! Input/Output
+  'vertical diffusion term due to KPP nonlocal'
+  'second-1'
+  '_vdiff, scalar, series'
+  'ocean_time'
+  'idDtrc(iTvdifNOL)'
+  'r3dvar'
+  1.0d0
+
+'_vdiffSHF'                                        ! Input/Output
+  'vertical diffusion term due to surface forcing'
+  'second-1'
+  '_vdiff, scalar, series'
+  'ocean_time'
+  'idDtrc(iTvdifSHF)'
+  'r3dvar'
+  1.0d0
+
 !
 !-----------------------------------------------------------------------
 !  Forward trajectory variables for tangent linear and adjoint models.
