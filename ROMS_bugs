@@ -1,0 +1,35 @@
+----------------------------------------------------------------------
+
+This file contains various bugs/problems that I've found and fixed/not
+fixed/not sure if needs fixing. 
+
+Ryan Holmes, started August 2016
+----------------------------------------------------------------------
+
+Uwind replaced with UWind at:
+Functionals/ana_specair 106
+Nonlinear/set_data.F 293, 304
+
+Vwind replaced with VWind at:
+Nonlinear/set_data.F 296, 305
+
+But fortran is case-insensitive so who really cares...
+
+28-10-16:
+   In bulk_flux.F the relative humidity RH is used in the LONGWAVE
+   section before it is checked whether it is relative or specific
+   humidity. I don't use LONGWAVE up to now, so not a problem. But may
+   be for others?
+
+19-12-16: There are problems with the files ana_m2clima.h,
+   ana_m3clima.h??? The options ANA_M2CLIMA and ANA_M3CLIMA don't seem
+   to work?
+
+17-03-16: Discovered that in wrt_avg.F, wrt_his.F (and probably the
+others), the call to Vname(idtime,ng) is wrong -> This should be
+Vname(1,idtime). It doesn't error because idtime is the first variable
+and so always equals 1. 
+
+20-03-16: omm label at top should be omn in mod_grid
+
+

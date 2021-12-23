@@ -1,0 +1,369 @@
+This log book records my understanding of the cheapAML code and how it
+is implemented in MITgcm and how I will implement in ROMS.
+
+Calls from main MITgcm code (in model/src) to cheapAML:
+-------------------------------------------------------
+/forward_step.F: CALL CHEAPAML
+/load_fields_driver.F: CALL CHEAPAML_FIELDS_LOAD - Load fields for cheapaml
+/packages_init_fixed.F: CALL CHEAPAML_INIT_FIELD - initializes fixed vars
+/packages_init_variables.F: CALL CHEAPAML_INIT_VARIA - initializes var vars
+/packages_readparams.F: CALL CHEAPAML_READPARAMS - reads cheapaml parameters from a data file
+/packages_write_pickup.F: CALL CHEAPAML_WRITE_PICKUP - rights params for cheapAML restart.
+
+Files/routines in cheapAML pkg:
+-------------------------------
+CHEAPAML.h - header for defining/allocating variables
+CHEAPAML_OPTIONS.h - File for defining cpp cheapAML options
+
+cheapaml.F - main routine
+
+cheapaml_seaice - compute fluxes over sea-ice.
+
+cheapaml_coare3_flux - calculates coare bulk fluxes
+cheapaml_lanl_flux - calculator lanl bulk fluxes
+
+cheapaml_init_fixed - initialized fixed fields (not very many), also calls cheapaml_diagnostics_init
+cheapaml_init_varia - mainly initialize tair, qair, tracer, mask, BL thickness fields.
+cheapaml_diagnostics_init - Adds diagnostic parameters to MITgcm output list?
+
+cheapaml_fields_load - read in external forcing fields and interpolate to grid.
+cheapaml_readparms - initialize parameters
+cheapaml_write_pickup - write restart file
+cheapaml_read_pickup - read restart file
+
+cheapaml_copy_edges - updates tile edges??
+
+cheapaml_timestep - step tracer field forward in time.
+gad_2d_calc_rhs - calculates advection/diffusion tendency of tracer.
+cheapaml_gad_c2_adv_r - simple advective flux calculation using centered 2nd order 
+cheapaml_gad_dst3fl_adv_r - same but using a 3rd order DST scheme.
+gad_c2_2d_adv_x.F - zonal area integrated flux advection centered 2nd-order
+gad_c2_2d_adv_x.F - meridional area integrated flux advection centered 2nd-order
+gad_diff_2d_X - zonal area integrated flux diffusion
+gad_diff_2d_Y - meridional area integrated flux diffusion
+
+Other Notes:
+------------
+
+ALLOW_SEAGER - does this surround the old Seager et. al. calculation?
+               Probably, this code won't run as there are bits missing.
+
+cheapAML core loop (at every oceanic time step) flow:
+-----------------------------------------------------
+
+         1. Initialize Qnet and EmPmR (heat, fresh water fluxes)
+         <<Start adv/diff>>
+         2. Atmospheric time step loop:
+            1. Loop over bi, bj (processors?)
+               1. Calculate RHS of Tair tendency equation for advection/diffusion
+               2. Calculate Tair tendency using adams bashforth
+               3. Step Tair using gTair (cheapaml_timestep)
+            2. Update edges
+            3. Loop over bi, bj
+               < do qair as for tair above >
+            4. Update edges
+            5. Loop over bi, bj
+               < do tracer as for above >
+            6. Update edges
+            7. Reset boundaries to boundary conditions (using copy edges). 
+         3. End loop
+         4. Write diagnostic Qair, Tair after advection-diffusion fields
+         <<finish adv/diff>>
+         5. Now do diabatic forcing
+            1. Loop bi, bj
+               1. Calculate LANL or COARE3 Fluxes (sensible latent, evap, ocean lw out, humidities)
+               2. Do atmospheric long wave radiation calculations (up and down)
+               3. Do atmosphere total flux up and down (xflu, xfld)
+               4. Do ocean net longwave (xlwnet, xolw from LANL/COARE3 above not used).
+               5. gTair = xfld-xflu
+               6. Ocean Qnet and solar (outputs of cheapAML)
+               7. Do rainfall
+               8. gqair
+               9. EmPmR (outputs of cheapAML)
+               10. Time step (cheapaml_timestep) Tair using new gTair
+               11. Relaxation over land Tair
+               12. Time step (cheapaml_timestep) Qair using new gTair
+               13. Relaxation over land Qair
+               14. Relaxation over land tracer
+               14. Write out diagnostics
+            2. Update edges on Tair, Qnet, qair, EmPmR, tracer
+            3. Reset boundaries to boundary conditions (using copy edges). 
+         6. Calculate fu and fv - wind stresses on u and v points????
+         7. Write out diagnostics
+
+--------------------------------------------------------------------------------
+Diabatic Steps:
+--------------------------------------------------------------------------------
+
+Heat (Tair):
+------------
+- Calc. ocean fluxes solar, latent, sensible, ocean-lw
+
+- atmospheric temperature at top of boundary layer:
+  ttt = Tair - <lapse rate> * (abl thickness - Tair height)
+
+- upwelled radiation  : lwup = 0.5 * sig * (0.5*Tair + 0.5*ttt)^4
+  downwelled radiation: lwdn = 0.5 * sig * Tair^4
+(factors of 0.5 here are for down+up ???)
+
+- total at top: (-solar + lwup + latent ) / ( rho * Cp )
+  total at bot: (-solar - lwdn + latent + sensible + oceanlwup) / (rho * Cp)
+
+- lw net for ocean and Qnet for ocean
+
+**** Here is the problem: 
+     - xolw from COARE3_FLUX is the outgoing longwave from the ocean,
+     not net. 
+     - Their complicated formula for F_l^net is for the net oceanic
+     flux. This is a similar formula to that in ROMS bulk_flux when
+     LONGWAVE is active. Both these need a cloud fraction.
+     - If so, then just use this for ocean (no changes needed for ocean
+     flux). Then all I need to do is pull the ocean upward flux out of
+     bulk flux and use that for the Tair calculation.
+
+************* THIS IS NOT A PROBLEM ****************************
+     The calculation of Tair isn't influenced by this. And the
+     calculation of ocean longwave isn't influenced by these changes
+     to Tair either. THe ocean longwave is all done in bulk_flux.F
+     (whether it's using a set downward longwave or a variable
+     depending on cloud fraction).
+***************************************************************
+**** 
+
+- TairTen = (lower flux - upper flux) / H(x,y)
+
+- time step using this TairTen
+
+- Nudge over land
+
+- reset boundaries
+
+Water Vapor (Qair/Hair):
+------------------------
+
+- Flux imbalance for water vapor = evaporation (input) - entrainment
+  at top of ABL (output).
+
+- evap = latent_heat_flux / latent heat of vaporization
+
+- entrainment is parameterized according to Seager et. al. (2005):
+
+  entrain = 0.25*rhoa*Cde*|u|*q
+          = 0.25*cdq*q
+        q = q100 = qs + qsr*(LOG(100/ZoQ)-psit(100.0/L))
+      cdq = evap/Dq
+       Dq = qs-Qair
+        
+  some equivalencies between cheapAML and bulk_flux.F:
+  cheapAML var :: bulk_flux var  
+          qs = Qsea
+          Dq = delQ
+          zq = blk_ZQ
+         qsr = Qstar
+         zoq = ZoQ
+     psit(?) = bulk_psit(?,pi)
+           L = L
+  
+  So basically it all makes sense except why do we use q at 100m
+  (q100) for q, and not at the top of the ABL?
+
+  To make this work: 
+  Need to pull q100 out of bulk_flux. Dq can be calculated in 
+
+Potential strategies for implementing this in ROMS:
+---------------------------------------------------
+
+1. Using ROMS bulk fluxes: Run Tair/Qair advection part at beginning
+   of bulk_flux.F (line 364). Then use bulk_flux code to calculate LW,
+   SH, LH heat fluxes and wind stresses. Then alter Tair and Qair
+   using these heat fluxes and cheapAML code (step 5 above) after
+   calculation (i.e. near line 835).
+
+2. Overwriting bulk fluxes: Ignore bulk_flux.F completely and use
+   cheapAML code at each time step to determine heat and momentum
+   fluxes everywhere.
+
+For both options, must also deal with:
+    - Initialization of cheapAML variables.
+    - Input/output of cheapAML vars, Qair/Tair (tracer?) to file
+    - Use of CORENYF in FRC/ for boundary conditions. Read in whole
+      field?
+    - Nudging to CORENYF values?
+    - Restart ability
+    - Parallel advection part
+
+3. Use a coupling program like MCT? Ask Nic
+
+Chat with Nick:
+---------------
+
+If i were to use MCT/OASIS or the like then I would have to do a lot
+of work to get cheapAML to run on it's own first, and then a whole lot
+of work to get the coupler working. Thus not good option.
+
+He suggests working in small steps if possible.
+
+Make decisions on a case-by-case basis as to whether to try to use a
+full MITgcm subroutine or to change for ROMS. i.e. use
+ADAMS_BASHFORTH2 but rework an #include "GRID.h".
+
+Advection-diffusion part is laterally dependent, so write this in as a
+separate subroutine outside of bulk_flux_tile.
+
+But could use the bulk flux part and the alteration of Tair, Qair in
+the bulk_flux_tile routine. Also have option to use teh cheapAML bulk
+fluxes instead?
+
+Simple steps:
+-------------
+
+1. Tair advection/diffusion (split in two?)
+2. Implement diabatic changes to Tair in bulk_fluxes.F
+3. Then do Qair
+
+Come up with a simple small test case to use for testing at beginning
+
+Advection/diffusion part:
+-------------------------
+
+Advect existing FORCES(ng)%Tair variable in ROMS. Input TairG into a
+TairB in set_data which will be used as the boundary condition and
+relaxation field. Same for Qair. Then calculate full Tair. This way we
+don't interfere with stats_enso either.
+
+Testing runs:
+-------------
+
+001 - Tair initial sin bump. Just advection and boundary restoring
+002 - Tair initial sin bump. Full
+003 - SST sin bump in center. Full
+004 - As for 003 but with Kappa = 5e4 instead of 5e3
+005 - As for 003 but with ntatm = 50 (performance is good!)
+006 - As for 003 but with Uwind = 5ms-1 instaed of 2ms-1
+007 - As for 003 but with Total SST less by 10C. (this is bad example of adv problems).
+008 - As for 007 but with Kappa = 5e5
+009 - As for 007 but with mask_width = 4
+
+Changes log:
+------------
+
+29-9-16 
+        - Added FORCES % TairB and ABLM cpp option. 
+        - loaded TairB into Tair. Added Tair to avg, his, qck, sta
+          outputs. 
+        - simple double-periodic patch test case setup for testing.
+
+04-10-16: 
+         - Added code to read/require Tair in input files.
+         - Wrote skeleton ablm.F module and ablm_advdif subroutine
+         - Added output of ABLM and STATS_ENSO cpp options to .out
+           file
+
+05-10-16:
+         - Wrote in Tair advection code draft. Not working because of
+         bad domain index values, need to figure these out.
+ 
+19-10-16:
+        -  Advection/diffusion core code working version.
+
+20-10-16:
+        - Open boundary conditions for Tair, Uwind and Vwind written
+        in. Appears to be working but need a better test case to
+        check properly.
+
+21-10-16:
+        - Removed open boundary conditions read in for Tair
+        (i.e. clamped), as I can just use bc_r2d_tile to apply
+        gradient boundary conditions to Tair, Uwind and Vwind.
+
+        - Added dummy_mask for writing out of Tair over land
+
+        - Added Adams-Bashforth TairTenPrev save and switch
+        
+        - Moved some parameters to mod_scalars
+
+        - Wrote first draft diabatic Tair changes code
+
+24-10-16:
+        - Tested Tair diabatic. Seems to be working
+
+        - Wrote ablm_nudgcof for setting spatial nudging
+          coefficients. Tested and seems to work.
+        
+        - Wrote in all of Qair infrastructure and advection-diffusion
+          part.
+
+25-10-16:
+        
+        - Finished Qair diabatic part.
+
+        - Bug fixes
+
+        - Moved parameters to .in file
+
+26-10-16:
+        
+        - Testing: Fixed sign but in vertical advection.
+
+        - Got working in full simulations!
+
+28-10-16:
+        - Masked out diabatic (not advdif!) tendencies over land.
+
+        - Added cpp defs check for ABLM, ABLM_WATER AND BULK_FLUXES
+
+        - Wrote Tair and Qair outputs into restart file.
+        
+        - Merged ABLM and stats_enso into ryan/master
+
+        Next steps:
+
+           - Funny reflected waves: Coming from advection scheme, not
+             BCs (happens with sharp gradients in interior). This is
+             not a problem in full runs
+
+           - Other changes that could be made:
+             Possibly important:
+             - LONGWAVE vs. LONGWAVE_OUT
+             - Precipitation and convection for ocean fluxes. This is
+               actually not that hard, just need to overwrite the
+               precipitation input with the ABLM parameterization
+               based on vertical velocity and humidity (and equatorial
+               enhancement). 
+
+             Probably not important:
+             - Upwind advection scheme (contained in
+               MITgcm/pkg/generic_advdif/gad_dst3fl_adv_x)
+             - Spatially variable hABLM (probably not neccessary).
+             - Read in nudging cofficients from file
+             - Passive tracer
+             - Nesting: Parameters in mod_scalars are not followed by
+               a (ng)
+             - Fix periodic-slit problems? ( can't run with
+               NWperiodic, Mm=2)
+             
+           - What I don't understand:
+             - Why are we using 0.5*Tair + 0.5*Ttop in LWup?
+             - Why q100??
+             - Why advection problems -> Stationary features
+
+02-12-16:
+        - Added a very simple convective parameterization whereby Tair
+          is capped at a threshold ~28C.
+        - Also tested replacing the LWup radiation at Ttop*0.5 +
+          Tair*0.5 with just Ttop. This gives less longwave radiative
+          cooling and thus results in unrealistic warming throughout
+          the domain. 
+
+11-01-17:
+        - Added ABLM_RELHUM option in order to pick whether relative
+          or specific humidity is input.
+
+23-02-17:
+        - Changed to long-wave radiation from Ttop, not Ttop/2+Tair/2.
+        - Changed to q instead of q100.
+
+24-02-17:
+        - Added spatially varying hABLM and STATS_ENSO option for
+          this.
+
